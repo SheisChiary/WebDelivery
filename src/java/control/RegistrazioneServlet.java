@@ -20,12 +20,19 @@ public class RegistrazioneServlet extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         
-        String nome = request.getParameter("nome");
+       
+        
+        String nome = request.getParameter("nome_completo");
         String email = request.getParameter("email");
         String password = request.getParameter("password");
-        String ruolo = request.getParameter("ruolo");
         String telefono = request.getParameter("telefono");
         String indirizzo = request.getParameter("indirizzo");
+        
+        
+        String ruolo = request.getParameter("ruolo");
+        if (ruolo == null) {
+            ruolo = "cliente";
+        }
 
         String sql = "INSERT INTO Utente (nome_completo, email, password, telefono, indirizzo, ruolo) VALUES (?, ?, ?, ?, ?, ?)";
 

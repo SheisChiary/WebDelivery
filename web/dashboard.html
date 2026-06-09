@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - WebDelivery</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #F9FAF6; color: #333; }
+
+        header { background: #fff; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 24px; font-weight: bold; color: #116C4A; text-decoration: none; }
+        .search-bar { flex: 1; max-width: 500px; margin: 0 30px; display: flex; }
+        .search-bar input { width: 100%; padding: 10px 15px; border: 1px solid #ddd; border-radius: 20px 0 0 20px; outline: none; background: #f1f3f5; }
+        .search-bar button { padding: 10px 20px; background: #116C4A; color: white; border: none; border-radius: 0 20px 20px 0; cursor: pointer; }
+        .nav-actions { display: flex; align-items: center; gap: 15px; }
+        
+        .btn-cart { background: #116C4A; color: white; padding: 8px 18px; border-radius: 20px; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 8px; font-size: 14px; }
+        .icon-user-round { font-size: 22px; color: #116C4A; cursor: pointer; }
+
+        .dashboard-container { max-width: 1300px; margin: 30px auto; padding: 0 20px; display: flex; gap: 30px; }
+        
+      
+        .sidebar { width: 260px; background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); height: fit-content; border: 1px solid #eaeaea; }
+        .user-profile { margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid #f1f3f5; }
+        .user-profile h3 { font-size: 18px; color: #2c3e50; font-weight: 700; }
+        .user-profile p { font-size: 13px; color: #888; margin-top: 2px; }
+        .sidebar-menu { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+        .sidebar-item { display: flex; align-items: center; gap: 12px; padding: 12px 15px; border-radius: 20px; text-decoration: none; color: #555; font-weight: 600; font-size: 14px; transition: 0.2s; cursor: pointer; }
+        .sidebar-item i { font-size: 16px; width: 20px; }
+        .sidebar-item.active { background-color: #A7F3D0; color: #116C4A; }
+        .sidebar-item:not(.active):hover { background-color: #f1f3f5; color: #116C4A; }
+
+        
+        .main-content { flex: 1; }
+        .dashboard-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; margin-bottom: 25px; }
+        .welcome-block h2 { font-size: 32px; color: #0b3c29; font-weight: 800; }
+        .welcome-block p { color: #666; margin-top: 5px; font-size: 15px; }
+        
+        .promo-card { background-color: #116C4A; border-radius: 14px; padding: 20px; color: white; width: 280px; box-shadow: 0 4px 15px rgba(17,108,74,0.15); }
+        .promo-card h4 { font-size: 18px; font-weight: 800; margin-bottom: 5px; }
+        .promo-card p { font-size: 11px; opacity: 0.8; line-height: 1.3; margin-bottom: 12px; }
+        .btn-copy { background: white; color: #116C4A; border: none; padding: 6px 14px; border-radius: 15px; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-copy:hover { background: #f0fbf5; }
+
+        .categories-row { display: flex; gap: 10px; margin-bottom: 30px; list-style: none; }
+        .category-pill { padding: 8px 18px; border-radius: 20px; background: #eee; color: #555; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .category-pill.active { background: #116C4A; color: white; }
+
+        .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; margin-bottom: 30px; }
+        .prod-card { background: white; border-radius: 14px; overflow: hidden; border: 1px solid #eaeaea; box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: 0.3s; position: relative; }
+        .prod-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+        .img-container { width: 100%; height: 180px; position: relative; }
+        .prod-img { width: 100%; height: 100%; object-fit: cover; }
+        .tag-badge { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.6); color: white; font-size: 10px; padding: 4px 8px; border-radius: 6px; font-weight: bold; letter-spacing: 0.5px; }
+        .prod-info { padding: 20px; }
+        .title-price-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .prod-title { font-size: 18px; font-weight: 700; color: #2c3e50; }
+        .prod-price { font-size: 16px; font-weight: 800; color: #116C4A; }
+        .prod-description { font-size: 13px; color: #7f8c8d; line-height: 1.4; margin-bottom: 15px; height: 36px; overflow: hidden; }
+        .card-actions { display: flex; justify-content: flex-end; }
+        .btn-circle-cart { width: 36px; height: 36px; border-radius: 50%; background: #f1f3f5; border: none; color: #555; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; }
+        .btn-circle-cart:hover { background: #116C4A; color: white; }
+
+        .load-more-container { display: flex; justify-content: center; margin-top: 30px; }
+        .btn-load-more { background: white; border: 1px solid #116C4A; color: #116C4A; padding: 10px 22px; border-radius: 20px; font-weight: bold; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn-load-more:hover { background: #f0fbf5; }
+
+        footer { background-color: #062217; color: #a3b8b0; padding: 50px 5%; margin-top: 60px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; }
+        footer h3 { color: white; margin-bottom: 15px; font-size: 18px; }
+        footer p, footer ul { font-size: 14px; list-style: none; line-height: 1.6; }
+        footer a { color: #a3b8b0; text-decoration: none; }
+        footer a:hover { color: white; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo"><i class="fas fa-utensils"></i> WebDelivery</a>
+        <div class="search-bar">
+            <input type="text" placeholder="Cerca il tuo piatto...">
+            <button><i class="fas fa-search"></i></button>
+        </div>
+        <div class="nav-actions">
+            <a href="#" class="btn-cart" onclick="alert('Carrello in costruzione!')"><i class="fas fa-shopping-cart"></i> Carrello</a>
+            <i class="fas fa-user-circle icon-user-round"></i>
+            <a href="LogoutServlet" style="color: #666; font-size: 12px; text-decoration: none;">Esci</a>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="user-profile">
+                <h3 id="nome-utente">Caricamento...</h3>
+                <p id="ruolo-utente">Cliente</p>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item active" onclick="cambiaVoce(this)"><i class="fas fa-utensils"></i> Menù</li>
+                <li class="sidebar-item" onclick="cambiaVoce(this)"><i class="fas fa-shopping-bag"></i> I tuoi ordini</li>
+                <li class="sidebar-item" onclick="cambiaVoce(this)"><i class="fas fa-percentage"></i> Promozioni</li>
+            </ul>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <div class="dashboard-top">
+                <div class="welcome-block">
+                    <h2 id="saluto-utente">Benvenuto!</h2>
+                    <p>Esplora i prodotti freschi di oggi.</p>
+                </div>
+                <!-- Banner Sconto Corretto -->
+                <div class="promo-card">
+                    <h4>Sconto 20%</h4>
+                    <p>Sul tuo primo ordine con il codice RHYTHM24</p>
+                    <button class="btn-copy" id="btn-copia" onclick="copiaSconto()">Copia Codice</button>
+                </div>
+            </div>
+
+            <ul class="categories-row">
+                <li class="category-pill active" onclick="cambiaCategoria(this)">Tutti</li>
+                <li class="category-pill" onclick="cambiaCategoria(this)">Pizze</li>
+                <li class="category-pill" onclick="cambiaCategoria(this)">Burger</li>
+                <li class="category-pill" onclick="cambiaCategoria(this)">Primi</li>
+                <li class="category-pill" onclick="cambiaCategoria(this)">Dessert</li>
+                <li class="category-pill" onclick="cambiaCategoria(this)">Drinks</li>
+            </ul>
+
+            <div class="products-grid">
+                
+                <div class="prod-card">
+                    <div class="img-container">
+                        <span class="tag-badge">POPOLARE</span>
+                        <img src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=500&q=60" class="prod-img" alt="Margherita Reale">
+                    </div>
+                    <div class="prod-info">
+                        <div class="title-price-row">
+                            <h3 class="prod-title">Margherita Reale</h3>
+                            <span class="prod-price">12.50 €</span>
+                        </div>
+                        <p class="prod-description">Pomodoro San Marzano, Mozzarella di Bufala, Olio EVO e Basilico fresco.</p>
+                        <div class="card-actions"><button class="btn-circle-cart" onclick="alert('Aggiunto al carrello!')"><i class="fas fa-shopping-basket"></i></button></div>
+                    </div>
+                </div>
+
+                <div class="prod-card">
+                    <div class="img-container">
+                        <span class="tag-badge" style="background:#116C4A;">NUOVO</span>
+                        <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=500&q=60" class="prod-img" alt="The Green Rhythm">
+                    </div>
+                    <div class="prod-info">
+                        <div class="title-price-row">
+                            <h3 class="prod-title">The Green Rhythm</h3>
+                            <span class="prod-price">14.00 €</span>
+                        </div>
+                        <p class="prod-description">Manzo scottona, Salsa segreta al basilico, Pecorino e Rucola selvatica.</p>
+                        <div class="card-actions"><button class="btn-circle-cart" onclick="alert('Aggiunto al carrello!')"><i class="fas fa-shopping-basket"></i></button></div>
+                    </div>
+                </div>
+
+                <div class="prod-card">
+                    <div class="img-container">
+                        <img src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=500&q=60" class="prod-img" alt="Sushi Dream Mix">
+                    </div>
+                    <div class="prod-info">
+                        <div class="title-price-row">
+                            <h3 class="prod-title">Sushi Dream Mix</h3>
+                            <span class="prod-price">18.50 €</span>
+                        </div>
+                        <p class="prod-description">12 pezzi mix: salmone, tonno, avocado e gambero croccante.</p>
+                        <div class="card-actions"><button class="btn-circle-cart" onclick="alert('Aggiunto al carrello!')"><i class="fas fa-shopping-basket"></i></button></div>
+                    </div>
+                </div>
+
+                <div class="prod-card">
+                    <div class="img-container">
+                        <span class="tag-badge">SENZA GLUTINE</span>
+                        <img src="https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=500&q=60" class="prod-img" alt="Cuore Morbido">
+                    </div>
+                    <div class="prod-info">
+                        <div class="title-price-row">
+                            <h3 class="prod-title">Cuore Morbido</h3>
+                            <span class="prod-price">6.50 €</span>
+                        </div>
+                        <p class="prod-description">Tortino al cioccolato fondente 70% con frutti di bosco biologici.</p>
+                        <div class="card-actions"><button class="btn-circle-cart" onclick="alert('Aggiunto al carrello!')"><i class="fas fa-shopping-basket"></i></button></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="load-more-container">
+                <button class="btn-load-more">Mostra Altri Piatti <i class="fas fa-chevron-down"></i></button>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <div>
+            <h3>WebDelivery</h3>
+            <p>2024 WebDelivery Food Systems. Freshly Tech-Savvy Logistics.</p>
+        </div>
+        <div>
+            <h3>System Links</h3>
+            <p><a href="#">Contact Us</a><br><a href="#">Staff Support</a><br><a href="#">Safety Protocols</a></p>
+        </div>
+        <div>
+            <h3>Facility Info</h3>
+            <p>123 Farm Road, Organic Valley<br>Delivery Hours: 8AM - 10PM<br>Central Hub Status: Operational</p>
+        </div>
+        <div>
+            <h3>Developer Trace</h3>
+            <p style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px; font-family: monospace; font-size: 11px;">SMTP Simulation Active<br>Auth Layer: Tier 1 JwT</p>
+        </div>
+    </footer>
+
+    
+    <script>
+        
+        function copiaSconto() {
+            navigator.clipboard.writeText("RHYTHM24");
+            const btn = document.getElementById("btn-copia");
+            btn.innerText = "Copiato!";
+            btn.style.backgroundColor = "#e8f5e9";
+            setTimeout(() => { 
+                btn.innerText = "Copia Codice"; 
+                btn.style.backgroundColor = "white";
+            }, 2000);
+        }
+
+        
+        function cambiaCategoria(elemento) {
+            document.querySelectorAll('.category-pill').forEach(el => el.classList.remove('active'));
+            elemento.classList.add('active');
+        }
+
+        
+        function cambiaVoce(elemento) {
+            document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+            elemento.classList.add('active');
+        }
+
+        //Controllo Sicurezza: Se non hai fatto l'accesso
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('CheckSessionServlet')
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.loggato) {
+                        window.location.href = 'index.html';
+                    } else {
+                        document.getElementById('nome-utente').innerText = data.nome;
+                        document.getElementById('saluto-utente').innerText = 'Benvenuto, ' + data.nome.split(' ')[0];
+                    }
+                })
+                .catch(error => console.error('Errore di sessione:', error));
+        });
+    </script>
+</body>
+</html>

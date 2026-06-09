@@ -19,9 +19,6 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        response.setContentType("text/html;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-        
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
@@ -44,25 +41,24 @@ public class LoginServlet extends HttpServlet {
                     session.setAttribute("nome_completo", nome);
                     session.setAttribute("ruolo", ruolo);
                     
-                    out.println("<html><body style='font-family: Arial; text-align: center; margin-top: 50px; background-color: #f7f9f8;'>");
-                    out.println("<div style='background-color: white; padding: 40px; border-radius: 20px; display: inline-block; box-shadow: 0 10px 30px rgba(0,0,0,0.1);'>");
-                    out.println("<h2 style='color: #00B862;'>Login effettuato con successo!</h2>");
-                    out.println("<h3>Benvenuto, " + nome + " \uD83D\uDC4B</h3>");
-                    out.println("<p>Il tuo ruolo nel sistema è: <b>" + ruolo + "</b></p>");
-                    out.println("<br><a href='index.html' style='color: white; background-color: #00B862; padding: 15px 25px; text-decoration: none; border-radius: 12px; font-weight: bold; display: inline-block; margin-top: 20px;'>Torna alla Home</a>");
-                    out.println("</div></body></html>");
+                    
+                    response.sendRedirect("dashboard.html");
                     
                 } else {
-                    out.println("<html><body style='font-family: Arial; text-align: center; margin-top: 50px; background-color: #f7f9f8;'>");
-                    out.println("<div style='background-color: white; padding: 40px; border-radius: 20px; display: inline-block; box-shadow: 0 10px 30px rgba(0,0,0,0.1);'>");
-                    out.println("<h2 style='color: #e74c3c;'>Errore: Credenziali non valide!</h2>");
-                    out.println("<p>Email o password errati.</p>");
-                    out.println("<br><a href='login.html' style='color: #00B862; text-decoration: none; font-weight: bold;'>← Riprova</a>");
+                    response.setContentType("text/html;charset=UTF-8");
+                    PrintWriter out = response.getWriter();
+                    out.println("<html><body style='font-family: Arial; text-align: center; margin-top: 50px; background-color: #f8f9fa;'>");
+                    out.println("<div style='background-color: white; padding: 40px; border-radius: 12px; border: 1px solid #eee; display: inline-block; box-shadow: 0 4px 15px rgba(0,0,0,0.06);'>");
+                    out.println("<h2 style='color: #e74c3c; margin-bottom: 10px; font-size: 26px;'>Errore: Credenziali non valide!</h2>");
+                    out.println("<p style='color: #666;'>Email o password errati.</p>");
+                    out.println("<br><a href='login.html' style='color: #116C4A; text-decoration: none; font-weight: bold; margin-top: 15px; display: inline-block;'>← Riprova</a>");
                     out.println("</div></body></html>");
                 }
             }
 
         } catch (SQLException e) {
+            response.setContentType("text/html;charset=UTF-8");
+            PrintWriter out = response.getWriter();
             out.println("<h3>Errore Database:</h3> <p>" + e.getMessage() + "</p>");
         }
     }
