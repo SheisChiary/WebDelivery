@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebDelivery - Registrati</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* === STILI BASE === */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f8f9fa; color: #333; display: flex; flex-direction: column; min-height: 100vh; }
+        
+        /* === BARRA DI NAVIGAZIONE MINIMALE === */
+        header { 
+            background: #fff; padding: 15px 5%; display: flex; 
+            justify-content: center; align-items: center; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        .logo { font-size: 24px; font-weight: bold; color: #116C4A; text-decoration: none; }
+        
+        /* === CONTENITORE FORM === */
+        .register-container {
+            flex: 1; display: flex; justify-content: center; align-items: center; padding: 40px 20px;
+        }
+        .register-card {
+            background: white; padding: 40px; border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06); width: 100%; max-width: 500px;
+            border: 1px solid #eee; text-align: center;
+        }
+        .register-card h2 { color: #116C4A; margin-bottom: 10px; font-size: 26px; }
+        .register-card p { color: #666; margin-bottom: 30px; font-size: 14px; }
+        
+        /* === CAMPI INPUT === */
+        .form-group { text-align: left; margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #333; }
+        .form-group input, .form-group textarea {
+            width: 100%; padding: 12px 15px; border: 1px solid #ddd;
+            border-radius: 8px; outline: none; transition: border-color 0.3s; background: #f9f9f9;
+        }
+        .form-group input:focus, .form-group textarea:focus { 
+            border-color: #116C4A; background: #fff; box-shadow: 0 0 5px rgba(17, 108, 74, 0.2); 
+        }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        
+        /* Grid per affiancare Telefono e Password */
+        .form-row { display: flex; gap: 15px; }
+        .form-row .form-group { flex: 1; }
+
+        /* === BOTTONE === */
+        .btn-submit {
+            width: 100%; background: #116C4A; color: white; padding: 12px;
+            border: none; border-radius: 8px; font-weight: bold; font-size: 16px;
+            cursor: pointer; transition: 0.3s; margin-top: 15px;
+        }
+        .btn-submit:hover { background: #0e593d; }
+        
+        /* === LINK LOGIN === */
+        .login-link { margin-top: 25px; font-size: 14px; color: #666; }
+        .login-link a { color: #116C4A; text-decoration: none; font-weight: bold; transition: color 0.3s; }
+        .login-link a:hover { color: #0e593d; text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo"><i class="fas fa-utensils"></i> WebDelivery</a>
+    </header>
+
+    <div class="register-container">
+        <div class="register-card">
+            <h2>Crea un account</h2>
+            <p>Unisciti a noi per ordinare i tuoi piatti preferiti.</p>
+            
+            <form action="RegistrazioneServlet" method="POST">
+                
+                <div class="form-group">
+                    <label for="nome_completo">Nome e Cognome</label>
+                    <input type="text" id="nome_completo" name="nome_completo" placeholder="es. Mario Rossi" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="es. mario@email.it" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" placeholder="Crea una password" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="telefono">Telefono</label>
+                        <input type="tel" id="telefono" name="telefono" placeholder="es. 3331234567" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="indirizzo">Indirizzo di Consegna</label>
+                    <textarea id="indirizzo" name="indirizzo" placeholder="es. Via Roma 10, L'Aquila" required></textarea>
+                </div>
+                
+                <button type="submit" class="btn-submit">Registrati ora</button>
+            </form>
+            
+            <div class="login-link">
+                Hai già un account? <a href="login.html">Accedi</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
