@@ -5,11 +5,13 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+@WebServlet(name = "CarrelloServlet", urlPatterns = {"/CarrelloServlet"})
 public class CarrelloServlet extends HttpServlet {
 
     @Override
@@ -18,44 +20,29 @@ public class CarrelloServlet extends HttpServlet {
         
         response.setContentType("application/json;charset=UTF-8");
         PrintWriter out = response.getWriter();
+        HttpSession session = request.getSession();
         
-        try {
-            HttpSession session = request.getSession();
-            List<ElementoCarrello> carrello = (List<ElementoCarrello>) session.getAttribute("carrello");
-            StringBuilder json = new StringBuilder();
-            json.append("[");
-            
-            if (carrello != null && !carrello.isEmpty()) {
-                for (int i = 0; i < carrello.size(); i++) {
-                    ElementoCarrello el = carrello.get(i);
-                    String nome = el.getProdotto().getNome() != null ? el.getProdotto().getNome().replace("\"", "\\\"") : "";
-                    String desc = el.getProdotto().getDescrizione() != null ? el.getProdotto().getDescrizione().replace("\"", "\\\"").replace("\n", " ") : "";
-                    String img = el.getProdotto().getImmagineUrl() != null ? el.getProdotto().getImmagineUrl() : "";
-                    String opzioniSalvate = el.getOpzioni() != null ? el.getOpzioni().replace("\"", "\\\"") : "";
-
-                    json.append("{");
-                    json.append("\"id\":").append(el.getProdotto().getIdProdotto()).append(",");
-                    json.append("\"nome\":\"").append(nome).append("\",");
-                    json.append("\"descrizione\":\"").append(desc).append("\",");
-                    json.append("\"prezzo\":").append(el.getPrezzoUnitario()).append(",");
-                    
-                    
-                    json.append("\"prezzoBase\":").append(el.getProdotto().getPrezzoBase()).append(",");
-                    
-                    json.append("\"immagine\":\"").append(img).append("\",");
-                    json.append("\"quantita\":").append(el.getQuantita()).append(",");
-                    json.append("\"opzioni\":\"").append(opzioniSalvate).append("\"");
-                    json.append("}");
-                    
-                    if (i < carrello.size() - 1) json.append(",");
-                }
+        List<ElementoCarrello> carrello = (List<ElementoCarrello>) session.getAttribute("carrello");
+        StringBuilder json = new StringBuilder();
+        json.append("[");
+        
+        if (carrello != null && !carrello.isEmpty()) {
+            for (int i = 0; i < carrello.size(); i++) {
+                ElementoCarrello el = carrello.get(i);
+                json.append("{");
+                json.append("\"id\":").append(el.getProdotto().getIdProdotto()).append(",");
+                json.append("\"nome\":\"").append(el.getProdotto().getNome().replace("\"", "\\\"")).append("\",");
+                json.append("\"descrizione\":\"").append(el.getProdotto().getDescrizione().replace("\"", "\\\"")).append("\",");
+                json.append("\"prezzo\":").append(el.getPrezzoUnitario()).append(",");
+                json.append("\"prezzoBase\":").append(el.getProdotto().getPrezzoBase()).append(",");
+                json.append("\"immagine\":\"").append(el.getProdotto().getImmagineUrl()).append("\",");
+                json.append("\"quantita\":").append(el.getQuantita()).append(",");
+                json.append("\"opzioni\":\"").append(el.getOpzioni() != null ? el.getOpzioni().replace("\"", "\\\"") : "").append("\"");
+                json.append("}");
+                if (i < carrello.size() - 1) json.append(",");
             }
-            json.append("]");
-            out.print(json.toString());
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-            out.print("[]");
         }
+        json.append("]");
+        out.print(json.toString());
     }
 }

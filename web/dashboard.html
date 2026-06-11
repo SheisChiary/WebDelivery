@@ -370,10 +370,16 @@
                 });
         }
 
-        function aggiungiAlCarrelloReal(idPiatto, nomePiatto) {
+       function aggiungiAlCarrelloReal(idPiatto, nomePiatto) {
             fetch('AggiungiAlCarrelloServlet?id=' + idPiatto)
                 .then(r => r.json())
-                .then(data => { if(data.successo) { totaleCarrello++; aggiornaBadgeCarrello(); mostraNotifica(nomePiatto + " aggiunto al carrello!"); } });
+                .then(data => { 
+                    if(data.successo) { 
+                       
+                        aggiornaContatoreCarrelloDalServer(); 
+                        mostraNotifica(nomePiatto + " aggiunto al carrello!"); 
+                    } 
+                });
         }
 
         function mostraNotifica(msg) {

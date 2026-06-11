@@ -35,7 +35,6 @@
         .btn-qty { border: none; background: transparent; font-size: 16px; cursor: pointer; color: #116C4A; font-weight: bold; }
         .qty-number { font-weight: bold; font-size: 14px; width: 15px; text-align: center; color: #0b3c29; }
         
-        
         .btn-personalizza { border: 1px solid #116C4A; color: #116C4A; background: transparent; padding: 6px 16px; border-radius: 20px; font-weight: bold; font-size: 13px; cursor: pointer; transition: 0.2s; outline: none; }
         .btn-personalizza:hover { background: #f0fbf5; }
         
@@ -69,7 +68,7 @@
         .btn-order { width: 100%; background: #0b3c29; color: white; border: none; padding: 16px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 10px; }
         .empty-cart-msg { text-align: center; padding: 40px; color: #7f8c8d; font-size: 18px; }
 
-        /* STILE POPUP MODALE (Lo stesso della Dashboard!) */
+        
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; z-index: 1000; opacity: 0; transition: opacity 0.3s ease; }
         .modal-overlay.show { opacity: 1; }
         .modal-content { background: #F9FAF6; width: 95%; max-width: 900px; max-height: 90vh; border-radius: 16px; overflow: hidden; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.3); display: flex; flex-direction: column; transform: translateY(20px); transition: transform 0.3s ease; }
@@ -171,7 +170,8 @@
             <div class="summary-row"><span>Subtotale</span><span id="subtotale-testo">€0.00</span></div>
             <div class="summary-row"><span>Consegna</span><span id="consegna-testo">€2.50</span></div>
             <div class="summary-row total"><span class="total-label">Totale</span><span id="totale-testo">€0.00</span></div>
-            <button class="btn-order" onclick="alert('Ordine Confermato!')">Conferma e Paga <i class="fas fa-arrow-right"></i></button>
+            
+            <button class="btn-order" onclick="confermaOrdine()">Conferma e Paga <i class="fas fa-arrow-right"></i></button>
         </aside>
     </div>
 
@@ -317,7 +317,28 @@
             document.getElementById('totale-testo').innerText = "€" + (ciSonoPiatti ? subtotale + cConsegna : 0).toFixed(2);
         }
         function selezionaOrario(s) { document.getElementById('time-picker-container').style.display = s==='prog'?'block':'none'; document.getElementById('btn-asap').classList.toggle('active', s==='asap'); document.getElementById('btn-prog').classList.toggle('active', s==='prog'); }
+
+        // Funzione per inviare l'email e confermare l'ordine
+        function confermaOrdine() {
+            let totale = document.getElementById('totale-testo').innerText;
+            if(totale === "€0.00") {
+                alert("Non puoi confermare: il carrello è vuoto!");
+                return;
+            }
+            
+            // Chiamiamo la Servlet per confermare l'ordine e inviare l'email!
+            fetch('/WebDelivery/ConfermaOrdineServlet', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.successo) {
+                        alert(data.messaggio); // Mostra "Ordine confermato! Controlla la tua email."
+                        window.location.href = 'dashboard.html'; // Torna alla dashboard a carrello vuoto
+                    } else {
+                        alert("Errore: " + data.messaggio);
+                    }
+                })
+                .catch(error => console.error('Errore Checkout:', error));
+        }
     </script>
 </body>
-</html>  
-
+</html>
