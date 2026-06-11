@@ -1,23 +1,64 @@
 package model;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DBConnect {
-    //coordinate database locale
     private static final String URL = "jdbc:mysql://localhost:3306/webdelivery?useSSL=false&serverTimezone=UTC";
     private static final String USER = "root";
-   
     private static final String PASSWORD = "pass123"; 
 
     public static Connection getConnection() throws SQLException {
         try {
-            // Chiama il driver MySQL
             Class.forName("com.mysql.cj.jdbc.Driver");
             return DriverManager.getConnection(URL, USER, PASSWORD);
         } catch (ClassNotFoundException e) {
             throw new SQLException("Errore: Driver JDBC non trovato. Controlla le Libraries!", e);
         }
+    }
+
+    public List<OrdineAdminDashboard> getTuttiGliOrdiniConStorico() throws SQLException {
+        List<OrdineAdminDashboard> lista = new ArrayList<>();
+        
+        try (Connection con = getConnection()) {
+            
+            // 1. Prendo tutti gli ordini
+            String queryOrdini = "SELECT o.id_ordine, u.nome_completo, o.data_creazione, o.prezzo_totale, o.stato_attuale " +
+                                 "FROM Ordine o JOIN Utente u ON o.id_cliente = u.id_utente ORDER BY o.data_creazione DESC";
+            
+            try (PreparedStatement stmt = con.prepareStatement(queryOrdini);
+                 ResultSet rs = stmt.executeQuery()) {
+                
+                while (rs.next()) {
+                    int id = rs.getInt("id_ordine");
+                    OrdineAdminDashboard ordine = new OrdineAdminDashboard(
+                        id, rs.getString("nome_completo"), rs.getString("data_creazione"), 
+                        rs.getDouble("prezzo_totale"), rs.getString("stato_attuale")
+                    );
+                    
+                    // 2. Per ogni ordine, cerco la sua storia
+                    String queryStoria = "SELECT s.stato, s.data_ora_modifica, u.nome_completo " +
+                                         "FROM Storico_Stati_Ordine s " +
+                                         "JOIN Utente u ON s.id_personale = u.id_utente " +
+                                         "WHERE s.id_ordine = ? ORDER BY s.data_ora_modifica ASC";
+                    
+                    try (PreparedStatement stmtStoria = con.prepareStatement(queryStoria)) {
+                        stmtStoria.setInt(1, id);
+                        ResultSet rsStoria = stmtStoria.executeQuery();
+                        while (rsStoria.next()) {
+                            StoricoStato storico = new StoricoStato(
+                                rsStoria.getString("stato"),
+                                rsStoria.getString("data_ora_modifica"),
+                                rsStoria.getString("nome_completo")
+                            );
+                            ordine.addCronologia(storico);
+                        }
+                    }
+                    lista.add(ordine);
+                }
+            }
+        }
+        return lista;
     }
 }

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordini - Dashboard Proprietario</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            height: 100vh;
+            color: #333;
+        }
+
+        /* BARRA LATERALE */
+        .sidebar {
+            width: 250px;
+            background-color: #ffffff;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #116C4A;
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 0 15px;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: #555;
+            font-size: 15px;
+            font-weight: 500;
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+
+        .nav-item:hover {
+            background-color: #f0f5f3;
+            color: #116C4A;
+        }
+
+        .nav-item.active {
+            background-color: #116C4A;
+            color: #ffffff;
+        }
+
+        .logout {
+            margin-top: auto;
+            margin-bottom: 20px;
+            color: #d9534f;
+        }
+        
+        .logout:hover {
+            background-color: #fdf0f0;
+            color: #c9302c;
+        }
+
+        /* CONTENUTO PRINCIPALE */
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        /* TABELLE */
+        .table-container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid #e0e0e0;
+            overflow-x: auto; 
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            font-size: 13px;
+            font-weight: 600;
+            color: #777;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 15px 0;
+            font-size: 14px;
+            border-bottom: 1px solid #f5f5f5;
+            white-space: nowrap;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        /* BADGE STATO */
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge.inserito { background-color: #fff3cd; color: #856404; }
+        .badge.inpreparazione { background-color: #cce5ff; color: #004085; }
+        .badge.consegnato { background-color: #d4edda; color: #155724; }
+
+        /* BOTTONE AZIONE */
+        .btn-azione {
+            background-color: transparent;
+            border: 1px solid #116C4A;
+            color: #116C4A;
+            padding: 6px 12px;
+            border-radius: 5px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-azione:hover {
+            background-color: #116C4A;
+            color: #ffffff;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #777;
+            padding: 30px 0;
+            font-style: italic;
+        }
+
+        /* MODALE (POPUP DETTAGLI) */
+        .modal-overlay {
+            display: none; 
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            width: 450px;
+            max-width: 90%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 { margin: 0; font-size: 20px; }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+        .close-btn:hover { color: #333; }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .item-name { font-weight: 500; }
+        .item-details { font-size: 12px; color: #777; display: block; margin-top: 3px; }
+        .item-price { font-weight: 600; }
+
+        .order-total {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid #e0e0e0;
+            font-size: 18px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="logo">WebDelivery</div>
+        <div class="nav-menu">
+            <a href="#" class="nav-item active">Ordini</a>
+            <a href="#" class="nav-item">Gestione del menù</a>
+            <a href="#" class="nav-item">Gestione dello staff</a>
+            <a href="#" class="nav-item">Statistiche</a>
+        </div>
+        <div class="nav-menu" style="margin-top: auto;">
+            <a href="LogoutServlet" class="nav-item logout">Esci</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <h1>Ordini</h1>
+        
+        <div class="table-container">
+            <h2>Dettagli ordini in corso</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID ORDINE</th>
+                        <th>CLIENTE</th>
+                        <th>DATA E ORA RICHIESTA</th>
+                        <th>TOTALE</th>
+                        <th>STATO</th>
+                        <th>ORDINAZIONE</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-in-corso">
+                    <tr>
+                        <td>#1042</td>
+                        <td>Mario Rossi</td>
+                        <td>11 Giu 2026, 20:30</td>
+                        <td>€ 24.50</td>
+                        <td><span class="badge inserito">Inserito</span></td>
+                        <td><button class="btn-azione" onclick="apriPopup('#1042')">Vedi Dettagli</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-container">
+            <h2>Storico ordini</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID ORDINE</th>
+                        <th>CLIENTE</th>
+                        <th>DATA E ORA CONSEGNA</th>
+                        <th>TOTALE</th>
+                        <th>STATO</th>
+                        <th>ORDINAZIONE</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-storico">
+                    <tr>
+                        <td colspan="6" class="empty-state">Caricamento ordini completati...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <div id="popupDettagli" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="popupTitolo">Dettagli Ordine</h3>
+                <button class="close-btn" onclick="chiudiPopup()">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <div id="popupListaProdotti"></div>
+                <div class="order-total">
+                    <span>Totale</span>
+                    <span id="popupTotalePrezzo">€ 0.00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+function apriPopup(idOrdineRaw) {
+            const idOrdine = idOrdineRaw.replace('#', '');
+            
+            document.getElementById('popupTitolo').innerText = 'Dettagli Ordine #' + idOrdine;
+            document.getElementById('popupDettagli').style.display = 'flex';
+            document.getElementById('popupListaProdotti').innerHTML = '<div style="text-align:center; padding:20px; color:#777;"><em>Caricamento dettagli dal database...</em></div>';
+            document.getElementById('popupTotalePrezzo').innerText = '€ ...';
+
+            fetch('GetDettaglioOrdineJson?id=' + idOrdine)
+                .then(response => {
+                    if (!response.ok) throw new Error('Errore di rete');
+                    return response.json();
+                })
+                .then(data => {
+                    let html = '<h4 style="margin: 0 0 10px 0; color: #116C4A;">Prodotti Ordinati:</h4>';
+                    
+                    if (data.prodotti && data.prodotti.length > 0) {
+                        data.prodotti.forEach(p => {
+                            let prezzoTotaleProdotto = p.prezzo * p.quantita;
+                            html += `<div class="order-item">
+                                        <span class="item-name">${p.quantita}x ${p.nome}</span>
+                                        <span class="item-price">€ ${prezzoTotaleProdotto.toFixed(2)}</span>
+                                     </div>`;
+                        });
+                    } else {
+                        html += '<p style="font-size:13px; color:#777;">Nessun dettaglio prodotto trovato.</p>';
+                    }
+
+                    html += '<h4 style="margin: 25px 0 10px 0; color: #116C4A;">Cronologia di Gestione:</h4>';
+                    if (data.storico && data.storico.length > 0) {
+                        data.storico.forEach(s => {
+                            let classeBadge = s.stato.replace(/\s+/g, '').toLowerCase();
+                            html += `<div style="font-size:13px; color:#555; padding:8px 0; border-bottom:1px solid #f5f5f5; display:flex; justify-content:space-between; align-items:center;">
+                                        <div><b>${s.data}</b> - Da: ${s.personale}</div>
+                                        <span class="badge ${classeBadge}">${s.stato}</span>
+                                     </div>`;
+                        });
+                    } else {
+                        html += '<p style="font-size:13px; color:#777;">Nessuno storico disponibile.</p>';
+                    }
+
+                    document.getElementById('popupListaProdotti').innerHTML = html;
+                    document.getElementById('popupTotalePrezzo').innerText = '€ ' + parseFloat(data.totale).toFixed(2);
+                })
+                .catch(error => {
+                    console.error('Errore:', error);
+                    document.getElementById('popupListaProdotti').innerHTML = '<div style="color:red; text-align:center;">Errore nel caricamento dei dati.</div>';
+                });
+        }
+
+        // Funzioni per chiudere il popup
+        function chiudiPopup() {
+            document.getElementById('popupDettagli').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            var popup = document.getElementById('popupDettagli');
+            if (event.target == popup) {
+                chiudiPopup();
+            }
+        }
+
+
+        // ---------------------------------------------------------
+        // 2. CARICAMENTO TABELLE PRINCIPALI (All'apertura della pagina)
+        // ---------------------------------------------------------
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('GetOrdiniJson')
+                .then(response => {
+                    if (!response.ok) throw new Error('Errore nella connessione al server');
+                    return response.json();
+                })
+                .then(data => {
+                    const tbodyInCorso = document.getElementById('tbody-in-corso');
+                    const tbodyStorico = document.getElementById('tbody-storico');
+
+                    tbodyInCorso.innerHTML = '';
+                    tbodyStorico.innerHTML = '';
+
+                    data.forEach(o => {
+                        let rowHTML = `<tr>
+                            <td>#${o.id}</td>
+                            <td>${o.cliente}</td>
+                            <td>${o.data}</td>
+                            <td>€ ${parseFloat(o.totale).toFixed(2)}</td>
+                            <td><span class="badge ${o.stato.replace(/\s+/g, '').toLowerCase()}">${o.stato}</span></td>
+                            <td><button class="btn-azione" onclick="apriPopup('#${o.id}')">Dettagli</button></td>
+                        </tr>`;
+
+                        if (o.stato.toLowerCase() === 'consegnato') {
+                            tbodyStorico.innerHTML += rowHTML;
+                        } else {
+                            tbodyInCorso.innerHTML += rowHTML;
+                        }
+                    });
+
+                    if (tbodyInCorso.innerHTML.trim() === '') {
+                        tbodyInCorso.innerHTML = '<tr><td colspan="6" class="empty-state">Nessun ordine in corso al momento.</td></tr>';
+                    }
+                    if (tbodyStorico.innerHTML.trim() === '') {
+                        tbodyStorico.innerHTML = '<tr><td colspan="6" class="empty-state">Nessun ordine completato al momento.</td></tr>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Errore durante il caricamento dati:', error);
+                    document.getElementById('tbody-in-corso').innerHTML = '<tr><td colspan="6" class="empty-state" style="color:red;">Errore nel caricamento dei dati dal database.</td></tr>';
+                });
+        });
+    </script>
+
+</body>
+</html>

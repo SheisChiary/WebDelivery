@@ -8,11 +8,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+@WebServlet(name = "LoginServlet", urlPatterns = {"/LoginServlet"})
 public class LoginServlet extends HttpServlet {
 
     @Override
@@ -36,15 +38,25 @@ public class LoginServlet extends HttpServlet {
                     String nome = rs.getString("nome_completo");
                     String ruolo = rs.getString("ruolo");
                     
+                    // Pulizia del ruolo per evitare errori (spazi o maiuscole)
+                    String ruoloPulito = (ruolo != null) ? ruolo.trim().toLowerCase() : "";
+                    
                     HttpSession session = request.getSession();
                     session.setAttribute("id_utente", id);
                     session.setAttribute("nome_completo", nome);
-                    session.setAttribute("ruolo", ruolo);
+                    session.setAttribute("ruolo", ruoloPulito);
                     
-                    
-                    response.sendRedirect("dashboard.html");
+                    // Logica di reindirizzamento basata sul ruolo
+                    if (ruoloPulito.equals("proprietario")) {
+                        response.sendRedirect("dashboard_admin.html");
+                    } else if (ruoloPulito.equals("personale")) {
+                        response.sendRedirect("dashboard_staff.html");
+                    } else {
+                        response.sendRedirect("dashboard.html");
+                    }
                     
                 } else {
+                    // Login fallito: pagina di errore
                     response.setContentType("text/html;charset=UTF-8");
                     PrintWriter out = response.getWriter();
                     out.println("<html><body style='font-family: Arial; text-align: center; margin-top: 50px; background-color: #f8f9fa;'>");
@@ -55,7 +67,6 @@ public class LoginServlet extends HttpServlet {
                     out.println("</div></body></html>");
                 }
             }
-
         } catch (SQLException e) {
             response.setContentType("text/html;charset=UTF-8");
             PrintWriter out = response.getWriter();
