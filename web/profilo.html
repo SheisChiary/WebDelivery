@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Il mio Profilo - WebDelivery</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #F9FAF6; }
+        .dashboard-container { max-width: 1200px; margin: 40px auto; display: flex; gap: 30px; padding: 0 20px; }
+        
+        /* Sidebar Identica alla Dashboard */
+        .sidebar { width: 260px; background: white; padding: 25px; border-radius: 12px; border: 1px solid #eaeaea; height: fit-content; }
+        .sidebar-menu { list-style: none; }
+        .sidebar-item { padding: 12px 15px; border-radius: 20px; color: #555; font-weight: 600; cursor: pointer; margin-bottom: 5px; }
+        .sidebar-item.active { background-color: #A7F3D0; color: #116C4A; }
+        
+        /* Contenuto Profilo */
+        .main-content { flex: 1; }
+        .profile-card { background: white; padding: 30px; border-radius: 16px; border: 1px solid #eaeaea; margin-bottom: 20px; }
+        .card-title { font-size: 22px; color: #116C4A; margin-bottom: 25px; display: flex; align-items: center; gap: 10px; }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        label { display: block; font-size: 14px; font-weight: 600; color: #666; margin-bottom: 5px; }
+        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px; }
+        
+        .btn-save { background: #116C4A; color: white; border: none; padding: 12px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-logout { background: #e74c3c; color: white; border: none; padding: 12px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-block; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <h2 style="color:#116C4A; margin-bottom:20px;">WebDelivery</h2>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item" onclick="location.href='dashboard.html'"><i class="fas fa-utensils"></i> Menù</li>
+                <li class="sidebar-item active"><i class="fas fa-user"></i> Profilo</li>
+            </ul>
+        </aside>
+        
+        <main class="main-content">
+            <div class="profile-card">
+                <h2 class="card-title"><i class="fas fa-user-edit"></i> I tuoi Dati Personali</h2>
+                <form action="ProfiloServlet" method="POST">
+                    <div class="form-grid">
+                        <div>
+                            <label>Nome Completo</label>
+                            <input type="text" name="nome" id="nome" required>
+                        </div>
+                        <div>
+                            <label>Telefono</label>
+                            <input type="text" name="telefono" id="telefono">
+                        </div>
+                    </div>
+                    <label>Indirizzo di Consegna</label>
+                    <textarea name="indirizzo" id="indirizzo" style="width:100%; height:80px; padding:10px; border:1px solid #ddd; border-radius:8px;"></textarea>
+                    
+                    <button type="submit" class="btn-save">Salva Modifiche</button>
+                </form>
+            </div>
+
+            <div class="profile-card">
+                <h2 class="card-title"><i class="fas fa-sign-out-alt"></i> Sicurezza</h2>
+                <p style="margin-bottom:15px; color:#666;">Hai finito la tua sessione?</p>
+                <a href="LogoutServlet" class="btn-logout">Effettua il Logout</a>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        fetch('ProfiloServlet').then(r => r.json()).then(data => {
+            document.getElementById('nome').value = data.nome || '';
+            document.getElementById('telefono').value = data.telefono || '';
+            document.getElementById('indirizzo').value = data.indirizzo || '';
+        });
+    </script>
+</body>
+</html>
