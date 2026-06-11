@@ -35,7 +35,7 @@
         .btn-qty { border: none; background: transparent; font-size: 16px; cursor: pointer; color: #116C4A; font-weight: bold; }
         .qty-number { font-weight: bold; font-size: 14px; width: 15px; text-align: center; color: #0b3c29; }
         
-        /* IL TASTO PERSONALIZZA E' TORNATO! */
+        
         .btn-personalizza { border: 1px solid #116C4A; color: #116C4A; background: transparent; padding: 6px 16px; border-radius: 20px; font-weight: bold; font-size: 13px; cursor: pointer; transition: 0.2s; outline: none; }
         .btn-personalizza:hover { background: #f0fbf5; }
         
@@ -219,7 +219,7 @@
             });
         }
 
-        // ========================== MODALE ==========================
+        
         function apriModalePersonalizzazione(id, nome, desc, prezzoBase, indexModifica = -1) {
             modalePiattoId = id; modalePiattoNome = nome; modalePrezzoBase = prezzoBase; modaleTotaleExtra = 0; modaleQuantita = 1; modaleIndexModifica = indexModifica;
             
@@ -287,7 +287,7 @@
             fetch(url).then(r => r.json()).then(data => { if(data.successo) caricaCarrello(); });
         }
 
-        // ========================== ALTRE FUNZIONI ==========================
+        
         function caricaSuggerimentiDinamici() {
             fetch('MenuServlet').then(r => r.json()).then(tuttoIlMenu => {
                 let piattiNonNelCarrello = tuttoIlMenu.filter(p => !carrelloAttuale.some(i => i.id === p.id));
@@ -319,4 +319,5 @@
         function selezionaOrario(s) { document.getElementById('time-picker-container').style.display = s==='prog'?'block':'none'; document.getElementById('btn-asap').classList.toggle('active', s==='asap'); document.getElementById('btn-prog').classList.toggle('active', s==='prog'); }
     </script>
 </body>
-</html>
+</html>  
+
