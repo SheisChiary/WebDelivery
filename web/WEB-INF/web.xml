@@ -16,6 +16,34 @@
         <servlet-name>LogoutServlet</servlet-name>
         <servlet-class>control.LogoutServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>MenuServlet</servlet-name>
+        <servlet-class>control.MenuServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AggiungiAlCarrelloServlet</servlet-name>
+        <servlet-class>control.AggiungiAlCarrelloServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CarrelloServlet</servlet-name>
+        <servlet-class>control.CarrelloServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>OpzioniServlet</servlet-name>
+        <servlet-class>control.OpzioniServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>EmailUtility</servlet-name>
+        <servlet-class>utils.EmailUtility</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ConfermaOrdineServlet</servlet-name>
+        <servlet-class>control.ConfermaOrdineServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DebugServlet</servlet-name>
+        <servlet-class>control.DebugServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>RegistrazioneServlet</servlet-name>
         <url-pattern>/RegistrazioneServlet</url-pattern>
@@ -31,5 +59,33 @@
     <servlet-mapping>
         <servlet-name>LogoutServlet</servlet-name>
         <url-pattern>/LogoutServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MenuServlet</servlet-name>
+        <url-pattern>/MenuServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AggiungiAlCarrelloServlet</servlet-name>
+        <url-pattern>/AggiungiAlCarrelloServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CarrelloServlet</servlet-name>
+        <url-pattern>/CarrelloServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>OpzioniServlet</servlet-name>
+        <url-pattern>/OpzioniServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EmailUtility</servlet-name>
+        <url-pattern>/EmailUtility</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ConfermaOrdineServlet</servlet-name>
+        <url-pattern>/ConfermaOrdineServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DebugServlet</servlet-name>
+        <url-pattern>/DebugServlet</url-pattern>
     </servlet-mapping>
 </web-app>

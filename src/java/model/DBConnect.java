@@ -14,7 +14,7 @@ public class DBConnect {
             Class.forName("com.mysql.cj.jdbc.Driver");
             return DriverManager.getConnection(URL, USER, PASSWORD);
         } catch (ClassNotFoundException e) {
-            throw new SQLException("Errore: Driver JDBC non trovato. Controlla le Libraries!", e);
+            throw new SQLException("Driver MySQL non trovato!", e);
         }
     }
 
