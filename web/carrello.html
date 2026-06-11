@@ -287,7 +287,6 @@
             fetch(url).then(r => r.json()).then(data => { if(data.successo) caricaCarrello(); });
         }
 
-        
         function caricaSuggerimentiDinamici() {
             fetch('MenuServlet').then(r => r.json()).then(tuttoIlMenu => {
                 let piattiNonNelCarrello = tuttoIlMenu.filter(p => !carrelloAttuale.some(i => i.id === p.id));
@@ -318,7 +317,7 @@
         }
         function selezionaOrario(s) { document.getElementById('time-picker-container').style.display = s==='prog'?'block':'none'; document.getElementById('btn-asap').classList.toggle('active', s==='asap'); document.getElementById('btn-prog').classList.toggle('active', s==='prog'); }
 
-        // Funzione per inviare l'email e confermare l'ordine
+        // Funzione per inviare l'email, confermare l'ordine e andare allo storico
         function confermaOrdine() {
             let totale = document.getElementById('totale-testo').innerText;
             if(totale === "€0.00") {
@@ -326,18 +325,22 @@
                 return;
             }
             
-            // Chiamiamo la Servlet per confermare l'ordine e inviare l'email!
-            fetch('/WebDelivery/ConfermaOrdineServlet', { method: 'POST' })
+            // Chiamata RELATIVA alla Servlet per evitare errori di routing
+            fetch('ConfermaOrdineServlet', { method: 'POST' })
                 .then(response => response.json())
                 .then(data => {
                     if(data.successo) {
-                        alert(data.messaggio); // Mostra "Ordine confermato! Controlla la tua email."
-                        window.location.href = 'dashboard.html'; // Torna alla dashboard a carrello vuoto
+                        alert(data.messaggio);
+                        // Redirezione automatica alla pagina dei tuoi ordini
+                        window.location.href = 'ordini.html';
                     } else {
                         alert("Errore: " + data.messaggio);
                     }
                 })
-                .catch(error => console.error('Errore Checkout:', error));
+                .catch(error => {
+                    console.error('Errore Checkout:', error);
+                    alert("Errore di rete. Riprova tra poco.");
+                });
         }
     </script>
 </body>

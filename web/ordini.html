@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I Miei Ordini - WebDelivery</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        body { background-color: #FFFFFF; color: #333; display: flex; flex-direction: column; min-height: 100vh; }
+        
+        /* Header - TopNavBar */
+        header { background: #F9FAF6; height: 64px; padding: 0 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 24px; font-weight: bold; color: #116C4A; text-decoration: none; }
+        .nav-actions { display: flex; align-items: center; gap: 15px; }
+        .icon-user-round { font-size: 22px; color: #116C4A; cursor: pointer; }
+
+        .dashboard-container { max-width: 1300px; margin: 30px auto; padding: 0 20px; display: flex; gap: 30px; flex: 1; width: 100%; }
+
+        /* Aside - SideNavBar */
+        .sidebar { width: 256px; background: #EEEEEB; border-right: 1px solid rgba(193, 200, 194, 0.2); border-radius: 12px; padding: 24px 15px; display: flex; flex-direction: column; gap: 8px; height: fit-content; }
+        .user-profile { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-left: 10px; }
+        .user-profile h3 { font-size: 18px; color: #2c3e50; font-weight: 700; }
+        .user-profile p { font-size: 13px; color: #888; margin-top: 2px; }
+        
+        .sidebar-menu { list-style: none; display: flex; flex-direction: column; gap: 8px; width: 100%; }
+        /* Link normale */
+        .sidebar-item { display: flex; align-items: center; gap: 12px; padding: 12px 15px; border-radius: 20px; text-decoration: none; color: #555; font-weight: 600; font-size: 14px; transition: 0.2s; }
+        .sidebar-item:not(.active):hover { background-color: rgba(0,0,0,0.05); color: #116C4A; }
+        /* Link attivo per questa pagina */
+        .sidebar-item.active { background-color: #A7F3D0; color: #116C4A; }
+
+        /* Main Content - Active Orders Section */
+        .main-content { flex: 1; display: flex; flex-direction: column; gap: 48px; padding-top: 10px; }
+        .dashboard-top h2 { font-size: 32px; color: #0b3c29; font-weight: 800; }
+        
+        /* Lista Ordini con gap richiesto */
+        #lista-ordini { display: flex; flex-direction: column; gap: 24px; }
+        
+        .order-card { background: white; padding: 24px; border-radius: 12px; border: 1px solid #eaeaea; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+        .order-info h4 { color: #2c3e50; font-size: 20px; margin-bottom: 5px; }
+        .order-info p { color: #7f8c8d; font-size: 14px; }
+        .order-price { font-size: 22px; font-weight: 800; color: #116C4A; text-align: right; margin-bottom: 5px; }
+        
+        .order-status { font-size: 12px; font-weight: bold; padding: 6px 14px; border-radius: 20px; display: inline-block; text-transform: uppercase; }
+        .status-inserito { background: #fff3cd; color: #856404; }
+        .status-in-preparazione { background: #cce5ff; color: #004085; }
+        .status-in-consegna { background: #d1ecf1; color: #0c5460; }
+        .status-pronto { background: #e2e3e5; color: #383d41; }
+        .status-consegnato { background: #d4edda; color: #155724; }
+
+        /* Footer */
+        footer { background: #012D1D; width: 100%; height: 284px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding: 80px 0px; color: rgba(255,255,255,0.7); margin-top: auto; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="dashboard.html" class="logo"><i class="fas fa-utensils"></i> WebDelivery</a>
+        <div class="nav-actions">
+            <a href="carrello.html" style="color: #116C4A; font-weight:bold; text-decoration: none;"><i class="fas fa-shopping-cart"></i> Carrello</a>
+            <a href="profilo.html" style="text-decoration:none; color:inherit;"><i class="fas fa-user-circle icon-user-round"></i></a>
+            <a href="LogoutServlet" style="color: #666; font-size: 12px; text-decoration: none;">Esci</a>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <a href="profilo.html" style="text-decoration:none; color:inherit;">
+                <div class="user-profile"><h3 id="nome-utente">...</h3><p>Cliente</p></div>
+            </a>
+            <ul class="sidebar-menu">
+                <a href="dashboard.html" class="sidebar-item"><i class="fas fa-utensils"></i> Menù</a>
+                <a href="#" class="sidebar-item active"><i class="fas fa-shopping-bag"></i> I tuoi ordini</a>
+            </ul>
+        </aside>
+        
+        <main class="main-content">
+            <div class="dashboard-top">
+                <h2>I tuoi Ordini</h2>
+                <p style="color: #666; font-size: 15px; margin-top:5px;">Lo storico degli acquisti effettuati.</p>
+            </div>
+            
+            <div id="lista-ordini">
+                <div style="text-align: center; color: #777; padding: 20px;">Caricamento ordini in corso...</div>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 WebDelivery - Tutti i diritti riservati.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Carica Nome Utente
+            fetch('ProfiloServlet').then(r => r.json()).then(data => {
+                if (data && data.nome) document.getElementById('nome-utente').innerText = data.nome;
+            }).catch(e => { document.getElementById('nome-utente').innerText = "Cliente"; });
+
+            // Carica Ordini
+            fetch('StoricoOrdiniServlet')
+            .then(r => r.json())
+            .then(ordini => {
+                let html = '';
+                if(!ordini || ordini.length === 0) {
+                    html = '<p style="color:#777; font-style:italic;">Non hai ancora effettuato ordini. <a href="dashboard.html" style="color:#116C4A;">Vai al menù</a></p>';
+                } else {
+                    ordini.forEach(o => {
+                        let statoClass = o.stato ? 'status-' + o.stato.replace(/\s+/g, '-').toLowerCase() : 'status-inserito';
+                        html += `
+                        <div class="order-card">
+                            <div class="order-info">
+                                <h4>Ordine #${o.id}</h4>
+                                <p><i class="far fa-calendar-alt"></i> ${o.data}</p>
+                            </div>
+                            <div style="text-align:right;">
+                                <div class="order-price">€${o.totale.toFixed(2)}</div>
+                                <span class="order-status ${statoClass}">${o.stato || 'Inserito'}</span>
+                            </div>
+                        </div>`;
+                    });
+                }
+                document.getElementById('lista-ordini').innerHTML = html;
+            })
+            .catch(e => {
+                document.getElementById('lista-ordini').innerHTML = '<p style="color:red;">Errore nel caricamento. Effettua nuovamente il login.</p>';
+            });
+        });
+    </script>
+</body>
+</html>

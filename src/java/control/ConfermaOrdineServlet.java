@@ -1,9 +1,14 @@
 package control;
 
+import model.DBConnect;
 import model.ElementoCarrello;
 import utils.EmailUtility;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -21,57 +26,99 @@ public class ConfermaOrdineServlet extends HttpServlet {
         
         response.setContentType("application/json;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        HttpSession session = request.getSession(false);
         
-        if (session == null || session.getAttribute("emailUtente") == null) {
-            out.print("{\"successo\": false, \"messaggio\": \"Sessione scaduta\"}");
-            return;
-        }
-
-        List<ElementoCarrello> carrello = (List<ElementoCarrello>) session.getAttribute("carrello");
-        String email = (String) session.getAttribute("emailUtente");
-        String nome = (String) session.getAttribute("nomeUtente");
-        
-        if (carrello == null || carrello.isEmpty()) {
-            out.print("{\"successo\": false, \"messaggio\": \"Carrello vuoto\"}");
-            return;
-        }
-
-        // Generiamo un numero ordine univoco basato sul tempo
-        String numeroOrdine = "WD-" + System.currentTimeMillis();
-        double totaleOrdine = 2.50; // Includiamo subito la consegna
-
-        // Costruiamo l'HTML dell'email
-        StringBuilder html = new StringBuilder();
-        html.append("<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>");
-        html.append("<h2 style='color: #116C4A;'>Grazie per il tuo ordine, ").append(nome).append("!</h2>");
-        html.append("<p>Il tuo ordine <strong>#").append(numeroOrdine).append("</strong> è stato ricevuto con successo.</p>");
-        html.append("<hr style='border: 0; border-top: 1px solid #eee;'>");
-        html.append("<h3>Riepilogo Ordine:</h3>");
-        html.append("<table style='width: 100%; border-collapse: collapse;'>");
-        html.append("<tr style='background: #f4f4f4;'><th>Prodotto</th><th>Qtà</th><th>Prezzo</th></tr>");
-
-        for (ElementoCarrello el : carrello) {
-            double riga = (el.getProdotto().getPrezzoBase() + el.getPrezzoExtra()) * el.getQuantita();
-            totaleOrdine += riga;
-            html.append("<tr>")
-                .append("<td style='padding: 8px;'>").append(el.getProdotto().getNome()).append("</td>")
-                .append("<td style='padding: 8px; text-align: center;'>").append(el.getQuantita()).append("</td>")
-                .append("<td style='padding: 8px; text-align: right;'>€").append(String.format("%.2f", riga)).append("</td>")
-                .append("</tr>");
-        }
-        
-        html.append("</table>");
-        html.append("<p style='font-size: 18px; font-weight: bold; text-align: right;'>Totale: €").append(String.format("%.2f", totaleOrdine)).append("</p>");
-        html.append("<p>La consegna è stimata in 30-40 minuti.</p>");
-        html.append("<br><p style='color: #888;'>A presto,<br><strong>Il Team WebDelivery</strong></p>");
-        html.append("</div>");
-
         try {
-            EmailUtility.inviaEmailRiepilogo(email, "Conferma Ordine #" + numeroOrdine, html.toString());
+            HttpSession session = request.getSession(false);
+            
+            // Controllo della sessione
+            if (session == null || session.getAttribute("emailUtente") == null || session.getAttribute("idUtente") == null) {
+                out.print("{\"successo\": false, \"messaggio\": \"Sessione scaduta, per favore fai di nuovo il login.\"}");
+                return;
+            }
+
+            List<ElementoCarrello> carrello = (List<ElementoCarrello>) session.getAttribute("carrello");
+            String email = (String) session.getAttribute("emailUtente");
+            String nome = (String) session.getAttribute("nomeUtente");
+            int idCliente = (int) session.getAttribute("idUtente"); 
+            
+            if (carrello == null || carrello.isEmpty()) {
+                out.print("{\"successo\": false, \"messaggio\": \"Il carrello è vuoto!\"}");
+                return;
+            }
+
+            // Calcolo del totale
+            double totaleOrdine = 2.50; // Spedizione inclusa
+            for (ElementoCarrello el : carrello) {
+                totaleOrdine += (el.getProdotto().getPrezzoBase() + el.getPrezzoExtra()) * el.getQuantita();
+            }
+
+            int numeroOrdine = 0;
+
+            // --- FASE 1: SALVATAGGIO NEL DATABASE ---
+            try (Connection conn = DBConnect.getConnection()) {
+                conn.setAutoCommit(false); 
+                
+                String sqlOrdine = "INSERT INTO Ordine (id_cliente, orario_consegna_richiesto, stato_attuale, prezzo_totale, tempo_stimato_consegna) VALUES (?, DATE_ADD(NOW(), INTERVAL 40 MINUTE), 'inserito', ?, 40)";
+                try (PreparedStatement ps = conn.prepareStatement(sqlOrdine, Statement.RETURN_GENERATED_KEYS)) {
+                    ps.setInt(1, idCliente);
+                    ps.setDouble(2, totaleOrdine);
+                    ps.executeUpdate();
+                    
+                    try (ResultSet rs = ps.getGeneratedKeys()) {
+                        if (rs.next()) {
+                            numeroOrdine = rs.getInt(1); 
+                        }
+                    }
+                }
+                
+                if (numeroOrdine > 0) {
+                    String sqlDettaglio = "INSERT INTO Dettaglio_Ordine (id_ordine, id_prodotto, quantita) VALUES (?, ?, ?)";
+                    try (PreparedStatement psDett = conn.prepareStatement(sqlDettaglio)) {
+                        for (ElementoCarrello el : carrello) {
+                            psDett.setInt(1, numeroOrdine);
+                            
+                            // ECCO LA CORREZIONE: usiamo getIdProdotto() al posto di getId()
+                            psDett.setInt(2, el.getProdotto().getIdProdotto()); 
+                            
+                            psDett.setInt(3, el.getQuantita());
+                            psDett.executeUpdate();
+                        }
+                    }
+                    conn.commit(); // Salvataggio definitivo nel Database!
+                } else {
+                    conn.rollback();
+                    out.print("{\"successo\": false, \"messaggio\": \"Errore interno durante la creazione dell'ordine.\"}");
+                    return;
+                }
+            } catch (Exception dbEx) {
+                dbEx.printStackTrace();
+                out.print("{\"successo\": false, \"messaggio\": \"Errore fatale del database.\"}");
+                return;
+            }
+
+            // --- FASE 2: COSTRUZIONE E INVIO EMAIL ---
+            StringBuilder html = new StringBuilder();
+            html.append("<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>");
+            html.append("<h2 style='color: #116C4A;'>Grazie per il tuo ordine, ").append(nome).append("!</h2>");
+            html.append("<p>Il tuo ordine <strong>#").append(numeroOrdine).append("</strong> è stato ricevuto.</p>");
+            html.append("</div>");
+
+            try {
+                // Proviamo a inviare l'email
+                EmailUtility.inviaEmailRiepilogo(email, "Conferma Ordine #" + numeroOrdine, html.toString());
+            } catch (Throwable t) {
+                // SE LE LIBRERIE MAIL MANCANO O ESPLODONO, CATTURIAMO L'ERRORE QUI SENZA BLOCCARE IL SITO
+                System.out.println("ATTENZIONE: Email non inviata, ma ordine salvato! Errore: " + t.getMessage());
+            }
+            
+            // Sia che l'email parta, sia che fallisca, SVUOTIAMO IL CARRELLO E DIAMO SUCCESSO
             session.removeAttribute("carrello");
-            out.print("{\"successo\": true, \"messaggio\": \"Ordine confermato! Controlla la tua email.\"}");
-        } catch (Exception e) {
-            out.print("{\"successo\": false, \"messaggio\": \"Errore invio email\"}");
+            out.print("{\"successo\": true, \"messaggio\": \"Ordine confermato con successo!\"}");
+
+        } catch (Throwable t) {
+            // Questo blocca qualsiasi altro errore cosmico di Java
+            t.printStackTrace();
+            out.print("{\"successo\": false, \"messaggio\": \"Errore imprevisto del server.\"}");
         }
-    }}
+    }
+}

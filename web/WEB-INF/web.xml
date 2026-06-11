@@ -44,6 +44,14 @@
         <servlet-name>DebugServlet</servlet-name>
         <servlet-class>control.DebugServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ProfiloServlet</servlet-name>
+        <servlet-class>control.ProfiloServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>StoricoOrdiniServlet</servlet-name>
+        <servlet-class>control.StoricoOrdiniServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>RegistrazioneServlet</servlet-name>
         <url-pattern>/RegistrazioneServlet</url-pattern>
@@ -87,5 +95,13 @@
     <servlet-mapping>
         <servlet-name>DebugServlet</servlet-name>
         <url-pattern>/DebugServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProfiloServlet</servlet-name>
+        <url-pattern>/ProfiloServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StoricoOrdiniServlet</servlet-name>
+        <url-pattern>/StoricoOrdiniServlet</url-pattern>
     </servlet-mapping>
 </web-app>

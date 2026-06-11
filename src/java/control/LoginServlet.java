@@ -42,8 +42,13 @@ public class LoginServlet extends HttpServlet {
                     String ruoloPulito = (ruolo != null) ? ruolo.trim().toLowerCase() : "";
                     
                     HttpSession session = request.getSession();
+                    
+                    // Salviamo i dati necessari per TUTTE le servlet (Carrello, Checkout, Profilo)
                     session.setAttribute("id_utente", id);
+                    session.setAttribute("idUtente", id); // Usato nel profilo
                     session.setAttribute("nome_completo", nome);
+                    session.setAttribute("nomeUtente", nome); // Usato nel checkout
+                    session.setAttribute("emailUtente", email); // FONDAMENTALE PER PAGARE!
                     session.setAttribute("ruolo", ruoloPulito);
                     
                     // Logica di reindirizzamento basata sul ruolo
@@ -54,6 +59,8 @@ public class LoginServlet extends HttpServlet {
                     } else {
                         response.sendRedirect("dashboard.html");
                     }
+                    
+              
                     
                 } else {
                     // Login fallito: pagina di errore
