@@ -6,128 +6,321 @@
     <title>I Miei Ordini - WebDelivery</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         
-        body { background-color: #FFFFFF; color: #333; display: flex; flex-direction: column; min-height: 100vh; }
+        body { background-color: #F8F9FA; color: #333; display: flex; flex-direction: column; min-height: 100vh; }
         
-        /* Header - TopNavBar */
+        /* HEADER IDENTICO A DASHBOARD.HTML (senza carrello e ricerca) */
         header { background: #F9FAF6; height: 64px; padding: 0 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
         .logo { font-size: 24px; font-weight: bold; color: #116C4A; text-decoration: none; }
         .nav-actions { display: flex; align-items: center; gap: 15px; }
         .icon-user-round { font-size: 22px; color: #116C4A; cursor: pointer; }
 
-        .dashboard-container { max-width: 1300px; margin: 30px auto; padding: 0 20px; display: flex; gap: 30px; flex: 1; width: 100%; }
-
-        /* Aside - SideNavBar */
-        .sidebar { width: 256px; background: #EEEEEB; border-right: 1px solid rgba(193, 200, 194, 0.2); border-radius: 12px; padding: 24px 15px; display: flex; flex-direction: column; gap: 8px; height: fit-content; }
-        .user-profile { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-left: 10px; }
-        .user-profile h3 { font-size: 18px; color: #2c3e50; font-weight: 700; }
-        .user-profile p { font-size: 13px; color: #888; margin-top: 2px; }
+        .dashboard-container { max-width: 1300px; margin: 30px auto; padding: 0 20px; display: flex; gap: 40px; flex: 1; width: 100%; }
         
-        .sidebar-menu { list-style: none; display: flex; flex-direction: column; gap: 8px; width: 100%; }
-        /* Link normale */
-        .sidebar-item { display: flex; align-items: center; gap: 12px; padding: 12px 15px; border-radius: 20px; text-decoration: none; color: #555; font-weight: 600; font-size: 14px; transition: 0.2s; }
+        /* SIDEBAR */
+        .sidebar { width: 240px; background: #F0F2F0; border-radius: 12px; padding: 30px 20px; display: flex; flex-direction: column; gap: 8px; height: fit-content; }
+        .user-profile { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .user-profile h3 { font-size: 16px; color: #1a1a1a; font-weight: 700; }
+        .user-profile p { font-size: 12px; color: #666; margin-top: 4px; }
+        
+        .sidebar-menu { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+        .sidebar-item { display: flex; align-items: center; gap: 12px; padding: 12px 15px; border-radius: 8px; text-decoration: none; color: #555; font-weight: 600; font-size: 14px; transition: 0.2s; }
         .sidebar-item:not(.active):hover { background-color: rgba(0,0,0,0.05); color: #116C4A; }
-        /* Link attivo per questa pagina */
-        .sidebar-item.active { background-color: #A7F3D0; color: #116C4A; }
+        .sidebar-item.active { background-color: #A7F3D0; color: #0b3c29; }
 
-        /* Main Content - Active Orders Section */
-        .main-content { flex: 1; display: flex; flex-direction: column; gap: 48px; padding-top: 10px; }
-        .dashboard-top h2 { font-size: 32px; color: #0b3c29; font-weight: 800; }
+        /* MAIN CONTENT */
+        .main-content { flex: 1; display: flex; flex-direction: column; padding-top: 5px; }
+        .page-title { font-size: 32px; color: #0b3c29; font-weight: 800; margin-bottom: 30px; letter-spacing: -0.5px; }
+        .section-title { font-size: 18px; font-weight: 700; color: #2c3e50; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         
-        /* Lista Ordini con gap richiesto */
-        #lista-ordini { display: flex; flex-direction: column; gap: 24px; }
+        /* ACTIVE ORDER CARD */
+        .active-order-card { background: white; border-radius: 12px; border: 1px solid #E6E9E8; padding: 30px; margin-bottom: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .express-badge { background: #A7F3D0; color: #0b3c29; font-size: 11px; font-weight: 800; padding: 6px 12px; border-radius: 20px; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 5px; }
         
-        .order-card { background: white; padding: 24px; border-radius: 12px; border: 1px solid #eaeaea; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-        .order-info h4 { color: #2c3e50; font-size: 20px; margin-bottom: 5px; }
-        .order-info p { color: #7f8c8d; font-size: 14px; }
-        .order-price { font-size: 22px; font-weight: 800; color: #116C4A; text-align: right; margin-bottom: 5px; }
+        /* STEPPER CSS */
+        .tracker-container { display: flex; justify-content: space-between; position: relative; margin: 40px 10px 50px 10px; }
+        .tracker-line { position: absolute; top: 16px; left: 0; width: 100%; height: 3px; background: #e0e0e0; z-index: 1; }
+        .tracker-line-fill { position: absolute; top: 16px; left: 0; height: 3px; background: #116C4A; z-index: 2; transition: width 0.3s ease; }
         
-        .order-status { font-size: 12px; font-weight: bold; padding: 6px 14px; border-radius: 20px; display: inline-block; text-transform: uppercase; }
-        .status-inserito { background: #fff3cd; color: #856404; }
-        .status-in-preparazione { background: #cce5ff; color: #004085; }
-        .status-in-consegna { background: #d1ecf1; color: #0c5460; }
-        .status-pronto { background: #e2e3e5; color: #383d41; }
-        .status-consegnato { background: #d4edda; color: #155724; }
+        .tracker-step { position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 10px; background: white; padding: 0 10px; width: 100px; }
+        .step-icon { width: 34px; height: 34px; border-radius: 50%; background: #eee; color: #999; display: flex; justify-content: center; align-items: center; font-size: 14px; border: 3px solid white; }
+        .step-label { font-size: 12px; font-weight: 600; color: #999; text-align: center; }
+        .step-sublabel { font-size: 10px; font-weight: 700; color: #116C4A; text-transform: uppercase; margin-top: -5px; }
+        
+        .step-completed .step-icon { background: #116C4A; color: white; }
+        .step-completed .step-label { color: #333; }
+        .step-active .step-icon { background: white; border: 3px solid #116C4A; color: #116C4A; box-shadow: 0 0 0 3px rgba(17,108,74,0.2); }
+        .step-active .step-label { color: #116C4A; font-weight: 700; }
 
-        /* Footer */
-        footer { background: #012D1D; width: 100%; height: 284px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding: 80px 0px; color: rgba(255,255,255,0.7); margin-top: auto; }
+        /* ACTIVE ORDER DETAILS */
+        .active-order-details { display: flex; justify-content: space-between; border-top: 1px solid #f0f0f0; padding-top: 25px; gap: 20px; }
+        .detail-block { display: flex; gap: 15px; flex: 1; }
+        .detail-icon { width: 40px; height: 40px; border-radius: 8px; background: #A7F3D0; color: #0b3c29; display: flex; justify-content: center; align-items: center; font-size: 18px; flex-shrink: 0; }
+        .detail-icon.gray { background: #f1f3f5; color: #777; }
+        .detail-text h5 { font-size: 11px; color: #777; font-weight: 600; text-transform: uppercase; margin-bottom: 3px; }
+        .detail-text p { font-size: 14px; color: #1a1a1a; font-weight: 600; line-height: 1.4; }
+        .detail-text .sub-p { font-size: 12px; color: #116C4A; font-weight: 500; margin-top: 2px; }
+        .items-list { list-style: none; font-size: 12px; color: #555; }
+        .items-list li { display: flex; justify-content: space-between; margin-bottom: 4px; }
+
+        /* HISTORY TABLE */
+        .history-container { background: white; border-radius: 12px; border: 1px solid #E6E9E8; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.01); }
+        
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; padding: 15px 20px; border-bottom: 1px solid #E6E9E8; background: #fafafa; }
+        td { padding: 20px; font-size: 13px; color: #333; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        
+        .td-id { font-weight: 700; color: #2c3e50; }
+        .td-items { color: #666; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .td-total { font-weight: 800; color: #116C4A; }
+        
+        .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; background: #e8f5e9; color: #116C4A; text-transform: capitalize;}
+        .status-badge::before { content: ''; width: 6px; height: 6px; background: #116C4A; border-radius: 50%; }
+        .status-badge.annullato { background: #fdf0f0; color: #c9302c; }
+        .status-badge.annullato::before { background: #c9302c; }
+
+        .btn-reorder { background: #0b3c29; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; transition: 0.2s; }
+        .btn-reorder:hover { background: #116C4A; }
+        
+        .btn-full-history { display: flex; justify-content: center; align-items: center; gap: 8px; width: 200px; margin: 30px auto; padding: 10px; border: 1px solid #ccc; border-radius: 20px; background: transparent; color: #333; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn-full-history:hover { background: #f1f3f5; border-color: #bbb; }
+
+        .empty-state { text-align: center; padding: 40px; color: #777; font-style: italic; }
     </style>
 </head>
 <body>
 
     <header>
-        <a href="dashboard.html" class="logo"><i class="fas fa-utensils"></i> WebDelivery</a>
+        <a href="index.html" class="logo"><i class="fas fa-utensils"></i> WebDelivery</a>
         <div class="nav-actions">
-            <a href="carrello.html" style="color: #116C4A; font-weight:bold; text-decoration: none;"><i class="fas fa-shopping-cart"></i> Carrello</a>
             <a href="profilo.html" style="text-decoration:none; color:inherit;"><i class="fas fa-user-circle icon-user-round"></i></a>
-            <a href="LogoutServlet" style="color: #666; font-size: 12px; text-decoration: none;">Esci</a>
+            <a href="LogoutServlet" style="color: #666; font-size: 14px; font-weight: 600; text-decoration: none;">Esci</a>
         </div>
     </header>
 
     <div class="dashboard-container">
         <aside class="sidebar">
             <a href="profilo.html" style="text-decoration:none; color:inherit;">
-                <div class="user-profile"><h3 id="nome-utente">...</h3><p>Cliente</p></div>
+                <div class="user-profile">
+                    <h3 id="nome-utente">...</h3>
+                    <p>Cliente</p>
+                </div>
             </a>
-            <ul class="sidebar-menu">
-                <a href="dashboard.html" class="sidebar-item"><i class="fas fa-utensils"></i> Menù</a>
-                <a href="#" class="sidebar-item active"><i class="fas fa-shopping-bag"></i> I tuoi ordini</a>
-            </ul>
+            <nav class="sidebar-menu">
+                <a href="dashboard.html" class="sidebar-item"><i class="fas fa-file-alt"></i> Menù</a>
+                <a href="#" class="sidebar-item active"><i class="fas fa-utensils"></i> I tuoi ordini</a>
+            </nav>
         </aside>
         
         <main class="main-content">
-            <div class="dashboard-top">
-                <h2>I tuoi Ordini</h2>
-                <p style="color: #666; font-size: 15px; margin-top:5px;">Lo storico degli acquisti effettuati.</p>
+            <h1 class="page-title">I Tuoi Ordini</h1>
+
+            <div id="sezione-ordine-attivo"></div>
+
+            <div class="section-title">
+                <span>Storico Ordini</span>
             </div>
             
-            <div id="lista-ordini">
-                <div style="text-align: center; color: #777; padding: 20px;">Caricamento ordini in corso...</div>
+            <div class="history-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID Ordine</th>
+                            <th>Data</th>
+                            <th>Articoli</th>
+                            <th>Totale</th>
+                            <th>Stato</th>
+                            <th>Azione</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-ordini">
+                        <tr>
+                            <td colspan="6" class="empty-state">Caricamento ordini in corso...</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
+            <button class="btn-full-history">Mostra tutto lo storico <i class="fas fa-arrow-down"></i></button>
+
         </main>
     </div>
 
-    <footer>
-        <p>&copy; 2026 WebDelivery - Tutti i diritti riservati.</p>
-    </footer>
-
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Carica Nome Utente
-            fetch('ProfiloServlet').then(r => r.json()).then(data => {
-                if (data && data.nome) document.getElementById('nome-utente').innerText = data.nome;
-            }).catch(e => { document.getElementById('nome-utente').innerText = "Cliente"; });
+        var indirizzoSalvato = "Indirizzo non specificato nel profilo";
 
-            // Carica Ordini
-            fetch('StoricoOrdiniServlet')
-            .then(r => r.json())
-            .then(ordini => {
-                let html = '';
-                if(!ordini || ordini.length === 0) {
-                    html = '<p style="color:#777; font-style:italic;">Non hai ancora effettuato ordini. <a href="dashboard.html" style="color:#116C4A;">Vai al menù</a></p>';
-                } else {
-                    ordini.forEach(o => {
-                        let statoClass = o.stato ? 'status-' + o.stato.replace(/\s+/g, '-').toLowerCase() : 'status-inserito';
-                        html += `
-                        <div class="order-card">
-                            <div class="order-info">
-                                <h4>Ordine #${o.id}</h4>
-                                <p><i class="far fa-calendar-alt"></i> ${o.data}</p>
-                            </div>
-                            <div style="text-align:right;">
-                                <div class="order-price">€${o.totale.toFixed(2)}</div>
-                                <span class="order-status ${statoClass}">${o.stato || 'Inserito'}</span>
-                            </div>
-                        </div>`;
-                    });
-                }
-                document.getElementById('lista-ordini').innerHTML = html;
-            })
-            .catch(e => {
-                document.getElementById('lista-ordini').innerHTML = '<p style="color:red;">Errore nel caricamento. Effettua nuovamente il login.</p>';
+        document.addEventListener('DOMContentLoaded', function() {
+            // Carica Profilo e Indirizzo
+            fetch('ProfiloServlet').then(function(r) { return r.json(); }).then(function(data) {
+                if (data && data.nome) document.getElementById('nome-utente').innerText = data.nome;
+                if (data && data.indirizzo && data.indirizzo.trim() !== "") indirizzoSalvato = data.indirizzo;
+                
+                caricaStoricoOrdini();
+            }).catch(function(e) { 
+                document.getElementById('nome-utente').innerText = "Cliente"; 
+                caricaStoricoOrdini();
             });
         });
+
+        function caricaStoricoOrdini() {
+            fetch('StoricoOrdiniServlet')
+            .then(function(r) { return r.json(); })
+            .then(function(ordini) {
+                var tbody = document.getElementById('lista-ordini');
+                var attivoContainer = document.getElementById('sezione-ordine-attivo');
+                tbody.innerHTML = '';
+                attivoContainer.innerHTML = '';
+
+                if(!ordini || ordini.length === 0) {
+                    tbody.innerHTML = "<tr><td colspan='6' class='empty-state'>Non hai ancora effettuato ordini.</td></tr>";
+                    return;
+                }
+
+                // Trova il primo ordine in corso
+                var ordineAttivo = null;
+                for(var i=0; i<ordini.length; i++) {
+                    if(ordini[i].stato.toLowerCase() !== 'consegnato' && ordini[i].stato.toLowerCase() !== 'annullato') {
+                        ordineAttivo = ordini[i];
+                        break;
+                    }
+                }
+                
+                if (ordineAttivo) {
+                    renderizzaOrdineAttivo(ordineAttivo, attivoContainer);
+                }
+
+                // Renderizza la tabella per TUTTI gli ordini
+                ordini.forEach(function(o) {
+                    var badgeClass = o.stato.toLowerCase() === 'annullato' ? 'annullato' : '';
+                    
+                    var html = "<tr>" +
+                        "<td class='td-id'>#" + o.id + "</td>" +
+                        "<td>" + o.data.split(' ')[0] + "</td>" +
+                        "<td class='td-items' id='td-items-" + o.id + "'><i class='fas fa-spinner fa-spin' style='color:#ccc;'></i> Caricamento...</td>" +
+                        "<td class='td-total'>€ " + o.totale.toFixed(2) + "</td>" +
+                        "<td><span class='status-badge " + badgeClass + "'>" + o.stato + "</span></td>" +
+                        "<td><button class='btn-reorder' onclick=\"window.location.href='dashboard.html'\">Riordina</button></td>" +
+                    "</tr>";
+                    tbody.innerHTML += html;
+
+                    // Chiamata AJAX per recuperare gli articoli di ogni ordine della tabella
+                    fetch('GetDettaglioOrdineJson?id=' + o.id)
+                    .then(function(res) { return res.json(); })
+                    .then(function(dettagli) {
+                        var testoProdotti = "Nessun articolo";
+                        if(dettagli.prodotti && dettagli.prodotti.length > 0) {
+                            var arrNomi = [];
+                            for(var j=0; j<dettagli.prodotti.length; j++){
+                                arrNomi.push(dettagli.prodotti[j].quantita + "x " + dettagli.prodotti[j].nome);
+                            }
+                            testoProdotti = arrNomi.join(", ");
+                        }
+                        var cella = document.getElementById('td-items-' + o.id);
+                        if(cella) cella.innerText = testoProdotti;
+                    }).catch(function(){
+                         var cella = document.getElementById('td-items-' + o.id);
+                         if(cella) cella.innerText = "Dettagli non disponibili";
+                    });
+                });
+            })
+            .catch(function(e) {
+                document.getElementById('lista-ordini').innerHTML = "<tr><td colspan='6' class='empty-state' style='color:red;'>Errore di caricamento. Effettua di nuovo il login.</td></tr>";
+            });
+        }
+
+        function renderizzaOrdineAttivo(o, container) {
+            var steps = ['inserito', 'in preparazione', 'pronto', 'in consegna', 'consegnato'];
+            var statoDb = o.stato.toLowerCase();
+            var currentIndex = steps.indexOf(statoDb);
+            if (currentIndex === -1) currentIndex = 0;
+
+            var fillPercentage = (currentIndex / (steps.length - 1)) * 100;
+            var stepHtml = "";
+            var labels = ['Ricevuto', 'In Cucina', 'Pronto', 'In Viaggio', 'Consegnato'];
+            var icons = ['fa-check', 'fa-fire', 'fa-box', 'fa-bicycle', 'fa-map-marker-alt'];
+
+            for (var i = 0; i < steps.length; i++) {
+                var statusClass = "";
+                var iconContent = "<i class='fas " + icons[i] + "'></i>";
+                var subLabel = "";
+
+                if (i < currentIndex) {
+                    statusClass = "step-completed";
+                    iconContent = "<i class='fas fa-check'></i>";
+                } else if (i === currentIndex) {
+                    statusClass = "step-active";
+                    subLabel = "<div class='step-sublabel'>LIVE</div>";
+                }
+
+                stepHtml += "<div class='tracker-step " + statusClass + "'>" +
+                    "<div class='step-icon'>" + iconContent + "</div>" +
+                    "<div class='step-label'>" + labels[i] + "</div>" +
+                    subLabel +
+                "</div>";
+            }
+
+            var orario = o.data.split(' ')[1] ? o.data.split(' ')[1].substring(0,5) : 'A breve';
+
+            container.innerHTML = "" +
+            "<div class='section-title'>" +
+                "<span>Ordine in corso <span style='color:#888; font-weight:500;'>#" + o.id + "</span></span>" +
+                "<span class='express-badge'><i class='fas fa-bolt'></i> CONSEGNA EXPRESS</span>" +
+            "</div>" +
+            "<div class='active-order-card'>" +
+                "<div class='tracker-container'>" +
+                    "<div class='tracker-line'></div>" +
+                    "<div class='tracker-line-fill' style='width: " + fillPercentage + "%;'></div>" +
+                    stepHtml +
+                "</div>" +
+                "<div class='active-order-details'>" +
+                    "<div class='detail-block'>" +
+                        "<div class='detail-icon'><i class='far fa-clock'></i></div>" +
+                        "<div class='detail-text'>" +
+                            "<h5>Consegna Stimata</h5>" +
+                            "<p>Oggi, " + orario + "</p>" +
+                            "<div class='sub-p'>In orario</div>" +
+                        "</div>" +
+                    "</div>" +
+                    "<div class='detail-block'>" +
+                        "<div class='detail-icon gray'><i class='fas fa-map-marker-alt'></i></div>" +
+                        "<div class='detail-text'>" +
+                            "<h5>Indirizzo di Consegna</h5>" +
+                            "<p style='font-size:13px; font-weight:500;'>" + indirizzoSalvato + "</p>" +
+                        "</div>" +
+                    "</div>" +
+                    "<div class='detail-block'>" +
+                        "<div class='detail-icon gray'><i class='fas fa-list-ul'></i></div>" +
+                        "<div class='detail-text' style='width:100%;'>" +
+                            "<h5>Riepilogo Ordine</h5>" +
+                            "<ul class='items-list' id='active-items-list'>" +
+                                "<li><i class='fas fa-spinner fa-spin'></i> Caricamento articoli...</li>" +
+                            "</ul>" +
+                        "</div>" +
+                    "</div>" +
+                "</div>" +
+            "</div>";
+
+            // Recuperiamo i prodotti dell'ordine attivo
+            fetch('GetDettaglioOrdineJson?id=' + o.id)
+            .then(function(res) { return res.json(); })
+            .then(function(dettagli) {
+                var htmlProdotti = "";
+                if(dettagli.prodotti && dettagli.prodotti.length > 0) {
+                    for(var k=0; k<dettagli.prodotti.length; k++){
+                        var p = dettagli.prodotti[k];
+                        htmlProdotti += "<li><span>" + p.quantita + "x " + p.nome + "</span><span>€ " + (p.prezzo * p.quantita).toFixed(2) + "</span></li>";
+                    }
+                }
+                htmlProdotti += "<li style='border-top:1px solid #eee; margin-top:5px; padding-top:5px; font-weight:bold; color:#1a1a1a;'>" +
+                                "<span>Totale</span><span>€ " + o.totale.toFixed(2) + "</span></li>";
+                
+                var listaAttiva = document.getElementById('active-items-list');
+                if(listaAttiva) listaAttiva.innerHTML = htmlProdotti;
+            });
+        }
     </script>
 </body>
 </html>

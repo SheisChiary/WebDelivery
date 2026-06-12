@@ -19,7 +19,10 @@ CREATE TABLE Prodotto (
     prezzo_base DECIMAL(10, 2) NOT NULL,
     tempo_preparazione INT NOT NULL COMMENT 'Tempo in minuti',
     ingredienti TEXT,
-    ricetta TEXT
+    ricetta TEXT,
+    categoria VARCHAR(50) DEFAULT 'tutti',
+    immagine_url TEXT,
+    badge VARCHAR(50)
 );
 
 CREATE TABLE Gruppo_Esclusione (

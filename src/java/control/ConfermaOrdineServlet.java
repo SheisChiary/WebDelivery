@@ -46,18 +46,19 @@ public class ConfermaOrdineServlet extends HttpServlet {
                 return;
             }
 
-            // Calcolo del totale
-            double totaleOrdine = 2.50; // Spedizione inclusa
+            // Calcolo del totale (inclusa eventuale spedizione o costo base)
+            double totaleOrdine = 2.50; 
             for (ElementoCarrello el : carrello) {
                 totaleOrdine += (el.getProdotto().getPrezzoBase() + el.getPrezzoExtra()) * el.getQuantita();
             }
 
             int numeroOrdine = 0;
 
-            // --- FASE 1: SALVATAGGIO NEL DATABASE ---
+            // Salvataggio nel database ---
             try (Connection conn = DBConnect.getConnection()) {
                 conn.setAutoCommit(false); 
                 
+                // 1. Creazione dell'Ordine "Testata"
                 String sqlOrdine = "INSERT INTO Ordine (id_cliente, orario_consegna_richiesto, stato_attuale, prezzo_totale, tempo_stimato_consegna) VALUES (?, DATE_ADD(NOW(), INTERVAL 40 MINUTE), 'inserito', ?, 40)";
                 try (PreparedStatement ps = conn.prepareStatement(sqlOrdine, Statement.RETURN_GENERATED_KEYS)) {
                     ps.setInt(1, idCliente);
@@ -72,19 +73,26 @@ public class ConfermaOrdineServlet extends HttpServlet {
                 }
                 
                 if (numeroOrdine > 0) {
+                    // 2. Inserimento dei prodotti del carrello
                     String sqlDettaglio = "INSERT INTO Dettaglio_Ordine (id_ordine, id_prodotto, quantita) VALUES (?, ?, ?)";
                     try (PreparedStatement psDett = conn.prepareStatement(sqlDettaglio)) {
                         for (ElementoCarrello el : carrello) {
                             psDett.setInt(1, numeroOrdine);
-                            
-                            // ECCO LA CORREZIONE: usiamo getIdProdotto() al posto di getId()
                             psDett.setInt(2, el.getProdotto().getIdProdotto()); 
-                            
                             psDett.setInt(3, el.getQuantita());
                             psDett.executeUpdate();
                         }
                     }
-                    conn.commit(); // Salvataggio definitivo nel Database!
+          
+                    String sqlStorico = "INSERT INTO Storico_Stati_Ordine (id_ordine, id_personale, stato) VALUES (?, ?, 'inserito')";
+                    try (PreparedStatement psStorico = conn.prepareStatement(sqlStorico)) {
+                        psStorico.setInt(1, numeroOrdine);
+                        psStorico.setInt(2, idCliente); // Usiamo l'ID del cliente che ha fatto l'ordine!
+                        psStorico.executeUpdate();
+                    }
+                    
+                    conn.commit(); // Salvataggio definitivo nel Database di tutte e 3 le tabelle!
+                    
                 } else {
                     conn.rollback();
                     out.print("{\"successo\": false, \"messaggio\": \"Errore interno durante la creazione dell'ordine.\"}");
@@ -96,27 +104,23 @@ public class ConfermaOrdineServlet extends HttpServlet {
                 return;
             }
 
-            // --- FASE 2: COSTRUZIONE E INVIO EMAIL ---
+            
             StringBuilder html = new StringBuilder();
             html.append("<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>");
             html.append("<h2 style='color: #116C4A;'>Grazie per il tuo ordine, ").append(nome).append("!</h2>");
-            html.append("<p>Il tuo ordine <strong>#").append(numeroOrdine).append("</strong> è stato ricevuto.</p>");
+            html.append("<p>Il tuo ordine <strong>#").append(numeroOrdine).append("</strong> è stato ricevuto e sarà in preparazione a breve.</p>");
             html.append("</div>");
 
             try {
-                // Proviamo a inviare l'email
                 EmailUtility.inviaEmailRiepilogo(email, "Conferma Ordine #" + numeroOrdine, html.toString());
             } catch (Throwable t) {
-                // SE LE LIBRERIE MAIL MANCANO O ESPLODONO, CATTURIAMO L'ERRORE QUI SENZA BLOCCARE IL SITO
                 System.out.println("ATTENZIONE: Email non inviata, ma ordine salvato! Errore: " + t.getMessage());
             }
             
-            // Sia che l'email parta, sia che fallisca, SVUOTIAMO IL CARRELLO E DIAMO SUCCESSO
             session.removeAttribute("carrello");
             out.print("{\"successo\": true, \"messaggio\": \"Ordine confermato con successo!\"}");
 
         } catch (Throwable t) {
-            // Questo blocca qualsiasi altro errore cosmico di Java
             t.printStackTrace();
             out.print("{\"successo\": false, \"messaggio\": \"Errore imprevisto del server.\"}");
         }

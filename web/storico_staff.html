@@ -39,19 +39,22 @@
         td { padding: 15px 10px 15px 0; font-size: 14px; border-bottom: 1px solid #f5f5f5; white-space: nowrap; }
         tr:last-child td { border-bottom: none; padding-bottom: 0; }
 
+        /* BADGE STATO */
         .badge {
-         padding: 4px 10px;
-         border-radius: 20px;
-         font-size: 11px;
-         font-weight: 600;
-         display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
         }
         .badge.inserito { background-color: #fff3cd; color: #856404; }
         .badge.inpreparazione { background-color: #cce5ff; color: #004085; }
-        .badge.pronto { background-color: #d4edda; color: #155724; }
+        .badge.pronto { background-color: #e2e3e5; color: #383d41; }
         .badge.inconsegna { background-color: #e2d9f3; color: #4a238b; }
-        .badge.consegnato { background-color: #d4edda; color: #155724
+        .badge.consegnato { background-color: #d4edda; color: #155724; }
+        .badge.annullato { background-color: #f8d7da; color: #721c24; }
 
+        /* BOTTONE AZIONE */
         .btn-azione { background-color: transparent; border: 1px solid #116C4A; color: #116C4A; padding: 6px 12px; border-radius: 5px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; }
         .btn-azione:hover { background-color: #116C4A; color: #ffffff; }
         .empty-state { text-align: center; color: #777; padding: 30px 0; font-style: italic; }
@@ -64,21 +67,22 @@
         .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
         .close-btn:hover { color: #333; }
         .order-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #eee; }
+        .item-name { font-weight: 500; }
+        .item-price { font-weight: 600; }
+        .order-total { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 15px; border-top: 2px solid #e0e0e0; font-size: 18px; font-weight: 700; }
+
+        /* RESPONSIVITÀ */
         @media (max-width: 768px) {
-    body { flex-direction: column; height: auto; }
-    .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #e0e0e0; flex-direction: row; flex-wrap: wrap; align-items: center; padding-bottom: 15px; }
-    .logo { width: 100%; padding: 15px; margin-bottom: 0; border-bottom: none; text-align: left; }
-    .nav-menu { flex-direction: row; width: 100%; justify-content: flex-start; gap: 10px; flex-wrap: wrap; }
-    .nav-item { font-size: 13px; padding: 8px 12px; }
-    .logout { margin-top: 10px; }
-    .main-content { padding: 15px; }
-    .header-top { flex-direction: column; align-items: flex-start; gap: 15px; }
-    .stats-container { flex-direction: column; gap: 10px; }
-    .order-header { flex-direction: column; align-items: flex-start; gap: 8px; }
-    .order-body { flex-direction: column; align-items: flex-start; gap: 15px; }
-    .status-section, .items-section { text-align: left; }
-    .action-btn { width: 100%; text-align: center; }
-}
+            body { flex-direction: column; height: auto; }
+            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #e0e0e0; flex-direction: row; flex-wrap: wrap; align-items: center; padding-bottom: 15px; }
+            .logo { width: 100%; padding: 15px; margin-bottom: 0; border-bottom: none; text-align: left; }
+            .nav-menu { flex-direction: row; width: 100%; justify-content: flex-start; gap: 10px; flex-wrap: wrap; }
+            .nav-item { font-size: 13px; padding: 8px 12px; }
+            .logout { margin-top: 10px; }
+            .main-content { padding: 15px; }
+            .header-top { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .table-container { padding: 15px; }
+        }
     </style>
 </head>
 <body>
@@ -86,8 +90,8 @@
     <div class="sidebar">
         <div class="logo">WebDelivery</div>
         <div class="nav-menu">
-           <a href="dashboard_staff.html" class="nav-item">Gestione Ordini (Live)</a>
-    <a href="storico_staff.html" class="nav-item active">Storico Personale</a>
+            <a href="dashboard_staff.html" class="nav-item">Gestione Ordini (Live)</a>
+            <a href="#" class="nav-item active">Storico Personale</a>
         </div>
         <div class="nav-menu" style="margin-top: auto;">
             <a href="LogoutServlet" class="nav-item logout">Esci</a>
@@ -96,8 +100,8 @@
 
     <div class="main-content">
         <div class="header-top">
-            <h1>Storico Ordini Completati</h1>
-            <div class="subtitle">Archivio delle consegne effettuate. Utile per verifiche e controlli scontrini.</div>
+            <h1>Storico Ordini</h1>
+            <div class="subtitle">Archivio degli ordini consegnati o annullati. Utile per verifiche e controlli.</div>
         </div>
 
         <div class="table-container">
@@ -106,7 +110,7 @@
                     <tr>
                         <th>ID ORDINE</th>
                         <th>CLIENTE</th>
-                        <th>DATA E ORA CONSEGNA</th>
+                        <th>DATA E ORA</th>
                         <th>TOTALE</th>
                         <th>STATO</th>
                         <th>DETTAGLI E STORICO</th>
@@ -127,9 +131,10 @@
                 <h3 id="popupTitolo">Dettagli Ordine</h3>
                 <button class="close-btn" onclick="chiudiPopup()">&times;</button>
             </div>
+            
             <div class="modal-body">
                 <div id="popupListaProdotti"></div>
-                <div style="display: flex; justify-content: space-between; margin-top: 20px; padding-top: 15px; border-top: 2px solid #e0e0e0; font-size: 18px; font-weight: 700;">
+                <div class="order-total">
                     <span>Totale</span>
                     <span id="popupTotalePrezzo">€ 0.00</span>
                 </div>
@@ -148,11 +153,14 @@
                     const tbody = document.getElementById('tbody-storico');
                     tbody.innerHTML = ''; 
 
-                    // FILTRO: prendiamo solo quelli consegnati
-                    const ordiniCompletati = data.filter(o => o.stato.toLowerCase() === 'consegnato');
+                    // FILTRO AGGIORNATO: Ora include sia i Consegnati che gli Annullati
+                    const ordiniCompletati = data.filter(o => 
+                        o.stato.toLowerCase() === 'consegnato' || 
+                        o.stato.toLowerCase() === 'annullato'
+                    );
 
                     if (ordiniCompletati.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Nessun ordine completato presente nel database.</td></tr>';
+                        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Nessun ordine completato o annullato presente nel database.</td></tr>';
                         return;
                     }
 
@@ -162,7 +170,7 @@
                             <td>${o.cliente}</td>
                             <td>${o.data}</td>
                             <td>€ ${parseFloat(o.totale).toFixed(2)}</td>
-                            <td><span class="badge consegnato">${o.stato}</span></td>
+                            <td><span class="badge ${o.stato.replace(/\s+/g, '').toLowerCase()}">${o.stato}</span></td>
                             <td><button class="btn-azione" onclick="apriPopup('${o.id}')">Apri Scheda</button></td>
                         </tr>`;
                         tbody.innerHTML += row;
@@ -175,39 +183,50 @@
         });
 
         // GESTIONE POPUP
-        function apriPopup(idOrdine) {
+        function apriPopup(idOrdineRaw) {
+            const idOrdine = idOrdineRaw.replace('#', '');
+            
             document.getElementById('popupTitolo').innerText = 'Dettagli Ordine #' + idOrdine;
             document.getElementById('popupDettagli').style.display = 'flex';
             document.getElementById('popupListaProdotti').innerHTML = '<div style="text-align:center; padding:20px; color:#777;"><em>Caricamento...</em></div>';
+            document.getElementById('popupTotalePrezzo').innerText = '€ ...';
             
             fetch('GetDettaglioOrdineJson?id=' + idOrdine)
                 .then(r => r.json())
                 .then(data => {
                     let html = '<h4 style="color:#116C4A; margin-top:0; margin-bottom:10px;">Prodotti Ordinati:</h4>';
-                    if (data.prodotti) {
+                    
+                    if (data.prodotti && data.prodotti.length > 0) {
                         data.prodotti.forEach(p => {
+                            let prezzoTotaleProdotto = p.prezzo * p.quantita;
                             html += `<div class="order-item">
-                                        <span style="font-weight:500;">${p.quantita}x ${p.nome}</span>
-                                        <span>€ ${(p.prezzo * p.quantita).toFixed(2)}</span>
+                                        <span class="item-name">${p.quantita}x ${p.nome}</span>
+                                        <span class="item-price">€ ${prezzoTotaleProdotto.toFixed(2)}</span>
                                      </div>`;
                         });
+                    } else {
+                        html += '<p style="font-size:13px; color:#777;">Nessun dettaglio prodotto trovato.</p>';
                     }
                     
                     html += '<h4 style="margin: 25px 0 10px 0; color: #116C4A;">Storico Modifiche:</h4>';
-                     if (data.storico && data.storico.length > 0) {
-                       data.storico.forEach(s => {
-                         let classeBadge = s.stato.replace(/\s+/g, '').toLowerCase();
-                         html += `<div style="font-size:13px; border-bottom:1px solid #f5f5f5; padding:10px 0;">
-                              <b>${s.data}</b> - <span class="badge ${classeBadge}">${s.stato}</span><br>
-                              <i style="color:#777; font-size:12px; margin-top:4px; display:inline-block;">da: ${s.personale}</i>
-                         </div>`;
-                     });
-                 } else {
-                     html += '<p style="font-size:13px; color:#777;">Nessuna modifica registrata finora.</p>';
-                 }
+                    if (data.storico && data.storico.length > 0) {
+                        data.storico.forEach(s => {
+                            let classeBadge = s.stato.replace(/\s+/g, '').toLowerCase();
+                            html += `<div style="font-size:13px; border-bottom:1px solid #f5f5f5; padding:10px 0;">
+                                        <b>${s.data}</b> - <span class="badge ${classeBadge}">${s.stato}</span><br>
+                                        <i style="color:#777; font-size:12px; margin-top:4px; display:inline-block;">da: ${s.personale}</i>
+                                     </div>`;
+                        });
+                    } else {
+                        html += '<p style="font-size:13px; color:#777;">Nessuna modifica registrata finora.</p>';
+                    }
                     
                     document.getElementById('popupListaProdotti').innerHTML = html;
                     document.getElementById('popupTotalePrezzo').innerText = '€ ' + parseFloat(data.totale).toFixed(2);
+                })
+                .catch(error => {
+                    console.error('Errore:', error);
+                    document.getElementById('popupListaProdotti').innerHTML = '<div style="color:red; text-align:center;">Errore nel caricamento dei dati.</div>';
                 });
         }
 
