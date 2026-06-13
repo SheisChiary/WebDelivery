@@ -59,4 +59,54 @@ public class ProdottoDAO {
     }
     return null;
 }
+    
+    // Aggiungi un nuovo prodotto
+    public boolean addProdotto(Prodotto p) {
+        String query = "INSERT INTO Prodotto (nome, descrizione, prezzo_base, categoria, immagine_url, badge) VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setString(1, p.getNome());
+            ps.setString(2, p.getDescrizione());
+            ps.setDouble(3, p.getPrezzoBase());
+            ps.setString(4, p.getCategoria());
+            ps.setString(5, p.getImmagineUrl());
+            ps.setString(6, p.getBadge());
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Modifica un prodotto esistente
+    public boolean updateProdotto(Prodotto p) {
+        String query = "UPDATE Prodotto SET nome=?, descrizione=?, prezzo_base=?, categoria=?, immagine_url=?, badge=? WHERE id_prodotto=?";
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setString(1, p.getNome());
+            ps.setString(2, p.getDescrizione());
+            ps.setDouble(3, p.getPrezzoBase());
+            ps.setString(4, p.getCategoria());
+            ps.setString(5, p.getImmagineUrl());
+            ps.setString(6, p.getBadge());
+            ps.setInt(7, p.getIdProdotto());
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Elimina un prodotto
+    public boolean deleteProdotto(int id) {
+        String query = "DELETE FROM Prodotto WHERE id_prodotto = ?";
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

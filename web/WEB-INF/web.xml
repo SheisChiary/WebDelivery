@@ -52,6 +52,18 @@
         <servlet-name>StoricoOrdiniServlet</servlet-name>
         <servlet-class>control.StoricoOrdiniServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AddProdotto</servlet-name>
+        <servlet-class>control.AddProdottoServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>EditProdottoServlet</servlet-name>
+        <servlet-class>control.EditProdottoServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DeleteProdottoServlet</servlet-name>
+        <servlet-class>control.DeleteProdottoServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>RegistrazioneServlet</servlet-name>
         <url-pattern>/RegistrazioneServlet</url-pattern>
@@ -103,5 +115,17 @@
     <servlet-mapping>
         <servlet-name>StoricoOrdiniServlet</servlet-name>
         <url-pattern>/StoricoOrdiniServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AddProdotto</servlet-name>
+        <url-pattern>/AddProdotto</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EditProdottoServlet</servlet-name>
+        <url-pattern>/EditProdottoServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DeleteProdottoServlet</servlet-name>
+        <url-pattern>/DeleteProdottoServlet</url-pattern>
     </servlet-mapping>
 </web-app>

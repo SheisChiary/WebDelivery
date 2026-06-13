@@ -3,20 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestione menù - WebDelivery</title>
+    <title>Gestione Menù - Dashboard Proprietario</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
+        * { box-sizing: border-box; }
+        
         body {
             margin: 0;
             font-family: 'Inter', sans-serif;
-            background-color: #f4f7f6;
+            background-color: #f4f7f6; 
             display: flex;
             height: 100vh;
             color: #333;
+            overflow: hidden;
         }
 
- 
+        /* --- SIDEBAR ORIGINALE DEL PROPRIETARIO --- */
         .sidebar {
             width: 260px;
             background-color: #ffffff;
@@ -24,7 +27,7 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
-            box-sizing: border-box;
+            flex-shrink: 0;
         }
 
         .logo {
@@ -41,7 +44,7 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            padding: 25px 20px; /* Più spazio ai lati come nell'immagine */
+            padding: 25px 20px;
         }
 
         .nav-item {
@@ -54,293 +57,187 @@
             transition: all 0.2s;
         }
 
-        .nav-item:hover:not(.active) {
-            background-color: #f4f7f6;
-            color: #116C4A;
-        }
+        .nav-item:hover:not(.active) { background-color: #f4f7f6; color: #116C4A; }
+        .nav-item.active { background-color: #116C4A; color: #ffffff; box-shadow: 0 4px 10px rgba(17, 108, 74, 0.2); }
 
-        .nav-item.active {
-            background-color: #116C4A;
-            color: #ffffff;
-            box-shadow: 0 4px 10px rgba(17, 108, 74, 0.2);
-        }
-
-        .logout-container {
-            margin-top: auto;
-            padding: 20px;
-            border-top: 1px solid #f0f0f0;
-        }
-
-        .logout {
-            color: #d9534f;
-            text-decoration: none;
-            font-size: 15px;
-            font-weight: 500;
-            padding: 14px 20px;
-            display: block;
-            border-radius: 8px;
-            transition: 0.2s;
-        }
-
-        .logout:hover {
-            background-color: #fdf0f0;
-        }
+        .logout-container { margin-top: auto; padding: 20px; border-top: 1px solid #f0f0f0; }
+        .logout { color: #d9534f; text-decoration: none; font-size: 15px; font-weight: 500; padding: 14px 20px; display: block; border-radius: 8px; transition: 0.2s; }
+        .logout:hover { background-color: #fdf0f0; }
 
         /* --- CONTENUTO PRINCIPALE --- */
-        .main-content {
-            flex: 1;
-            padding: 40px;
-            overflow-y: auto;
-        }
+        .main-content { flex: 1; padding: 40px; overflow-y: auto; height: 100vh; }
 
-        h1 {
-            font-size: 28px;
-            font-weight: 600;
-            margin-top: 0;
-            margin-bottom: 30px;
-            color: #333;
-        }
+        h1 { font-size: 28px; font-weight: 600; margin-top: 0; margin-bottom: 30px; color: #333; }
 
-        /* --- FORM E TABELLE --- */
         .table-container {
-            background-color: #ffffff;
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            border: 1px solid #f0f0f0;
-            overflow-x: auto;
+            background-color: #ffffff; border-radius: 10px; padding: 25px; margin-bottom: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #e0e0e0;
+        }
+        h2 { font-size: 18px; font-weight: 600; margin-top: 0; margin-bottom: 20px; color: #333; }
+
+        /* --- LAYOUT DIVISO: FORM E ANTEPRIMA --- */
+        .split-layout { display: flex; gap: 30px; align-items: flex-start; }
+        .form-section { flex: 1; }
+        
+        .preview-section {
+            width: 300px; background: #f4f7f6; padding: 20px; border-radius: 10px; border: 1px dashed #ccc; display: flex; flex-direction: column; align-items: center; position: sticky; top: 20px;
         }
 
-        h2 {
-            font-size: 18px;
-            font-weight: 600;
-            margin-top: 0;
-            margin-bottom: 20px;
-            color: #333;
-        }
+        .preview-title-section { font-size: 12px; font-weight: 600; color: #777; text-transform: uppercase; margin-bottom: 15px; width: 100%; text-align: left; }
 
-        /* Form di registrazione */
-        .form-grid {
-            display: flex;
-            gap: 15px;
-            align-items: flex-end;
-            flex-wrap: wrap;
-            margin-bottom: 10px;
-        }
+        /* Card Anteprima (Stile Dashboard Cliente) */
+        .card-preview { width: 100%; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid #e0e0e0; }
+        .card-preview img { width: 100%; height: 160px; object-fit: cover; background: #eee; }
+        .card-body { padding: 15px; }
+        .card-name { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 4px; }
+        .card-cat { font-size: 12px; color: #777; margin-bottom: 10px; }
+        .card-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 10px;}
+        .card-price { font-size: 16px; font-weight: 700; color: #116C4A; }
+        .card-badge { background: #FEF3C7; color: #D97706; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; display: none; }
 
-        .input-group {
-            flex: 1;
-            min-width: 200px;
+        /* Form di inserimento */
+        .form-grid { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 10px; }
+        .input-group { flex: 1; min-width: 200px; margin-bottom: 10px; }
+        .input-group.full-width { flex: 100%; }
+        .input-group label { display: block; font-size: 12px; font-weight: 600; color: #777; margin-bottom: 8px; }
+        
+        .input-group input, .input-group select, .input-group textarea {
+            width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; box-sizing: border-box; background-color: #f9f9f9; outline: none; transition: 0.2s; font-family: 'Inter', sans-serif;
         }
-
-        .input-group label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            color: #777;
-            margin-bottom: 8px;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            font-size: 14px;
-            box-sizing: border-box;
-            background-color: #f9f9f9;
-            outline: none;
-        }
-
-        .input-group input:focus {
-            border-color: #116C4A;
-        }
+        .input-group input:focus, .input-group textarea:focus, .input-group select:focus { border-color: #116C4A; background-color: #fff; }
 
         .btn-submit {
-            background-color: #116C4A;
-            color: #ffffff;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            height: 42px; 
+            background-color: #116C4A; color: #ffffff; border: none; padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s; width: 100%; margin-top: 15px; height: 42px;
         }
+        .btn-submit:hover { background-color: #0d422c; }
 
-        .btn-submit:hover {
-            background-color: #0d422c;
+        .btn-azione {
+            background-color: transparent; border: 1px dashed #116C4A; color: #116C4A; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-block;
         }
+        .btn-azione:hover { background-color: #f0fdf4; }
 
         /* Tabella */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        th {
-            font-size: 12px;
-            font-weight: 600;
-            color: #777;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #e0e0e0;
-            white-space: nowrap;
-            text-transform: uppercase;
-        }
-
-        td {
-            padding: 15px 0;
-            font-size: 14px;
-            border-bottom: 1px solid #f5f5f5;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-
-        /* Bottoni Azione (Matita e Cestino) */
-        .btn-icon {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-            margin-right: 10px;
-            transition: transform 0.2s;
-        }
-
-        .btn-icon:hover {
-            transform: scale(1.1);
-        }
-
-        /* --- MODALE MODIFICA --- */
-        .modal-overlay {
-            display: none; 
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            width: 400px;
-            max-width: 90%;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            
-        }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { font-size: 12px; font-weight: 600; color: #777; padding-bottom: 15px; border-bottom: 1px solid #e0e0e0; text-transform: uppercase; }
+        td { padding: 15px 0; font-size: 14px; border-bottom: 1px solid #f5f5f5; vertical-align: middle; color: #333; }
+        .img-preview-table { width: 48px; height: 48px; border-radius: 8px; object-fit: cover; }
+        .badge-table { background: #FEF3C7; color: #D97706; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
         
-        /* RESPONSIVITÀ PER SCHERMI PICCOLI E FINESTRE STRETTE */
-       @media (max-width: 768px) {
-            body { 
-                flex-direction: column; 
-                height: auto; 
-            }
-            .sidebar { 
-                width: 100%; 
-                height: auto; 
-                border-right: none; 
-                border-bottom: 1px solid #e0e0e0; 
-            }
-            .logo-container {
-                padding: 15px 20px 5px;
-                text-align: center;
-                border-bottom: none;
-            }
-            .nav-menu { 
-                flex-direction: row; 
-                flex-wrap: wrap; 
-                justify-content: center; 
-                gap: 10px; 
-                padding: 10px 15px;
-            }
-            .nav-item { 
-                font-size: 13px; 
-                padding: 8px 12px; 
-            }
-            .logout-container { 
-                margin-top: 0; 
-                padding: 5px 15px 15px; 
-                border-top: none;
-                display: flex;
-                justify-content: center;
-            }
-            .logout { 
-                padding: 8px 12px; 
-                text-align: center;
-            }
-            .main-content { 
-                padding: 20px; 
-            }
-            .table-container { 
-                padding: 15px; 
-            }
-            .form-grid {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .btn-submit {
-                width: 100%;
-            }
-        }
+        .btn-icon { background: none; border: none; cursor: pointer; font-size: 18px; margin-right: 15px; color: #888; transition: transform 0.2s; }
+        .btn-icon:hover { transform: scale(1.1); color: #116C4A; }
+        .delete-icon:hover { color: #d9534f; }
+
+        /* Modale Modifica */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background-color: #fff; padding: 30px; border-radius: 10px; width: 600px; max-width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <h2 class="logo">WebDelivery</h2>
+        <div class="logo">WebDelivery</div>
         <div class="nav-menu">
             <a href="dashboard_admin.html" class="nav-item">Ordini</a>
             <a href="gestione_menu.html" class="nav-item active">Gestione del menù</a>
             <a href="gestione_staff.html" class="nav-item">Gestione dello staff</a>
             <a href="statistiche.html" class="nav-item">Statistiche</a>
         </div>
-        <div class="nav-menu" style="margin-top: auto;">
-            <a href="LogoutServlet" class="nav-item logout">Esci</a>
+        <div class="logout-container">
+            <a href="LogoutServlet" class="logout">Esci</a>
         </div>
     </div>
 
     <div class="main-content">
-        <h1>Gestione dello staff</h1>
+        <h1>Gestione del menù</h1>
         
         <div class="table-container">
-            <h2>Registra nuovo membro dello Staff</h2>
-            <form id="formRegistrazioneStaff">
-                <div class="form-grid">
-                    <div class="input-group">
-                        <label>Nome utente</label>
-                        <input type="text" name="username" id="reg-username" required>
-                    </div>
-                    <div class="input-group">
-                        <label>Email</label>
-                        <input type="email" name="email" id="reg-email" required>
-                    </div>
-                    <div class="input-group">
-                        <label>Password</label>
-                        <input type="password" name="password" id="reg-password" required>
-                    </div>
-                    <button type="submit" class="btn-submit">Conferma</button>
+            <h2>Aggiungi nuovo piatto</h2>
+            
+            <div class="split-layout">
+                <div class="form-section">
+                    <form id="formAggiungiProdotto">
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label>Nome Prodotto *</label>
+                                <input type="text" id="reg-nome" placeholder="Es. Pizza Margherita" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Categoria *</label>
+                                <select id="reg-categoria" required>
+                                    <option value="Pizze">Pizze</option>
+                                    <option value="Burger">Burger</option>
+                                    <option value="Primi">Primi / Insalate</option>
+                                    <option value="Sushi">Sushi</option>
+                                    <option value="Bevande">Bevande</option>
+                                    <option value="Dolci">Dolci</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label>Prezzo Base (€) *</label>
+                                <input type="number" step="0.10" id="reg-prezzo" placeholder="0.00" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Badge (es. POPOLARE)</label>
+                                <input type="text" id="reg-badge" placeholder="Opzionale">
+                            </div>
+                            <div class="input-group full-width">
+                                <label>Descrizione base *</label>
+                                <textarea id="reg-descrizione" rows="2" placeholder="Descrizione del piatto..." required></textarea>
+                            </div>
+                            <div class="input-group full-width">
+                                <label>URL Immagine (Link della foto)</label>
+                                <input type="text" id="reg-immagine" placeholder="https://...">
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e0e0e0;">
+                            <label style="display: block; font-size: 13px; font-weight: 700; color: #116C4A; margin-bottom: 8px;">
+                                <i class="fas fa-list-ul"></i> Ingredienti modificabili dal cliente (Varianti/Extra)
+                            </label>
+                            <p style="font-size: 12px; color: #777; margin-top: 0; margin-bottom: 15px;">Aggiungi ingredienti extra, rimozioni possibili, o varianti d'impasto.</p>
+                            
+                            <div id="varianti-container">
+                                </div>
+                            <button type="button" class="btn-azione" onclick="aggiungiVarianteUI('varianti-container')">+ Aggiungi Ingrediente / Variante</button>
+                        </div>
+
+                        <button type="submit" class="btn-submit">Aggiungi al Menù</button>
+                    </form>
                 </div>
-            </form>
+
+                <div class="preview-section">
+                    <div class="preview-title-section">Anteprima per il Cliente</div>
+                    <div class="card-preview">
+                        <img id="prev-img" src="https://placehold.co/400x300?text=Anteprima+Foto" alt="Anteprima">
+                        <div class="card-body">
+                            <div class="card-name" id="prev-nome">Nome Piatto</div>
+                            <div class="card-cat" id="prev-cat">Categoria</div>
+                            
+                            <div id="prev-varianti-list" style="margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px; font-size: 12px; display: none;">
+                                </div>
+
+                            <div class="card-bottom">
+                                <div class="card-price" id="prev-prezzo">€ 0.00</div>
+                                <div class="card-badge" id="prev-badge"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="table-container">
-            <h2>Membri dello Staff</h2>
+            <h2>Catalogo Attuale</h2>
             <table>
                 <thead>
                     <tr>
-                        <th>NOME UTENTE</th>
-                        <th>EMAIL</th>
+                        <th>Immagine</th>
+                        <th>Nome Piatto</th>
+                        <th>Categoria</th>
+                        <th>Prezzo</th>
+                        <th>Azioni</th>
                     </tr>
                 </thead>
-                <tbody id="tbody-staff">
+                <tbody id="tbody-menu">
                     </tbody>
             </table>
         </div>
@@ -348,150 +245,218 @@
 
     <div id="modaleModifica" class="modal-overlay">
         <div class="modal-content">
-            <h2 style="margin-top:0;">Modifica Staff</h2>
-            <form id="formModificaStaff">
+            <h2 style="margin-top:0; color: #116C4A;">Modifica Piatto</h2>
+            <form id="formModificaProdotto">
                 <input type="hidden" id="mod-id">
-                <div class="input-group" style="margin-bottom: 15px;">
-                    <label>Nome utente</label>
-                    <input type="text" id="mod-username" required>
+                <div class="input-group" style="margin-bottom: 10px;"><label>Nome</label><input type="text" id="mod-nome" required></div>
+                <div style="display: flex; gap: 15px; margin-bottom: 10px;">
+                    <div class="input-group" style="margin:0;"><label>Categoria</label>
+                        <select id="mod-categoria" required>
+                            <option value="Pizze">Pizze</option>
+                            <option value="Burger">Burger</option>
+                            <option value="Primi">Primi / Insalate</option>
+                            <option value="Sushi">Sushi</option>
+                            <option value="Bevande">Bevande</option>
+                            <option value="Dolci">Dolci</option>
+                        </select>
+                    </div>
+                    <div class="input-group" style="margin:0;"><label>Prezzo (€)</label><input type="number" step="0.10" id="mod-prezzo" required></div>
                 </div>
-                <div class="input-group" style="margin-bottom: 15px;">
-                    <label>Email</label>
-                    <input type="email" id="mod-email" required>
+                <div class="input-group" style="margin-bottom: 10px;"><label>Badge</label><input type="text" id="mod-badge"></div>
+                <div class="input-group" style="margin-bottom: 10px;"><label>Descrizione</label><textarea id="mod-descrizione" rows="2" required></textarea></div>
+                <div class="input-group" style="margin-bottom: 10px;"><label>URL Immagine</label><input type="text" id="mod-immagine"></div>
+                
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e0e0e0; margin-bottom: 25px;">
+                    <label style="display: block; font-size: 13px; font-weight: 700; color: #116C4A; margin-bottom: 8px;">Ingredienti modificabili</label>
+                    <div id="modale-varianti-container"></div>
+                    <button type="button" class="btn-azione" onclick="aggiungiVarianteUI('modale-varianti-container')">+ Aggiungi Ingrediente</button>
                 </div>
-                <div class="input-group" style="margin-bottom: 25px;">
-                    <label>Nuova Password (lascia vuoto per non cambiare)</label>
-                    <input type="password" id="mod-password">
-                </div>
+
                 <div style="display:flex; justify-content:flex-end; gap:10px;">
-                    <button type="button" onclick="chiudiModale()" style="padding:10px 15px; border:none; border-radius:6px; cursor:pointer; background:#f0f0f0;">Annulla</button>
-                    <button type="submit" class="btn-submit">Salva Modifiche</button>
+                    <button type="button" onclick="chiudiModale()" style="padding:10px 15px; background:#f0f0f0; color:#333; font-weight:600; border:none; border-radius:6px; cursor:pointer;">Annulla</button>
+                    <button type="submit" class="btn-submit" style="width: auto; margin-top: 0;">Salva Modifiche</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script>
-        // 1. CARICAMENTO DATI
-        function caricaStaff() {
-            fetch('GetStaffServlet')
-                .then(res => res.json())
-                .then(data => {
-                    const tbody = document.getElementById('tbody-staff');
-                    tbody.innerHTML = '';
-                    
-                    if(data.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#777; font-style:italic;">Nessun membro dello staff presente.</td></tr>';
-                        return;
-                    }
-
-                    data.forEach(s => {
-                        tbody.innerHTML += `
-                            <tr>
-                                <td style="font-weight:600;">${s.username}</td>
-                                <td>${s.email}</td>
-                                <td>
-                                    <button class="btn-icon" onclick="apriModale('${s.id}', '${s.username}', '${s.email}')" title="Modifica">✏️</button>
-                                    <button class="btn-icon" onclick="eliminaStaff('${s.id}')" title="Rimuovi">🗑️</button>
-                                </td>
-                            </tr>
-                        `;
-                    });
-                })
-                .catch(err => console.error("Errore caricamento staff:", err));
+        // --- LOGICA GESTIONE INGREDIENTI/VARIANTI ---
+        function aggiungiVarianteUI(containerId) {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = 'variante-row';
+            div.style.cssText = 'display: flex; gap: 10px; margin-bottom: 10px; align-items: center;';
+            div.innerHTML = `
+                <input type="text" class="var-nome" placeholder="Es. +Mozzarella, Senza Cipolla" required style="flex: 2; padding: 10px; border: 1px solid #e0e0e0; border-radius: 6px; font-family: 'Inter'; outline: none;">
+                <input type="number" step="0.10" class="var-prezzo" placeholder="Prezzo €" value="0.00" required style="flex: 1; padding: 10px; border: 1px solid #e0e0e0; border-radius: 6px; font-family: 'Inter'; outline: none;">
+                <button type="button" onclick="rimuoviVariante(this)" style="background: none; border: none; color: #d9534f; cursor: pointer; font-size: 18px;"><i class="fas fa-times-circle"></i></button>
+            `;
+            
+            if(containerId === 'varianti-container') {
+                div.querySelectorAll('input').forEach(inp => inp.addEventListener('input', aggiornaAnteprimaVarianti));
+            }
+            container.appendChild(div);
+            if(containerId === 'varianti-container') aggiornaAnteprimaVarianti();
         }
 
-        // 2. AGGIUNTA NUOVO STAFF
-        document.getElementById('formRegistrazioneStaff').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const datiForm = new URLSearchParams();
-            datiForm.append('username', document.getElementById('reg-username').value);
-            datiForm.append('email', document.getElementById('reg-email').value);
-            datiForm.append('password', document.getElementById('reg-password').value);
+        function rimuoviVariante(btn) {
+            btn.parentElement.remove();
+            aggiornaAnteprimaVarianti();
+        }
 
-            fetch('AddStaffServlet', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: datiForm
-            })
-            .then(response => {
-                if(response.ok) {
-                    this.reset();
-                    caricaStaff(); // Aggiorna la tabella istantaneamente
+        function aggiornaAnteprimaVarianti() {
+            const list = document.getElementById('prev-varianti-list');
+            const rows = document.querySelectorAll('#varianti-container .variante-row');
+            
+            if(rows.length === 0) { list.style.display = 'none'; return; }
+            
+            list.style.display = 'block';
+            let html = '<div style="font-weight: 600; color: #333; margin-bottom: 6px;">Personalizzazioni:</div>';
+            rows.forEach(row => {
+                const nome = row.querySelector('.var-nome').value || '...';
+                const prezzo = parseFloat(row.querySelector('.var-prezzo').value) || 0;
+                const prezzoStr = prezzo > 0 ? `(+€${prezzo.toFixed(2)})` : '(Gratis)';
+                html += `<div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                            <span><i class="fas fa-check" style="color: #116C4A; margin-right: 4px;"></i> ${nome}</span>
+                            <span style="font-weight: 600; color: #116C4A;">${prezzoStr}</span>
+                         </div>`;
+            });
+            list.innerHTML = html;
+        }
+
+        // --- LOGICA ANTEPRIMA BASE ---
+        document.getElementById('reg-nome').addEventListener('input', e => document.getElementById('prev-nome').innerText = e.target.value || 'Nome Piatto');
+        document.getElementById('reg-categoria').addEventListener('change', e => document.getElementById('prev-cat').innerText = e.target.value || 'Categoria');
+        document.getElementById('reg-prezzo').addEventListener('input', e => {
+            const val = parseFloat(e.target.value);
+            document.getElementById('prev-prezzo').innerText = isNaN(val) ? '€ 0.00' : '€ ' + val.toFixed(2);
+        });
+        document.getElementById('reg-badge').addEventListener('input', e => {
+            const b = document.getElementById('prev-badge');
+            if(e.target.value.trim() !== '') { b.innerText = e.target.value; b.style.display = 'inline-block'; } else { b.style.display = 'none'; }
+        });
+        document.getElementById('reg-immagine').addEventListener('input', e => {
+            const img = document.getElementById('prev-img');
+            img.src = e.target.value || 'https://placehold.co/400x300?text=Anteprima+Foto';
+            img.onerror = () => { img.src = 'https://placehold.co/400x300?text=Errore+Link'; };
+        });
+
+        // --- LOGICA DATABASE (API) ---
+        function caricaMenu() {
+            fetch('MenuServlet').then(res => res.json()).then(data => {
+                const tbody = document.getElementById('tbody-menu');
+                tbody.innerHTML = '';
+                data.forEach(p => {
+                    const imgSrc = (p.immagine && p.immagine !== "null" && p.immagine !== "") ? p.immagine : 'https://placehold.co/100x100?text=Foto';
+                    const badgeHtml = (p.badge && p.badge !== "null" && p.badge !== "") ? `<span class="badge-table">${p.badge}</span>` : '';
+                    
+                    const safeNome = p.nome ? p.nome.replace(/'/g, "\\'") : '';
+                    const safeCat = p.categoria ? p.categoria.replace(/'/g, "\\'") : 'Pizze';
+                    const safeDesc = p.descrizione ? p.descrizione.replace(/'/g, "\\'") : '';
+                    const safeBadge = p.badge && p.badge !== "null" ? p.badge.replace(/'/g, "\\'") : '';
+                    const safeImg = p.immagine && p.immagine !== "null" ? p.immagine.replace(/'/g, "\\'") : '';
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><img src="${imgSrc}" class="img-preview-table"></td>
+                            <td>
+                                <div style="font-weight:600; color: #333;">${p.nome} ${badgeHtml}</div>
+                            </td>
+                            <td>${p.categoria}</td>
+                            <td style="font-weight:600; color: #116C4A;">€${p.prezzo.toFixed(2)}</td>
+                            <td>
+                                <button class="btn-icon" onclick="apriModale(${p.id}, '${safeNome}', '${safeCat}', ${p.prezzo}, '${safeBadge}', '${safeDesc}', '${safeImg}')"><i class="fas fa-pen"></i></button>
+                                <button class="btn-icon delete-icon" onclick="eliminaProdotto(${p.id})"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            });
+        }
+
+        // SALVATAGGIO NUOVO PRODOTTO E VARIANTI
+        document.getElementById('formAggiungiProdotto').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const dati = new URLSearchParams();
+            dati.append('nome', document.getElementById('reg-nome').value);
+            dati.append('categoria', document.getElementById('reg-categoria').value);
+            dati.append('prezzo', document.getElementById('reg-prezzo').value);
+            dati.append('badge', document.getElementById('reg-badge').value);
+            dati.append('descrizione', document.getElementById('reg-descrizione').value);
+            dati.append('immagine', document.getElementById('reg-immagine').value);
+
+            // Aggiungo tutte le varianti inserite
+            document.querySelectorAll('#varianti-container .variante-row').forEach(row => {
+                dati.append('var_nome', row.querySelector('.var-nome').value);
+                dati.append('var_prezzo', row.querySelector('.var-prezzo').value);
+            });
+
+            fetch('AddProdottoServlet', { method: 'POST', body: dati })
+            .then(res => {
+                if(res.ok) { 
+                    alert("🎉 Prodotto aggiunto con successo al tuo menù!");
+                    this.reset(); 
+                    document.getElementById('varianti-container').innerHTML = '';
+                    
+                    document.getElementById('prev-nome').innerText = 'Nome Piatto';
+                    document.getElementById('prev-cat').innerText = 'Categoria';
+                    document.getElementById('prev-prezzo').innerText = '€ 0.00';
+                    document.getElementById('prev-badge').style.display = 'none';
+                    document.getElementById('prev-img').src = 'https://placehold.co/400x300?text=Anteprima+Foto';
+                    document.getElementById('prev-varianti-list').style.display = 'none';
+                    
+                    caricaMenu(); 
                 } else {
-                    alert("Errore durante la registrazione dello staff.");
+                    alert("❌ Errore durante l'aggiunta del prodotto nel database.");
                 }
             });
         });
 
-        // 3. ELIMINAZIONE STAFF
-        function eliminaStaff(id) {
-            if(confirm('Attenzione: sei sicuro di voler rimuovere questo membro dello staff?')) {
-                fetch('DeleteStaffServlet?id=' + id, { method: 'POST' })
-                    .then(response => {
-                        if(response.ok) {
-                            caricaStaff(); // Se va a buon fine, ricarica la tabella
-                        } else {
-                            alert("⚠️ Errore durante l'eliminazione! Codice errore: " + response.status);
-                        }
-                    })
-                    .catch(error => alert("🚨 Errore di rete: " + error));
-            }
-        }
-
-        // 4. GESTIONE MODALE MODIFICA
-        function apriModale(id, username, email) {
+        function apriModale(id, nome, categoria, prezzo, badge, descrizione, immagine) {
             document.getElementById('mod-id').value = id;
-            document.getElementById('mod-username').value = username;
-            document.getElementById('mod-email').value = email;
-            document.getElementById('mod-password').value = '';
+            document.getElementById('mod-nome').value = nome;
+            document.getElementById('mod-categoria').value = categoria;
+            document.getElementById('mod-prezzo').value = prezzo;
+            document.getElementById('mod-badge').value = badge;
+            document.getElementById('mod-descrizione').value = descrizione;
+            document.getElementById('mod-immagine').value = immagine;
+            document.getElementById('modale-varianti-container').innerHTML = ''; 
             document.getElementById('modaleModifica').style.display = 'flex';
         }
 
-        function chiudiModale() {
-            document.getElementById('modaleModifica').style.display = 'none';
-        }
+        function chiudiModale() { document.getElementById('modaleModifica').style.display = 'none'; }
 
-      document.getElementById('formModificaStaff').addEventListener('submit', function(e) {
-            e.preventDefault(); // Blocca il ricaricamento della pagina
+        // SALVA MODIFICHE E VARIANTI 
+        document.getElementById('formModificaProdotto').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const dati = new URLSearchParams();
+            dati.append('id', document.getElementById('mod-id').value);
+            dati.append('nome', document.getElementById('mod-nome').value);
+            dati.append('categoria', document.getElementById('mod-categoria').value);
+            dati.append('prezzo', document.getElementById('mod-prezzo').value);
+            dati.append('badge', document.getElementById('mod-badge').value);
+            dati.append('descrizione', document.getElementById('mod-descrizione').value);
+            dati.append('immagine', document.getElementById('mod-immagine').value);
             
-            const datiModifica = new URLSearchParams();
-            datiModifica.append('id', document.getElementById('mod-id').value);
-            datiModifica.append('username', document.getElementById('mod-username').value);
-            datiModifica.append('email', document.getElementById('mod-email').value);
-            datiModifica.append('password', document.getElementById('mod-password').value);
+            document.querySelectorAll('#modale-varianti-container .variante-row').forEach(row => {
+                dati.append('var_nome', row.querySelector('.var-nome').value);
+                dati.append('var_prezzo', row.querySelector('.var-prezzo').value);
+            });
 
-            // Tasto disabilitato temporaneamente per mostrare che sta caricando
-            const btnSalva = this.querySelector('button[type="submit"]');
-            btnSalva.innerText = "Salvataggio...";
-            btnSalva.disabled = true;
-
-            fetch('EditStaffServlet', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: datiModifica
-            })
-            .then(response => {
-                btnSalva.innerText = "Salva Modifiche";
-                btnSalva.disabled = false;
-                
-                if(response.ok) {
-                    chiudiModale();
-                    caricaStaff(); 
-                } else {
-                    alert("⚠️ Errore dal server! Codice errore: " + response.status + ". (404 = Servlet non trovata, 500 = Errore nel database)");
-                }
-            })
-            .catch(error => {
-                btnSalva.innerText = "Salva Modifiche";
-                btnSalva.disabled = false;
-                alert("🚨 Errore di connessione a Tomcat: " + error);
+            fetch('EditProdottoServlet', { method: 'POST', body: dati }).then(res => {
+                if(res.ok) { chiudiModale(); caricaMenu(); }
+                else alert("Errore durante la modifica");
             });
         });
 
-        // Avvia il caricamento all'apertura
-        document.addEventListener("DOMContentLoaded", caricaStaff);
+        function eliminaProdotto(id) {
+            if(confirm('Vuoi davvero eliminare questo prodotto?')) {
+                fetch('DeleteProdottoServlet?id=' + id, { method: 'POST' }).then(res => { if(res.ok) caricaMenu(); });
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", caricaMenu);
     </script>
 </body>
 </html>
