@@ -42,18 +42,46 @@ public class GetDettaglioOrdineJson extends HttpServlet {
                 }
             }
 
-            // 2. Recupero i Prodotti ordinati
+            // 2. Recupero i Prodotti ordinati CON INFO CUCINA E PERSONALIZZAZIONI
             json.append("\"prodotti\": [");
-            String queryProd = "SELECT p.nome, p.prezzo_base, d.quantita FROM Dettaglio_Ordine d JOIN Prodotto p ON d.id_prodotto = p.id_prodotto WHERE d.id_ordine = ?";
+            String queryProd = "SELECT d.id_dettaglio, p.nome, p.prezzo_base, p.ricetta, p.ingredienti, d.quantita " +
+                               "FROM Dettaglio_Ordine d JOIN Prodotto p ON d.id_prodotto = p.id_prodotto " +
+                               "WHERE d.id_ordine = ?";
             try (PreparedStatement ps = conn.prepareStatement(queryProd)) {
                 ps.setInt(1, idOrdine);
                 try (ResultSet rs = ps.executeQuery()) {
                     boolean first = true;
                     while (rs.next()) {
                         if (!first) json.append(",");
-                        json.append("{\"nome\":\"").append(rs.getString("nome")).append("\",");
+                        json.append("{");
+                        json.append("\"nome\":\"").append(rs.getString("nome").replace("\"", "\\\"")).append("\",");
                         json.append("\"quantita\":").append(rs.getInt("quantita")).append(",");
-                        json.append("\"prezzo\":").append(rs.getDouble("prezzo_base")).append("}");
+                        json.append("\"prezzo\":").append(rs.getDouble("prezzo_base")).append(",");
+                        
+                        // Info Segrete
+                        String ricetta = rs.getString("ricetta");
+                        String ingredienti = rs.getString("ingredienti");
+                        json.append("\"ricetta\":\"").append(ricetta != null ? ricetta.replace("\"", "\\\"").replace("\n", " ") : "Nessuna nota").append("\",");
+                        json.append("\"ingredienti\":\"").append(ingredienti != null ? ingredienti.replace("\"", "\\\"").replace("\n", " ") : "Non specificati").append("\",");
+                        
+                        // Personalizzazioni scelte dal cliente
+                        json.append("\"opzioni\": [");
+                        String queryOpt = "SELECT c.nome FROM Dettaglio_Ordine_Caratteristiche doc " +
+                                          "JOIN Caratteristica c ON doc.id_caratteristica = c.id_caratteristica " +
+                                          "WHERE doc.id_dettaglio = ?";
+                        try(PreparedStatement psOpt = conn.prepareStatement(queryOpt)) {
+                            psOpt.setInt(1, rs.getInt("id_dettaglio"));
+                            try(ResultSet rsOpt = psOpt.executeQuery()) {
+                                boolean firstOpt = true;
+                                while(rsOpt.next()) {
+                                    if(!firstOpt) json.append(",");
+                                    json.append("{\"nome\":\"").append(rsOpt.getString("nome").replace("\"", "\\\"")).append("\"}");
+                                    firstOpt = false;
+                                }
+                            }
+                        }
+                        json.append("]");
+                        json.append("}");
                         first = false;
                     }
                 }
@@ -79,7 +107,6 @@ public class GetDettaglioOrdineJson extends HttpServlet {
                 }
             }
             json.append("]");
-
             json.append("}");
             out.print(json.toString());
             

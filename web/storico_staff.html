@@ -7,16 +7,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-        body {
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-            background-color: #f4f7f6;
-            display: flex;
-            height: 100vh;
-            color: #333;
-        }
-
-        /* BARRA LATERALE */
+        body { margin: 0; font-family: 'Inter', sans-serif; background-color: #f4f7f6; display: flex; height: 100vh; color: #333; }
         .sidebar { width: 250px; background-color: #ffffff; border-right: 1px solid #e0e0e0; display: flex; flex-direction: column; }
         .logo { font-size: 24px; font-weight: 700; color: #116C4A; padding: 30px 20px; text-align: center; border-bottom: 1px solid #e0e0e0; margin-bottom: 20px; }
         .nav-menu { display: flex; flex-direction: column; gap: 5px; padding: 0 15px; }
@@ -26,52 +17,37 @@
         .logout { margin-top: auto; margin-bottom: 20px; color: #d9534f; }
         .logout:hover { background-color: #fdf0f0; color: #c9302c; }
 
-        /* CONTENUTO PRINCIPALE */
         .main-content { flex: 1; padding: 40px; overflow-y: auto; }
         .header-top { margin-bottom: 30px; border-bottom: 2px solid #e0e0e0; padding-bottom: 15px; }
         h1 { margin: 0; font-size: 24px; font-weight: 600; }
         .subtitle { color: #777; font-size: 14px; margin-top: 5px; }
 
-        /* TABELLA STORICO (Stile pulito) */
         .table-container { background-color: #ffffff; border-radius: 10px; padding: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #e0e0e0; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; text-align: left; }
         th { font-size: 13px; font-weight: 600; color: #777; padding-bottom: 15px; border-bottom: 1px solid #e0e0e0; white-space: nowrap; }
         td { padding: 15px 10px 15px 0; font-size: 14px; border-bottom: 1px solid #f5f5f5; white-space: nowrap; }
         tr:last-child td { border-bottom: none; padding-bottom: 0; }
 
-        /* BADGE STATO */
-        .badge {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-            display: inline-block;
-        }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block; }
         .badge.inserito { background-color: #fff3cd; color: #856404; }
         .badge.inpreparazione { background-color: #cce5ff; color: #004085; }
-        .badge.pronto { background-color: #e2e3e5; color: #383d41; }
+        .badge.pronto {  background-color: #d1ecf1; color: #0c5460; }
         .badge.inconsegna { background-color: #e2d9f3; color: #4a238b; }
         .badge.consegnato { background-color: #d4edda; color: #155724; }
         .badge.annullato { background-color: #f8d7da; color: #721c24; }
 
-        /* BOTTONE AZIONE */
         .btn-azione { background-color: transparent; border: 1px solid #116C4A; color: #116C4A; padding: 6px 12px; border-radius: 5px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; }
         .btn-azione:hover { background-color: #116C4A; color: #ffffff; }
         .empty-state { text-align: center; color: #777; padding: 30px 0; font-style: italic; }
 
-        /* MODALE POPUP */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-content { background-color: #fff; padding: 30px; border-radius: 10px; width: 450px; max-width: 90%; box-shadow: 0 5px 15px rgba(0,0,0,0.3); position: relative; }
+        .modal-content { background-color: #fff; padding: 30px; border-radius: 10px; width: 500px; max-height: 90vh; overflow-y: auto; max-width: 90%; box-shadow: 0 5px 15px rgba(0,0,0,0.3); position: relative; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e0e0e0; padding-bottom: 15px; margin-bottom: 20px; }
         .modal-header h3 { margin: 0; font-size: 20px; }
         .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
         .close-btn:hover { color: #333; }
-        .order-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #eee; }
-        .item-name { font-weight: 500; }
-        .item-price { font-weight: 600; }
         .order-total { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 15px; border-top: 2px solid #e0e0e0; font-size: 18px; font-weight: 700; }
 
-        /* RESPONSIVITÀ */
         @media (max-width: 768px) {
             body { flex-direction: column; height: auto; }
             .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #e0e0e0; flex-direction: row; flex-wrap: wrap; align-items: center; padding-bottom: 15px; }
@@ -80,7 +56,6 @@
             .nav-item { font-size: 13px; padding: 8px 12px; }
             .logout { margin-top: 10px; }
             .main-content { padding: 15px; }
-            .header-top { flex-direction: column; align-items: flex-start; gap: 15px; }
             .table-container { padding: 15px; }
         }
     </style>
@@ -110,7 +85,7 @@
                     <tr>
                         <th>ID ORDINE</th>
                         <th>CLIENTE</th>
-                        <th>DATA E ORA</th>
+                        <th>DATA E ORA CONSEGNA</th>
                         <th>TOTALE</th>
                         <th>STATO</th>
                         <th>DETTAGLI E STORICO</th>
@@ -153,7 +128,6 @@
                     const tbody = document.getElementById('tbody-storico');
                     tbody.innerHTML = ''; 
 
-                    // FILTRO AGGIORNATO: Ora include sia i Consegnati che gli Annullati
                     const ordiniCompletati = data.filter(o => 
                         o.stato.toLowerCase() === 'consegnato' || 
                         o.stato.toLowerCase() === 'annullato'
@@ -165,10 +139,13 @@
                     }
 
                     ordiniCompletati.forEach(o => {
+                        // FIX UNDEFINED DATA:
+                        let dataSicura = o.data_consegna ? o.data_consegna : (o.data_richiesta ? o.data_richiesta : "Data Assente");
+                        
                         let row = `<tr>
                             <td><b>#${o.id}</b></td>
                             <td>${o.cliente}</td>
-                            <td>${o.data}</td>
+                            <td>${dataSicura}</td>
                             <td>€ ${parseFloat(o.totale).toFixed(2)}</td>
                             <td><span class="badge ${o.stato.replace(/\s+/g, '').toLowerCase()}">${o.stato}</span></td>
                             <td><button class="btn-azione" onclick="apriPopup('${o.id}')">Apri Scheda</button></td>
@@ -182,7 +159,7 @@
                 });
         });
 
-        // GESTIONE POPUP
+        // GESTIONE POPUP CON INGREDIENTI
         function apriPopup(idOrdineRaw) {
             const idOrdine = idOrdineRaw.replace('#', '');
             
@@ -198,10 +175,28 @@
                     
                     if (data.prodotti && data.prodotti.length > 0) {
                         data.prodotti.forEach(p => {
-                            let prezzoTotaleProdotto = p.prezzo * p.quantita;
-                            html += `<div class="order-item">
-                                        <span class="item-name">${p.quantita}x ${p.nome}</span>
-                                        <span class="item-price">€ ${prezzoTotaleProdotto.toFixed(2)}</span>
+                            let opzioniHtml = "";
+                            if(p.opzioni && p.opzioni.length > 0) {
+                                opzioniHtml = "<ul style='margin: 4px 0 0 20px; font-size: 12px; color: #d32f2f;'>";
+                                p.opzioni.forEach(opt => {
+                                    opzioniHtml += `<li><b>Aggiunta/Modifica:</b> ${opt.nome}</li>`;
+                                });
+                                opzioniHtml += "</ul>";
+                            }
+                            
+                            let secretHtml = `
+                            <div style="background:#f9f9f9; padding:10px; border-radius:6px; margin-top:8px; font-size:11px; color:#555; border-left:3px solid #116C4A;">
+                                <div style="margin-bottom:4px;"><b>Ingredienti:</b> ${p.ingredienti}</div>
+                                <div><b>Note Cucina:</b> ${p.ricetta}</div>
+                            </div>`;
+
+                            html += `<div style="border-bottom: 1px dashed #eee; padding-bottom: 15px; margin-bottom: 15px;">
+                                        <div style="font-weight:600; font-size:15px; color:#333; display:flex; justify-content:space-between;">
+                                            <span>${p.quantita}x ${p.nome}</span>
+                                            <span>€ ${(p.prezzo * p.quantita).toFixed(2)}</span>
+                                        </div>
+                                        ${opzioniHtml}
+                                        ${secretHtml}
                                      </div>`;
                         });
                     } else {

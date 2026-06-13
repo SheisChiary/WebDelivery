@@ -7,6 +7,11 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
+        /* Regola d'oro per evitare sbordamenti di layout */
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
             font-family: 'Inter', sans-serif;
@@ -14,9 +19,10 @@
             display: flex;
             height: 100vh;
             color: #333;
+            overflow: hidden; /* Evita doppi scroll */
         }
 
- 
+        /* --- SIDEBAR --- */
         .sidebar {
             width: 260px;
             background-color: #ffffff;
@@ -24,7 +30,7 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
-            box-sizing: border-box;
+            flex-shrink: 0;
         }
 
         .logo {
@@ -41,7 +47,7 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            padding: 25px 20px; /* Più spazio ai lati come nell'immagine */
+            padding: 25px 20px;
         }
 
         .nav-item {
@@ -91,6 +97,7 @@
             flex: 1;
             padding: 40px;
             overflow-y: auto;
+            height: 100vh;
         }
 
         h1 {
@@ -109,7 +116,7 @@
             margin-bottom: 30px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             border: 1px solid #f0f0f0;
-            overflow-x: auto;
+            overflow-x: auto; /* Permette scorrimento laterale */
         }
 
         h2 {
@@ -202,13 +209,18 @@
             padding-bottom: 0;
         }
 
-        /* Bottoni Azione (Matita e Cestino) */
+        /* Colonna azioni (pulsanti) */
+        .actions-cell {
+            text-align: right;
+            white-space: nowrap;
+        }
+
         .btn-icon {
             background: none;
             border: none;
             cursor: pointer;
             font-size: 18px;
-            margin-right: 10px;
+            margin-left: 10px; /* Margine a sinistra invece che destra, così stanno bene a fondo riga */
             transition: transform 0.2s;
         }
 
@@ -242,6 +254,7 @@
             body { 
                 flex-direction: column; 
                 height: auto; 
+                overflow-y: auto;
             }
             .sidebar { 
                 width: 100%; 
@@ -249,17 +262,12 @@
                 border-right: none; 
                 border-bottom: 1px solid #e0e0e0; 
             }
-            .logo-container {
-                padding: 15px 20px 5px;
-                text-align: center;
-                border-bottom: none;
-            }
             .nav-menu { 
                 flex-direction: row; 
                 flex-wrap: wrap; 
                 justify-content: center; 
                 gap: 10px; 
-                padding: 10px 15px;
+                padding: 15px; 
             }
             .nav-item { 
                 font-size: 13px; 
@@ -267,7 +275,7 @@
             }
             .logout-container { 
                 margin-top: 0; 
-                padding: 5px 15px 15px; 
+                padding: 15px; 
                 border-top: none;
                 display: flex;
                 justify-content: center;
@@ -278,10 +286,20 @@
             }
             .main-content { 
                 padding: 20px; 
+                height: auto;
+                overflow-y: visible;
             }
+            
+            /* FIX TABELLA AMMUCCHIATA SU MOBILE */
             .table-container { 
                 padding: 15px; 
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
             }
+            table {
+                min-width: 500px; /* Impedisce che il testo vada a capo in maniera brutta */
+            }
+
             .form-grid {
                 flex-direction: column;
                 align-items: stretch;
@@ -302,8 +320,8 @@
             <a href="gestione_staff.html" class="nav-item active">Gestione dello staff</a>
             <a href="statistiche.html" class="nav-item">Statistiche</a>
         </div>
-        <div class="nav-menu" style="margin-top: auto;">
-            <a href="LogoutServlet" class="nav-item logout">Esci</a>
+        <div class="logout-container">
+            <a href="LogoutServlet" class="logout">Esci</a>
         </div>
     </div>
 
@@ -338,7 +356,7 @@
                     <tr>
                         <th>NOME UTENTE</th>
                         <th>EMAIL</th>
-                    </tr>
+                        <th></th> </tr>
                 </thead>
                 <tbody id="tbody-staff">
                     </tbody>
@@ -390,7 +408,7 @@
                             <tr>
                                 <td style="font-weight:600;">${s.username}</td>
                                 <td>${s.email}</td>
-                                <td>
+                                <td class="actions-cell">
                                     <button class="btn-icon" onclick="apriModale('${s.id}', '${s.username}', '${s.email}')" title="Modifica">✏️</button>
                                     <button class="btn-icon" onclick="eliminaStaff('${s.id}')" title="Rimuovi">🗑️</button>
                                 </td>
@@ -418,7 +436,7 @@
             .then(response => {
                 if(response.ok) {
                     this.reset();
-                    caricaStaff(); // Aggiorna la tabella istantaneamente
+                    caricaStaff(); 
                 } else {
                     alert("Errore durante la registrazione dello staff.");
                 }
@@ -431,7 +449,7 @@
                 fetch('DeleteStaffServlet?id=' + id, { method: 'POST' })
                     .then(response => {
                         if(response.ok) {
-                            caricaStaff(); // Se va a buon fine, ricarica la tabella
+                            caricaStaff(); 
                         } else {
                             alert("⚠️ Errore durante l'eliminazione! Codice errore: " + response.status);
                         }
@@ -454,7 +472,7 @@
         }
 
       document.getElementById('formModificaStaff').addEventListener('submit', function(e) {
-            e.preventDefault(); // Blocca il ricaricamento della pagina
+            e.preventDefault(); 
             
             const datiModifica = new URLSearchParams();
             datiModifica.append('id', document.getElementById('mod-id').value);
@@ -462,7 +480,6 @@
             datiModifica.append('email', document.getElementById('mod-email').value);
             datiModifica.append('password', document.getElementById('mod-password').value);
 
-            // Tasto disabilitato temporaneamente per mostrare che sta caricando
             const btnSalva = this.querySelector('button[type="submit"]');
             btnSalva.innerText = "Salvataggio...";
             btnSalva.disabled = true;

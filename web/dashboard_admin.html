@@ -8,6 +8,10 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
+        * {
+            box-sizing: border-box; /* Previene sbordamenti */
+        }
+
         body {
             margin: 0;
             font-family: 'Inter', sans-serif;
@@ -15,6 +19,7 @@
             display: flex;
             height: 100vh;
             color: #333;
+            overflow: hidden;
         }
 
         .sidebar {
@@ -24,7 +29,7 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
-            box-sizing: border-box;
+            flex-shrink: 0;
         }
 
         .logo {
@@ -41,7 +46,7 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            padding: 25px 20px; /* Più spazio ai lati come nell'immagine */
+            padding: 25px 20px;
         }
 
         .nav-item {
@@ -91,6 +96,7 @@
             flex: 1;
             padding: 40px;
             overflow-y: auto;
+            height: 100vh;
         }
 
         h1 {
@@ -124,26 +130,26 @@
             text-align: left;
         }
 
-        th {
+th {
             font-size: 13px;
             font-weight: 600;
             color: #777;
-            padding-bottom: 15px;
+            padding: 15px 15px; 
             border-bottom: 1px solid #e0e0e0;
             white-space: nowrap;
+            text-align: left; 
         }
 
         td {
-            padding: 15px 0;
+            padding: 15px 15px;
             font-size: 14px;
             border-bottom: 1px solid #f5f5f5;
             white-space: nowrap;
+            vertical-align: middle; 
         }
 
-        tr:last-child td {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
+        th:first-child, td:first-child { padding-left: 0; }
+        th:last-child, td:last-child { padding-right: 0; }
 
         /* BADGE STATO */
         .badge {
@@ -247,12 +253,14 @@
 
         /* RESPONSIVITÀ PER SCHERMI PICCOLI E FINESTRE STRETTE */
         @media (max-width: 768px) {
-            body { flex-direction: column; height: auto; }
-            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid #e0e0e0; padding-bottom: 15px; }
-            .nav-menu { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 10px; }
+            body { flex-direction: column; height: auto; overflow-y: auto; }
+            /* FIX SIDEBAR: L'altezza deve essere 'auto', non '100vh', per non creare il blocco vuoto gigante */
+            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #e0e0e0; padding-bottom: 15px; }
+            .nav-menu { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 15px; }
             .nav-item { font-size: 13px; padding: 8px 12px; }
-            .logout { margin-top: 10px; }
-            .main-content { padding: 20px; }
+            .logout-container { display: flex; justify-content: center; padding: 15px; border-top: none; margin-top: 0; }
+            
+            .main-content { padding: 20px; overflow-y: visible; height: auto; }
             .table-container { padding: 15px; overflow-x: auto; -webkit-overflow-scrolling: touch;}
              table {min-width: 800px; }
         }
@@ -268,8 +276,8 @@
             <a href="gestione_staff.html" class="nav-item">Gestione dello staff</a>
             <a href="statistiche.html" class="nav-item">Statistiche</a>
         </div>
-        <div class="nav-menu" style="margin-top: auto;">
-            <a href="LogoutServlet" class="nav-item logout">Esci</a>
+        <div class="logout-container">
+            <a href="LogoutServlet" class="logout">Esci</a>
         </div>
     </div>
 
@@ -284,6 +292,7 @@
                         <th>ID ORDINE</th>
                         <th>CLIENTE</th>
                         <th>ORARIO RICHIESTO</th>
+                        <th>TEMPO STIMATO</th>
                         <th>TOTALE</th>
                         <th>STATO</th>
                         <th>ORDINAZIONE</th>
@@ -291,7 +300,7 @@
                 </thead>
                 <tbody id="tbody-in-corso">
                     <tr>
-                        <td colspan="6" class="empty-state">Caricamento ordini in corso...</td>
+                        <td colspan="7" class="empty-state">Caricamento ordini in corso...</td>
                     </tr>
                 </tbody>
             </table>
@@ -305,13 +314,13 @@
                         <th>ID ORDINE</th>
                         <th>CLIENTE</th>
                         <th>ORARIO CONSEGNA</th>
-                        <th>STATO</th>
+                        <th>TOTALE</th> <th>STATO</th>
                         <th>ORDINAZIONE</th>
                     </tr>
                 </thead>
                 <tbody id="tbody-storico">
                     <tr>
-                        <td colspan="5" class="empty-state">Caricamento ordini completati...</td>
+                        <td colspan="6" class="empty-state">Caricamento ordini completati...</td>
                     </tr>
                 </tbody>
             </table>
@@ -416,22 +425,19 @@
                         let badgeHtml = `<span class="badge ${o.stato.replace(/\s+/g, '').toLowerCase()}">${o.stato}</span>`;
                         let btnDettagli = `<button class="btn-azione" onclick="apriPopup('#${o.id}')">Dettagli</button>`;
 
-                        // --- TRUCCHETTO MAGICO PER FORMATTARE LA DATA ---
+                        // Formattazione data orario richiesto
                         let rawDate = o.data_richiesta; 
-                        let orarioFormattato = rawDate; // Default se qualcosa va storto
+                        let orarioFormattato = rawDate; 
                         
                         if (rawDate && rawDate !== "Data non disp.") {
-                            // Cerca l'orario (es. "11:23:44") dentro la stringa di MySQL
                             let match = rawDate.match(/ (\d{2}:\d{2}):(\d{2})/);
                             if (match) {
-                                let hhmm = match[1]; // Prende "11:23"
-                                let secondi = match[2]; // Prende "44" o "00"
+                                let hhmm = match[1]; 
+                                let secondi = match[2]; 
 
                                 if (secondi === "00") {
-                                    // Se i secondi sono spaccati, il cliente l'ha programmato!
                                     orarioFormattato = `<span style="color: #2c3e50;"><i class="far fa-calendar-alt"></i> Prog. per le <b>${hhmm}</b></span>`;
                                 } else {
-                                    // Se ci sono secondi casuali, è il calcolo automatico del "Prima possibile"
                                     orarioFormattato = `<span style="color: #e67e22;"><i class="fas fa-bolt"></i> Subito (entro le <b>${hhmm}</b>)</span>`;
                                 }
                             }
@@ -439,6 +445,7 @@
 
                         if (o.stato.toLowerCase() === 'consegnato') {
                             
+                            // Formattazione data consegna reale
                             let rawConsegna = o.data_consegna;
                             let dataConsegnaFormattata = "Data assente";
                             if (rawConsegna && rawConsegna.length > 0) {
@@ -450,11 +457,12 @@
                                 }
                             }
 
-                            // RIGA STORICO
+                            // RIGA STORICO (FIX: 6 colonne, incluso il Totale)
                             let rowStorico = `<tr>
                                 <td><b>#${o.id}</b></td>
                                 <td>${o.cliente}</td>
                                 <td>${dataConsegnaFormattata}</td>
+                                <td>€ ${parseFloat(o.totale).toFixed(2)}</td>
                                 <td>${badgeHtml}</td>
                                 <td>${btnDettagli}</td>
                             </tr>`;
@@ -465,7 +473,7 @@
                                 <td><b>#${o.id}</b></td>
                                 <td>${o.cliente}</td>
                                 <td>${orarioFormattato}</td>
-                                <td>€ ${parseFloat(o.totale).toFixed(2)}</td>
+                                <td><b>${o.tempo_stimato} min</b></td> <td>€ ${parseFloat(o.totale).toFixed(2)}</td>
                                 <td>${badgeHtml}</td>
                                 <td>${btnDettagli}</td>
                             </tr>`;
@@ -473,12 +481,11 @@
                         }
                     });
 
-                    // Gestione Empty States con i Colspan corretti
                     if (tbodyInCorso.innerHTML.trim() === '') {
-                        tbodyInCorso.innerHTML = '<tr><td colspan="6" class="empty-state">Nessun ordine in corso al momento.</td></tr>';
+                        tbodyInCorso.innerHTML = '<tr><td colspan="7" class="empty-state">Nessun ordine in corso al momento.</td></tr>';
                     }
                     if (tbodyStorico.innerHTML.trim() === '') {
-                        tbodyStorico.innerHTML = '<tr><td colspan="5" class="empty-state">Nessun ordine completato al momento.</td></tr>';
+                        tbodyStorico.innerHTML = '<tr><td colspan="6" class="empty-state">Nessun ordine completato al momento.</td></tr>'; // FIX colspan 6
                     }
                 })
                 .catch(error => {

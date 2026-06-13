@@ -4,8 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Statistiche - Dashboard Proprietario</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        * {
+            box-sizing: border-box; /* Fondamentale per non far sbordare le barre */
+        }
 
         body {
             margin: 0;
@@ -14,9 +19,10 @@
             display: flex;
             height: 100vh;
             color: #333;
+            overflow: hidden;
         }
 
-       
+        /* --- LA TUA SIDEBAR ORIGINALE --- */
         .sidebar {
             width: 260px;
             background-color: #ffffff;
@@ -24,7 +30,7 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
-            box-sizing: border-box;
+            flex-shrink: 0;
         }
 
         .logo {
@@ -41,7 +47,7 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            padding: 25px 20px; /* Più spazio ai lati come nell'immagine */
+            padding: 25px 20px;
         }
 
         .nav-item {
@@ -86,176 +92,111 @@
             background-color: #fdf0f0;
         }
 
-
-        /* CONTENUTO PRINCIPALE */
+        /* --- CONTENUTO PRINCIPALE (Questo era sparito!) --- */
         .main-content {
             flex: 1;
             padding: 40px;
             overflow-y: auto;
+            height: 100vh;
         }
 
-        h1 {
-            font-size: 28px;
-            font-weight: 600;
-            margin-top: 0;
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 30px;
         }
 
-        h2 {
-            font-size: 18px;
-            font-weight: 600;
-            margin-top: 0;
-            margin-bottom: 20px;
-        }
+        .header-section h1 { margin: 0; font-size: 28px; font-weight: 700; color: #1a1a1a; }
 
-        /* TABELLE */
-        .table-container {
-            background-color: #ffffff;
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        .date-picker-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            padding: 8px 15px;
+            border-radius: 8px;
             border: 1px solid #e0e0e0;
-            overflow-x: auto; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
+        .date-picker-container label { font-size: 13px; font-weight: 600; color: #666; }
+        .date-picker-container input { border: none; outline: none; font-family: inherit; font-size: 14px; font-weight: 600; color: #116C4A; background: transparent; cursor: pointer; }
+
+        /* --- KPI CARDS --- */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
-        th {
-            font-size: 13px;
-            font-weight: 600;
-            color: #777;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #e0e0e0;
-            white-space: nowrap;
+        .kpi-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        td {
-            padding: 15px 0;
-            font-size: 14px;
-            border-bottom: 1px solid #f5f5f5;
-            white-space: nowrap;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-
-        /* BADGE STATO */
-        .badge {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-            display: inline-block;
-        }
-        .badge.inserito { background-color: #fff3cd; color: #856404; }
-        .badge.inpreparazione { background-color: #cce5ff; color: #004085; }
-        .badge.pronto { background-color: #d4edda; color: #155724; }
-        .badge.inconsegna { background-color: #e2d9f3; color: #4a238b; }
-        .badge.consegnato { background-color: #d4edda; color: #155724; }
-
-        /* BOTTONE AZIONE */
-        .btn-azione {
-            background-color: transparent;
-            border: 1px solid #116C4A;
-            color: #116C4A;
-            padding: 6px 12px;
-            border-radius: 5px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .btn-azione:hover {
-            background-color: #116C4A;
-            color: #ffffff;
-        }
+        .kpi-header { display: flex; justify-content: space-between; align-items: center; }
+        .kpi-title { font-size: 14px; font-weight: 600; color: #777; margin: 0; }
+        .kpi-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 18px; }
         
-        .empty-state {
-            text-align: center;
-            color: #777;
-            padding: 30px 0;
-            font-style: italic;
+        .icon-green { background: #e8f5e9; color: #2e7d32; }
+        .icon-blue { background: #e3f2fd; color: #1565c0; }
+        .icon-orange { background: #fff3e0; color: #ef6c00; }
+
+        .kpi-value { font-size: 32px; font-weight: 800; color: #1a1a1a; margin: 0; }
+        .kpi-subtitle { font-size: 12px; font-weight: 500; color: #888; margin: 0; }
+
+        /* --- CLASSIFICHE TOP/FLOP --- */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
         }
 
-        /* MODALE (POPUP DETTAGLI) */
-        .modal-overlay {
-            display: none; 
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            justify-content: center;
+        .chart-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        }
+
+        .chart-card h2 { margin: 0 0 20px 0; font-size: 18px; font-weight: 700; color: #1a1a1a; display: flex; align-items: center; gap: 8px; }
+
+        .list-item {
+            display: flex;
             align-items: center;
+            margin-bottom: 15px;
         }
 
-        .modal-content {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            width: 450px;
-            max-width: 90%;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            position: relative;
-        }
+        .item-info { flex: 1; min-width: 0; } /* min-width 0 evita che le scritte lunghe sbordino */
+        .item-name { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 5px; display: flex; justify-content: space-between; }
+        .item-qty { font-size: 13px; font-weight: 700; color: #116C4A; }
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #e0e0e0;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-        }
+        .bar-bg { width: 100%; height: 8px; background-color: #f0f0f0; border-radius: 4px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease-in-out; }
 
-        .modal-header h3 { margin: 0; font-size: 20px; }
-        
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #999;
-        }
-        .close-btn:hover { color: #333; }
+        .fill-top { background-color: #116C4A; }
+        .fill-flop { background-color: #e74c3c; }
 
-        .order-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px dashed #eee;
-        }
+        .empty-state { text-align: center; color: #888; font-style: italic; padding: 20px 0; font-size: 14px; }
 
-        .item-name { font-weight: 500; }
-        .item-price { font-weight: 600; }
-
-        .order-total {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 2px solid #e0e0e0;
-            font-size: 18px;
-            font-weight: 700;
-        }
-
-        /* RESPONSIVITÀ PER SCHERMI PICCOLI E FINESTRE STRETTE */
         @media (max-width: 768px) {
-            body { flex-direction: column; height: auto; }
-            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid #e0e0e0; padding-bottom: 15px; }
-            .nav-menu { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 10px; }
+            body { flex-direction: column; height: auto; overflow-y: auto; }
+            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #e0e0e0; }
+            .nav-menu { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 15px; }
             .nav-item { font-size: 13px; padding: 8px 12px; }
-            .logout { margin-top: 10px; }
-            .main-content { padding: 20px; }
-            .table-container { padding: 15px; overflow-x: auto; }
-             table {min-width: 800px; }
+            .logout-container { display: flex; justify-content: center; padding: 15px; border-top: none; }
+            .main-content { padding: 20px; overflow-y: visible; height: auto; }
+            .header-section { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .charts-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -269,180 +210,135 @@
             <a href="gestione_staff.html" class="nav-item">Gestione dello staff</a>
             <a href="statistiche.html" class="nav-item active">Statistiche</a>
         </div>
-        <div class="nav-menu" style="margin-top: auto;">
-            <a href="LogoutServlet" class="nav-item logout">Esci</a>
+        <div class="logout-container">
+            <a href="LogoutServlet" class="logout">Esci</a>
         </div>
     </div>
 
     <div class="main-content">
-        <h1>Ordini</h1>
-        
-        <div class="table-container">
-            <h2>Dettagli ordini in corso</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID ORDINE</th>
-                        <th>CLIENTE</th>
-                        <th>DATA E ORA RICHIESTA</th>
-                        <th> TEMPO STIMATO </th>
-                        <th>TOTALE</th>
-                        <th>STATO</th>
-                        <th>ORDINAZIONE</th>
-                    </tr>
-                </thead>
-                <tbody id="tbody-in-corso">
-                    <tr>
-                        <td colspan="6" class="empty-state">Caricamento ordini in corso...</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="header-section">
+            <h1>Panoramica Statistiche</h1>
+            <div class="date-picker-container">
+                <label for="dataSelect">Data di riferimento:</label>
+                <input type="date" id="dataSelect" onchange="caricaStatistiche()">
+            </div>
         </div>
 
-        <div class="table-container">
-            <h2>Storico ordini</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID ORDINE</th>
-                        <th>CLIENTE</th>
-                        <th>DATA E ORA CONSEGNA</th>
-                        <th>TOTALE</th>
-                        <th>STATO</th>
-                        <th>ORDINAZIONE</th>
-                    </tr>
-                </thead>
-                <tbody id="tbody-storico">
-                    <tr>
-                        <td colspan="6" class="empty-state">Caricamento ordini completati...</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-    </div>
-
-    <div id="popupDettagli" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="popupTitolo">Dettagli Ordine</h3>
-                <button class="close-btn" onclick="chiudiPopup()">&times;</button>
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <h3 class="kpi-title">Incasso Giornaliero</h3>
+                    <div class="kpi-icon icon-green"><i class="fas fa-coins"></i></div>
+                </div>
+                <p class="kpi-value" id="val-giorno">€ 0.00</p>
+                <p class="kpi-subtitle">Ordini consegnati nella data scelta</p>
             </div>
             
-            <div class="modal-body">
-                <div id="popupListaProdotti"></div>
-                <div class="order-total">
-                    <span>Totale</span>
-                    <span id="popupTotalePrezzo">€ 0.00</span>
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <h3 class="kpi-title">Incasso Mensile</h3>
+                    <div class="kpi-icon icon-blue"><i class="fas fa-chart-line"></i></div>
+                </div>
+                <p class="kpi-value" id="val-mese">€ 0.00</p>
+                <p class="kpi-subtitle">Totale del mese selezionato</p>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <h3 class="kpi-title">Ordini Completati</h3>
+                    <div class="kpi-icon icon-orange"><i class="fas fa-shopping-bag"></i></div>
+                </div>
+                <p class="kpi-value" id="val-ordini">0</p>
+                <p class="kpi-subtitle">Numero di ordini evasi nel mese</p>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h2><i class="fas fa-trophy" style="color:#f1c40f;"></i> Prodotti Più Venduti (Mese)</h2>
+                <div id="lista-top">
+                    <div class="empty-state">Caricamento dati...</div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h2><i class="fas fa-arrow-down" style="color:#e74c3c;"></i> Prodotti Meno Venduti (Mese)</h2>
+                <div id="lista-flop">
+                    <div class="empty-state">Caricamento dati...</div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        function apriPopup(idOrdineRaw) {
-            const idOrdine = idOrdineRaw.replace('#', '');
-            
-            document.getElementById('popupTitolo').innerText = 'Dettagli Ordine #' + idOrdine;
-            document.getElementById('popupDettagli').style.display = 'flex';
-            document.getElementById('popupListaProdotti').innerHTML = '<div style="text-align:center; padding:20px; color:#777;"><em>Caricamento dettagli dal database...</em></div>';
-            document.getElementById('popupTotalePrezzo').innerText = '€ ...';
-
-            fetch('GetDettaglioOrdineJson?id=' + idOrdine)
-                .then(response => {
-                    if (!response.ok) throw new Error('Errore di rete');
-                    return response.json();
-                })
-                .then(data => {
-                    let html = '<h4 style="margin: 0 0 10px 0; color: #116C4A;">Prodotti Ordinati:</h4>';
-                    
-                    if (data.prodotti && data.prodotti.length > 0) {
-                        data.prodotti.forEach(p => {
-                            let prezzoTotaleProdotto = p.prezzo * p.quantita;
-                            html += `<div class="order-item">
-                                        <span class="item-name">${p.quantita}x ${p.nome}</span>
-                                        <span class="item-price">€ ${prezzoTotaleProdotto.toFixed(2)}</span>
-                                     </div>`;
-                        });
-                    } else {
-                        html += '<p style="font-size:13px; color:#777;">Nessun dettaglio prodotto trovato.</p>';
-                    }
-
-                    html += '<h4 style="margin: 25px 0 10px 0; color: #116C4A;">Storico Modifiche:</h4>';
-                    if (data.storico && data.storico.length > 0) {
-                        data.storico.forEach(s => {
-                            let classeBadge = s.stato.replace(/\s+/g, '').toLowerCase();
-                            html += `<div style="font-size:13px; border-bottom:1px solid #f5f5f5; padding:10px 0;">
-                                        <b>${s.data}</b> - <span class="badge ${classeBadge}">${s.stato}</span><br>
-                                        <i style="color:#777; font-size:12px; margin-top:4px; display:inline-block;">da: ${s.personale}</i>
-                                     </div>`;
-                        });
-                    } else {
-                        html += '<p style="font-size:13px; color:#777;">Nessuna modifica registrata finora.</p>';
-                    }
-
-                    document.getElementById('popupListaProdotti').innerHTML = html;
-                    document.getElementById('popupTotalePrezzo').innerText = '€ ' + parseFloat(data.totale).toFixed(2);
-                })
-                .catch(error => {
-                    console.error('Errore:', error);
-                    document.getElementById('popupListaProdotti').innerHTML = '<div style="color:red; text-align:center;">Errore nel caricamento dei dati.</div>';
-                });
-        }
-
-        function chiudiPopup() {
-            document.getElementById('popupDettagli').style.display = 'none';
-        }
-
-        window.onclick = function(event) {
-            var popup = document.getElementById('popupDettagli');
-            if (event.target == popup) {
-                chiudiPopup();
-            }
-        }
-
-        // CARICAMENTO TABELLE PRINCIPALI
         document.addEventListener("DOMContentLoaded", function() {
-            fetch('GetOrdiniJson')
-                .then(response => {
-                    if (!response.ok) throw new Error('Errore nella connessione al server');
-                    return response.json();
-                })
-                .then(data => {
-                    const tbodyInCorso = document.getElementById('tbody-in-corso');
-                    const tbodyStorico = document.getElementById('tbody-storico');
-
-                    tbodyInCorso.innerHTML = '';
-                    tbodyStorico.innerHTML = '';
-
-                    data.forEach(o => {
-                        let rowHTML = `<tr>
-                            <td><b>#${o.id}</b></td>
-                            <td>${o.cliente}</td>
-                            <td>${o.data_richiesta}</td> <td>${o.tempo_stimato} min</td> <td>€ ${parseFloat(o.totale).toFixed(2)}</td>
-                            <td><span class="badge ${o.stato.replace(/\s+/g, '').toLowerCase()}">${o.stato}</span></td>
-                            <td><button class="btn-azione" onclick="apriPopup('#${o.id}')">Dettagli</button></td>
-                        </tr>`;
-
-                        if (o.stato.toLowerCase() === 'consegnato') {
-                            tbodyStorico.innerHTML += rowHTML;
-                        } else {
-                            tbodyInCorso.innerHTML += rowHTML;
-                        }
-                    });
-
-                    if (tbodyInCorso.innerHTML.trim() === '') {
-                        tbodyInCorso.innerHTML = '<tr><td colspan="6" class="empty-state">Nessun ordine in corso al momento.</td></tr>';
-                    }
-                    if (tbodyStorico.innerHTML.trim() === '') {
-                        tbodyStorico.innerHTML = '<tr><td colspan="6" class="empty-state">Nessun ordine completato al momento.</td></tr>';
-                    }
-                })
-                .catch(error => {
-                    console.error('Errore durante il caricamento dati:', error);
-                    document.getElementById('tbody-in-corso').innerHTML = '<tr><td colspan="6" class="empty-state" style="color:red;">Errore nel caricamento dei dati dal database.</td></tr>';
-                });
+            const dateInput = document.getElementById('dataSelect');
+            if (!dateInput.value) {
+                dateInput.valueAsDate = new Date();
+            }
+            caricaStatistiche();
         });
+
+        function caricaStatistiche() {
+            const dataScelta = document.getElementById('dataSelect').value;
+            
+            fetch('GetStatisticheServlet?data=' + dataScelta)
+                .then(response => response.json())
+                .then(data => {
+                    // Aggiorna KPI
+                    document.getElementById('val-giorno').innerText = '€ ' + parseFloat(data.incassoGiorno || 0).toFixed(2);
+                    document.getElementById('val-mese').innerText = '€ ' + parseFloat(data.incassoMese || 0).toFixed(2);
+                    document.getElementById('val-ordini').innerText = data.ordiniMese || 0;
+
+                    // Gestione TOP
+                    const listaTop = document.getElementById('lista-top');
+                    listaTop.innerHTML = '';
+                    if (data.topProdotti && data.topProdotti.length > 0) {
+                        let maxTop = data.topProdotti[0].quantita; 
+                        data.topProdotti.forEach(p => {
+                            let percentuale = maxTop > 0 ? (p.quantita / maxTop) * 100 : 0;
+                            let widthCss = percentuale > 0 ? percentuale : 1; 
+                            
+                            listaTop.innerHTML += `
+                                <div class="list-item">
+                                    <div class="item-info">
+                                        <div class="item-name"><span>${p.nome}</span> <span class="item-qty">${p.quantita} venduti</span></div>
+                                        <div class="bar-bg"><div class="bar-fill fill-top" style="width: ${widthCss}%"></div></div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        listaTop.innerHTML = '<div class="empty-state">Nessuna vendita registrata in questo mese.</div>';
+                    }
+
+                    // Gestione FLOP
+                    const listaFlop = document.getElementById('lista-flop');
+                    listaFlop.innerHTML = '';
+                    if (data.flopProdotti && data.flopProdotti.length > 0) {
+                        let maxFlop = Math.max(...data.flopProdotti.map(p => p.quantita)); 
+                        data.flopProdotti.forEach(p => {
+                            let percentuale = maxFlop > 0 ? (p.quantita / maxFlop) * 100 : 0;
+                            let widthCss = percentuale > 0 ? percentuale : 1;
+                            
+                            listaFlop.innerHTML += `
+                                <div class="list-item">
+                                    <div class="item-info">
+                                        <div class="item-name"><span>${p.nome}</span> <span class="item-qty" style="color:#e74c3c;">${p.quantita} venduti</span></div>
+                                        <div class="bar-bg"><div class="bar-fill fill-flop" style="width: ${widthCss}%"></div></div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        listaFlop.innerHTML = '<div class="empty-state">Nessun dato disponibile.</div>';
+                    }
+                })
+                .catch(err => {
+                    console.error("Errore statistiche:", err);
+                    document.getElementById('lista-top').innerHTML = '<div class="empty-state" style="color:red;">Errore di caricamento.</div>';
+                });
+        }
     </script>
 </body>
 </html>
