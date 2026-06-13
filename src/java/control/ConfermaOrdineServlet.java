@@ -29,8 +29,6 @@ public class ConfermaOrdineServlet extends HttpServlet {
         
         try {
             HttpSession session = request.getSession(false);
-            
-            // Controllo della sessione
             if (session == null || session.getAttribute("emailUtente") == null || session.getAttribute("idUtente") == null) {
                 out.print("{\"successo\": false, \"messaggio\": \"Sessione scaduta, per favore fai di nuovo il login.\"}");
                 return;
@@ -46,78 +44,52 @@ public class ConfermaOrdineServlet extends HttpServlet {
                 return;
             }
 
-            // --- NUOVI PARAMETRI RECUPERATI DAL FRONTEND ---
             String tipoOrario = request.getParameter("tipoOrario");
             String orarioScelto = request.getParameter("orario");
-            int tempoStimatoCalcolato = 40; // Tempo di default
+            int tempoStimatoCalcolato = 40; 
+            double totaleOrdine = 2.50; // Costo base/spedizione
 
-            // Calcolo del totale (inclusa eventuale spedizione o costo base)
-            double totaleOrdine = 2.50; 
             for (ElementoCarrello el : carrello) {
                 totaleOrdine += (el.getProdotto().getPrezzoBase() + el.getPrezzoExtra()) * el.getQuantita();
             }
 
             int numeroOrdine = 0;
 
-            // Salvataggio nel database ---
             try (Connection conn = DBConnect.getConnection()) {
                 conn.setAutoCommit(false); 
                 
-                // --- LOGICA SQL DINAMICA PER L'ORARIO SCELTO ---
                 String espressioneOrarioSQL = "DATE_ADD(NOW(), INTERVAL ? MINUTE)";
                 boolean isProgrammato = "prog".equals(tipoOrario) && orarioScelto != null && !orarioScelto.trim().isEmpty();
-                
-                if (isProgrammato) {
-                    // Unisce la data di oggi con l'orario scelto (aggiungendo :00 per i secondi)
-                    espressioneOrarioSQL = "CONCAT(CURDATE(), ' ', ?, ':00')"; 
-                }
+                if (isProgrammato) { espressioneOrarioSQL = "CONCAT(CURDATE(), ' ', ?, ':00')"; }
 
-                // 1. Creazione dell'Ordine "Testata"
                 String sqlOrdine = "INSERT INTO Ordine (id_cliente, orario_consegna_richiesto, stato_attuale, prezzo_totale, tempo_stimato_consegna) VALUES (?, " + espressioneOrarioSQL + ", 'inserito', ?, ?)";
-                
                 try (PreparedStatement ps = conn.prepareStatement(sqlOrdine, Statement.RETURN_GENERATED_KEYS)) {
-                    ps.setInt(1, idCliente); // Parametro 1
-                    
-                    if (isProgrammato) {
-                        ps.setString(2, orarioScelto); // Parametro 2 (se programmato)
-                    } else {
-                        ps.setInt(2, tempoStimatoCalcolato); // Parametro 2 (se ASAP)
-                    }
-                    
-                    ps.setDouble(3, totaleOrdine); // Parametro 3
-                    ps.setInt(4, tempoStimatoCalcolato); // Parametro 4
-                    
+                    ps.setInt(1, idCliente); 
+                    if (isProgrammato) { ps.setString(2, orarioScelto); } else { ps.setInt(2, tempoStimatoCalcolato); }
+                    ps.setDouble(3, totaleOrdine); 
+                    ps.setInt(4, tempoStimatoCalcolato); 
                     ps.executeUpdate();
-                    
-                    try (ResultSet rs = ps.getGeneratedKeys()) {
-                        if (rs.next()) {
-                            numeroOrdine = rs.getInt(1); 
-                        }
-                    }
+                    try (ResultSet rs = ps.getGeneratedKeys()) { if (rs.next()) { numeroOrdine = rs.getInt(1); } }
                 }
                 
                 if (numeroOrdine > 0) {
-                    // 2. Inserimento dei prodotti del carrello
-                    String sqlDettaglio = "INSERT INTO Dettaglio_Ordine (id_ordine, id_prodotto, quantita) VALUES (?, ?, ?)";
+                    String sqlDettaglio = "INSERT INTO Dettaglio_Ordine (id_ordine, id_prodotto, quantita, prezzo_unitario) VALUES (?, ?, ?, ?)";
                     try (PreparedStatement psDett = conn.prepareStatement(sqlDettaglio)) {
                         for (ElementoCarrello el : carrello) {
                             psDett.setInt(1, numeroOrdine);
                             psDett.setInt(2, el.getProdotto().getIdProdotto()); 
                             psDett.setInt(3, el.getQuantita());
+                            psDett.setDouble(4, el.getProdotto().getPrezzoBase() + el.getPrezzoExtra());
                             psDett.executeUpdate();
                         }
                     }
-          
-                    // 3. Salvataggio Storico Stati Ordine
                     String sqlStorico = "INSERT INTO Storico_Stati_Ordine (id_ordine, id_personale, stato) VALUES (?, ?, 'inserito')";
                     try (PreparedStatement psStorico = conn.prepareStatement(sqlStorico)) {
                         psStorico.setInt(1, numeroOrdine);
                         psStorico.setInt(2, idCliente); 
                         psStorico.executeUpdate();
                     }
-                    
-                    conn.commit(); // Salvataggio definitivo
-                    
+                    conn.commit(); 
                 } else {
                     conn.rollback();
                     out.print("{\"successo\": false, \"messaggio\": \"Errore interno durante la creazione dell'ordine.\"}");
@@ -129,18 +101,34 @@ public class ConfermaOrdineServlet extends HttpServlet {
                 return;
             }
 
-            // Invia l'email di conferma
+            // --- NUOVA EMAIL DI CONFERMA (RICEVUTA BELLISSIMA) ---
             StringBuilder html = new StringBuilder();
-            html.append("<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>");
-            html.append("<h2 style='color: #116C4A;'>Grazie per il tuo ordine, ").append(nome).append("!</h2>");
-            html.append("<p>Il tuo ordine <strong>#").append(numeroOrdine).append("</strong> è stato ricevuto e sarà in preparazione a breve.</p>");
+            html.append("<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; border: 1px solid #e5e7eb;'>");
+            html.append("<h2 style='color: #116C4A; text-align: center; margin-top: 0;'>Riepilogo Ordine #" + numeroOrdine + "</h2>");
+            html.append("<p style='color: #555; text-align: center; font-size: 16px;'>Grazie per aver scelto WebDelivery, <strong>").append(nome).append("</strong>! 🎉<br>Il tuo ordine è stato ricevuto ed è ora in preparazione.</p>");
+            
+            html.append("<div style='background: #f9fafb; padding: 20px; border-radius: 8px; margin-top: 25px;'>");
+            html.append("<h3 style='margin-top: 0; color: #333; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;'>Dettaglio Prodotti:</h3>");
+            html.append("<table style='width: 100%; border-collapse: collapse;'>");
+            
+            for (ElementoCarrello el : carrello) {
+                double subTot = (el.getProdotto().getPrezzoBase() + el.getPrezzoExtra()) * el.getQuantita();
+                html.append("<tr>");
+                html.append("<td style='padding: 12px 0; border-bottom: 1px solid #e5e7eb; color: #333;'><strong>").append(el.getQuantita()).append("x</strong> ").append(el.getProdotto().getNome()).append("</td>");
+                html.append("<td style='padding: 12px 0; border-bottom: 1px solid #e5e7eb; text-align: right; color: #333;'>€").append(String.format("%.2f", subTot)).append("</td>");
+                html.append("</tr>");
+            }
+            
+            html.append("<tr><td style='padding: 12px 0; color: #777;'>Spedizione / Servizio</td><td style='padding: 12px 0; text-align: right; color: #777;'>€2.50</td></tr>");
+            html.append("</table>");
+            html.append("<h2 style='text-align: right; color: #116C4A; margin-top: 20px; border-top: 2px solid #e5e7eb; padding-top: 15px;'>Totale: €").append(String.format("%.2f", totaleOrdine)).append("</h2>");
+            html.append("</div>");
+            
+            html.append("<p style='text-align: center; color: #777; font-size: 13px; margin-top: 30px;'>Ti invieremo un'altra email non appena il tuo ordine sarà in arrivo!</p>");
             html.append("</div>");
 
-            try {
-                EmailUtility.inviaEmailRiepilogo(email, "Conferma Ordine #" + numeroOrdine, html.toString());
-            } catch (Throwable t) {
-                System.out.println("ATTENZIONE: Email non inviata, ma ordine salvato! Errore: " + t.getMessage());
-            }
+            try { EmailUtility.inviaEmailRiepilogo(email, "🍕 Il tuo ordine #" + numeroOrdine + " è confermato!", html.toString()); } 
+            catch (Throwable t) { System.out.println("Email non inviata"); }
             
             session.removeAttribute("carrello");
             out.print("{\"successo\": true, \"messaggio\": \"Ordine confermato con successo!\"}");
