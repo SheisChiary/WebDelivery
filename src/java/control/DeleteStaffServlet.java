@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.DBConnect;
 
-// L'annotazione scritta così garantisce che Tomcat la trovi sempre!
+
 @WebServlet(name = "DeleteStaffServlet", urlPatterns = {"/DeleteStaffServlet"})
 public class DeleteStaffServlet extends HttpServlet {
 
@@ -25,7 +25,7 @@ public class DeleteStaffServlet extends HttpServlet {
             return;
         }
 
-        // Elimina solo se è davvero un membro dello staff (personale)
+        // Elimina solo se è davvero un membro dello staff 
         String sql = "DELETE FROM Utente WHERE id_utente = ? AND ruolo = 'personale'";
 
         try (Connection conn = DBConnect.getConnection();

@@ -44,7 +44,7 @@ public class GetStatisticheServlet extends HttpServlet {
                 }
             }
 
-            // 2 & 3. Incasso Mensile e Ordini
+            // 2 e 3. Incasso Mensile e Ordini
             String sqlMese = "SELECT SUM(prezzo_totale), COUNT(id_ordine) FROM Ordine WHERE YEAR(data_creazione) = YEAR(?) AND MONTH(data_creazione) = MONTH(?) AND stato_attuale = 'consegnato'";
             try (PreparedStatement ps = conn.prepareStatement(sqlMese)) {
                 ps.setString(1, dataScelta);
@@ -61,7 +61,7 @@ public class GetStatisticheServlet extends HttpServlet {
                 .append("\"incassoMese\":").append(incassoMese).append(",")
                 .append("\"ordiniMese\":").append(ordiniMese).append(",");
 
-            // 4. Prodotti PIÙ venduti
+            // 4. Prodotti più venduti
             json.append("\"topProdotti\": [");
             String sqlTop = "SELECT p.nome, SUM(d.quantita) as qta FROM Dettaglio_Ordine d JOIN Ordine o ON d.id_ordine = o.id_ordine JOIN Prodotto p ON d.id_prodotto = p.id_prodotto WHERE o.stato_attuale = 'consegnato' AND YEAR(o.data_creazione) = YEAR(?) AND MONTH(o.data_creazione) = MONTH(?) GROUP BY p.id_prodotto, p.nome ORDER BY qta DESC LIMIT 5";
             try (PreparedStatement ps = conn.prepareStatement(sqlTop)) {
@@ -78,7 +78,7 @@ public class GetStatisticheServlet extends HttpServlet {
             }
             json.append("],");
 
-            // 5. Prodotti MENO venduti (INCLUSI I FLOP A ZERO VENDITE - FIX APPLICATO)
+            // 5. Prodotti MENO venduti 
             json.append("\"flopProdotti\": [");
             String sqlFlop = "SELECT p.nome, COALESCE(SUM(d.quantita), 0) as qta " +
                              "FROM Prodotto p " +

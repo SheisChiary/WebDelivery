@@ -22,17 +22,17 @@ public class AdminOrdiniServlet extends HttpServlet {
         DBConnect db = new DBConnect();
         
         try {
-            // 2. Chiedo al database la lista degli ordini (quella che abbiamo scritto prima)
+            // 2. Chiedo al database la lista degli ordini 
             List<OrdineAdminDashboard> listaOrdini = db.getTuttiGliOrdiniConStorico();
             
-            // 3. Metto la lista nel "vassoio" (request) così la pagina JSP può leggerla
+            // 3. Metto la lista nel "vassoio"  così la pagina JSP può leggerla
             request.setAttribute("listaOrdini", listaOrdini);
             
-            // 4. Mando tutto alla pagina che disegna la tabella (dashboard_admin.jsp)
+            // 4. Mando tutto alla pagina che disegna la tabella
             request.getRequestDispatcher("dashboard_admin.jsp").forward(request, response);
             
         } catch (SQLException e) {
-            // Se c'è un errore col database, lo scriviamo nel log e avvisiamo l'utente
+            
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Errore caricamento ordini: " + e.getMessage());
         }
@@ -41,7 +41,7 @@ public class AdminOrdiniServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Per ora facciamo lo stesso del doGet
+       
         doGet(request, response);
     }
 }

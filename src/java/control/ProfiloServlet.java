@@ -23,14 +23,14 @@ public class ProfiloServlet extends HttpServlet {
         
         int id = (int) session.getAttribute("idUtente");
         
-        // Chiudiamo tutte le connessioni in modo sicuro con il try-with-resources
+        // Chiudiamo tutte le connessioni in modo sicuro
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement("SELECT nome_completo, email, telefono, indirizzo FROM Utente WHERE id_utente = ?")) {
             
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    // Pulizia dei testi per evitare errori di decodifica JSON
+                    
                     String nome = rs.getString("nome_completo") != null ? rs.getString("nome_completo").replace("\"", "\\\"") : "";
                     String email = rs.getString("email") != null ? rs.getString("email").replace("\"", "\\\"") : "";
                     String telefono = rs.getString("telefono") != null ? rs.getString("telefono").replace("\"", "\\\"") : "";

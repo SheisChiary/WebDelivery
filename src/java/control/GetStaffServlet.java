@@ -24,7 +24,7 @@ public class GetStaffServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         StringBuilder json = new StringBuilder("[");
 
-        // Usiamo "personale" come definito nel tuo ENUM e "nome_completo" al posto di username
+        
         String sql = "SELECT id_utente, nome_completo, email, telefono FROM Utente WHERE ruolo = 'personale'";
 
         try (Connection conn = DBConnect.getConnection();

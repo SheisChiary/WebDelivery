@@ -11,7 +11,7 @@ public class DebugServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
-        HttpSession session = request.getSession(false); // Non crearne una nuova
+        HttpSession session = request.getSession(false); 
 
         out.println("<h1>Stato Sessione:</h1>");
         if (session == null) {

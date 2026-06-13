@@ -9,7 +9,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
         * {
-            box-sizing: border-box; /* Previene sbordamenti */
+            box-sizing: border-box; 
         }
 
         body {
@@ -91,7 +91,7 @@
             background-color: #fdf0f0;
         }
 
-        /* CONTENUTO PRINCIPALE */
+        
         .main-content {
             flex: 1;
             padding: 40px;
@@ -113,7 +113,7 @@
             margin-bottom: 20px;
         }
 
-        /* TABELLE */
+        
         .table-container {
             background-color: #ffffff;
             border-radius: 10px;
@@ -151,7 +151,7 @@ th {
         th:first-child, td:first-child { padding-left: 0; }
         th:last-child, td:last-child { padding-right: 0; }
 
-        /* BADGE STATO */
+        
         .badge {
             padding: 4px 10px;
             border-radius: 20px;
@@ -165,7 +165,7 @@ th {
         .badge.inconsegna { background-color: #e2d9f3; color: #4a238b; }
         .badge.consegnato { background-color: #d4edda; color: #155724; }
 
-        /* BOTTONE AZIONE */
+       
         .btn-azione {
             background-color: transparent;
             border: 1px solid #116C4A;
@@ -190,7 +190,7 @@ th {
             font-style: italic;
         }
 
-        /* MODALE (POPUP DETTAGLI) */
+        
         .modal-overlay {
             display: none; 
             position: fixed;
@@ -251,10 +251,10 @@ th {
             font-weight: 700;
         }
 
-        /* RESPONSIVITÀ PER SCHERMI PICCOLI E FINESTRE STRETTE */
+        
         @media (max-width: 768px) {
             body { flex-direction: column; height: auto; overflow-y: auto; }
-            /* FIX SIDEBAR: L'altezza deve essere 'auto', non '100vh', per non creare il blocco vuoto gigante */
+            
             .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #e0e0e0; padding-bottom: 15px; }
             .nav-menu { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 15px; }
             .nav-item { font-size: 13px; padding: 8px 12px; }
@@ -407,7 +407,7 @@ th {
             }
         }
 
-        // CARICAMENTO TABELLE PRINCIPALI
+        
         document.addEventListener("DOMContentLoaded", function() {
             fetch('GetOrdiniJson')
                 .then(response => {
@@ -425,7 +425,7 @@ th {
                         let badgeHtml = `<span class="badge ${o.stato.replace(/\s+/g, '').toLowerCase()}">${o.stato}</span>`;
                         let btnDettagli = `<button class="btn-azione" onclick="apriPopup('#${o.id}')">Dettagli</button>`;
 
-                        // Formattazione data orario richiesto
+                        
                         let rawDate = o.data_richiesta; 
                         let orarioFormattato = rawDate; 
                         
@@ -445,7 +445,7 @@ th {
 
                         if (o.stato.toLowerCase() === 'consegnato') {
                             
-                            // Formattazione data consegna reale
+                            
                             let rawConsegna = o.data_consegna;
                             let dataConsegnaFormattata = "Data assente";
                             if (rawConsegna && rawConsegna.length > 0) {
@@ -457,7 +457,7 @@ th {
                                 }
                             }
 
-                            // RIGA STORICO (FIX: 6 colonne, incluso il Totale)
+                            
                             let rowStorico = `<tr>
                                 <td><b>#${o.id}</b></td>
                                 <td>${o.cliente}</td>
@@ -468,7 +468,7 @@ th {
                             </tr>`;
                             tbodyStorico.innerHTML += rowStorico;
                         } else {
-                            // RIGA ORDINI IN CORSO (6 colonne)
+                           
                             let rowInCorso = `<tr>
                                 <td><b>#${o.id}</b></td>
                                 <td>${o.cliente}</td>
@@ -485,7 +485,7 @@ th {
                         tbodyInCorso.innerHTML = '<tr><td colspan="7" class="empty-state">Nessun ordine in corso al momento.</td></tr>';
                     }
                     if (tbodyStorico.innerHTML.trim() === '') {
-                        tbodyStorico.innerHTML = '<tr><td colspan="6" class="empty-state">Nessun ordine completato al momento.</td></tr>'; // FIX colspan 6
+                        tbodyStorico.innerHTML = '<tr><td colspan="6" class="empty-state">Nessun ordine completato al momento.</td></tr>'; 
                     }
                 })
                 .catch(error => {

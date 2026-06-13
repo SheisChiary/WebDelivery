@@ -9,7 +9,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
         * {
-            box-sizing: border-box; /* Fondamentale per non far sbordare le barre */
+            box-sizing: border-box; 
         }
 
         body {
@@ -22,7 +22,7 @@
             overflow: hidden;
         }
 
-        /* --- LA TUA SIDEBAR ORIGINALE --- */
+       
         .sidebar {
             width: 260px;
             background-color: #ffffff;
@@ -92,7 +92,7 @@
             background-color: #fdf0f0;
         }
 
-        /* --- CONTENUTO PRINCIPALE (Questo era sparito!) --- */
+        
         .main-content {
             flex: 1;
             padding: 40px;
@@ -123,7 +123,6 @@
         .date-picker-container label { font-size: 13px; font-weight: 600; color: #666; }
         .date-picker-container input { border: none; outline: none; font-family: inherit; font-size: 14px; font-weight: 600; color: #116C4A; background: transparent; cursor: pointer; }
 
-        /* --- KPI CARDS --- */
         .kpi-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -153,7 +152,7 @@
         .kpi-value { font-size: 32px; font-weight: 800; color: #1a1a1a; margin: 0; }
         .kpi-subtitle { font-size: 12px; font-weight: 500; color: #888; margin: 0; }
 
-        /* --- CLASSIFICHE TOP/FLOP --- */
+        /* CLASSIFICHE TOP/FLOP  */
         .charts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -176,7 +175,7 @@
             margin-bottom: 15px;
         }
 
-        .item-info { flex: 1; min-width: 0; } /* min-width 0 evita che le scritte lunghe sbordino */
+        .item-info { flex: 1; min-width: 0; } 
         .item-name { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 5px; display: flex; justify-content: space-between; }
         .item-qty { font-size: 13px; font-weight: 700; color: #116C4A; }
 
@@ -285,12 +284,12 @@
             fetch('GetStatisticheServlet?data=' + dataScelta)
                 .then(response => response.json())
                 .then(data => {
-                    // Aggiorna KPI
+                    
                     document.getElementById('val-giorno').innerText = '€ ' + parseFloat(data.incassoGiorno || 0).toFixed(2);
                     document.getElementById('val-mese').innerText = '€ ' + parseFloat(data.incassoMese || 0).toFixed(2);
                     document.getElementById('val-ordini').innerText = data.ordiniMese || 0;
 
-                    // Gestione TOP
+                   
                     const listaTop = document.getElementById('lista-top');
                     listaTop.innerHTML = '';
                     if (data.topProdotti && data.topProdotti.length > 0) {
@@ -312,7 +311,7 @@
                         listaTop.innerHTML = '<div class="empty-state">Nessuna vendita registrata in questo mese.</div>';
                     }
 
-                    // Gestione FLOP
+                   
                     const listaFlop = document.getElementById('lista-flop');
                     listaFlop.innerHTML = '';
                     if (data.flopProdotti && data.flopProdotti.length > 0) {

@@ -110,13 +110,13 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.loggato) {
-                        // REINDIRIZZAMENTO INTELLIGENTE IN BASE AL RUOLO
+                        
                         if (data.ruolo === 'proprietario') {
                             window.location.href = 'dashboard_admin.html';
                         } else if (data.ruolo === 'personale') {
                             window.location.href = 'dashboard_staff.html';
                         } else {
-                            window.location.href = 'dashboard.html'; // Cliente
+                            window.location.href = 'dashboard.html'; 
                         }
                     } else {
                         // 2. SE NON SEI LOGGATA, CARICA IL VERO MENU DAL DATABASE
@@ -126,13 +126,13 @@
                 .catch(error => console.error('Errore:', error));
         });
 
-        // Funzione per caricare i dati reali
+        // Funzione per caricare i dati 
         function caricaMenuPubblico() {
             fetch('MenuServlet')
                 .then(response => response.json())
                 .then(prodotti => {
                     const grid = document.querySelector('.grid');
-                    grid.innerHTML = ''; // Svuota il menu finto HTML
+                    grid.innerHTML = ''; 
 
                     if (prodotti.length === 0) {
                         grid.innerHTML = '<p style="text-align:center; width:100%;">Il menu è in aggiornamento.</p>';
@@ -141,7 +141,7 @@
 
                     // Crea le card per ogni prodotto reale
                     prodotti.forEach(p => {
-                        // Se l'immagine è vuota nel DB, mette un'immagine di placeholder
+                        
                         const imgUrl = (p.immagine && p.immagine !== "null" && p.immagine !== "") 
                                         ? p.immagine 
                                         : 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=500&q=60';

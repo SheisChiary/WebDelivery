@@ -32,7 +32,7 @@ public class GetDettaglioOrdineJson extends HttpServlet {
         try (Connection conn = DBConnect.getConnection()) {
             StringBuilder json = new StringBuilder("{");
 
-            // 1. Recupero il Totale
+            // 1. Recupero il Prezzo Totale
             try (PreparedStatement ps = conn.prepareStatement("SELECT prezzo_totale FROM Ordine WHERE id_ordine = ?")) {
                 ps.setInt(1, idOrdine);
                 try (ResultSet rs = ps.executeQuery()) {
@@ -42,7 +42,7 @@ public class GetDettaglioOrdineJson extends HttpServlet {
                 }
             }
 
-            // 2. Recupero i Prodotti ordinati CON INFO CUCINA E PERSONALIZZAZIONI
+            // 2. Recupero i Prodotti ordinati 
             json.append("\"prodotti\": [");
             String queryProd = "SELECT d.id_dettaglio, p.nome, p.prezzo_base, p.ricetta, p.ingredienti, d.quantita " +
                                "FROM Dettaglio_Ordine d JOIN Prodotto p ON d.id_prodotto = p.id_prodotto " +
@@ -58,7 +58,7 @@ public class GetDettaglioOrdineJson extends HttpServlet {
                         json.append("\"quantita\":").append(rs.getInt("quantita")).append(",");
                         json.append("\"prezzo\":").append(rs.getDouble("prezzo_base")).append(",");
                         
-                        // Info Segrete
+                       
                         String ricetta = rs.getString("ricetta");
                         String ingredienti = rs.getString("ingredienti");
                         json.append("\"ricetta\":\"").append(ricetta != null ? ricetta.replace("\"", "\\\"").replace("\n", " ") : "Nessuna nota").append("\",");

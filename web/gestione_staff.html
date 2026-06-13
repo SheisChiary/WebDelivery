@@ -7,7 +7,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-        /* Regola d'oro per evitare sbordamenti di layout */
+       
         * {
             box-sizing: border-box;
         }
@@ -19,10 +19,10 @@
             display: flex;
             height: 100vh;
             color: #333;
-            overflow: hidden; /* Evita doppi scroll */
+            overflow: hidden; 
         }
 
-        /* --- SIDEBAR --- */
+       
         .sidebar {
             width: 260px;
             background-color: #ffffff;
@@ -92,7 +92,7 @@
             background-color: #fdf0f0;
         }
 
-        /* --- CONTENUTO PRINCIPALE --- */
+        
         .main-content {
             flex: 1;
             padding: 40px;
@@ -108,7 +108,6 @@
             color: #333;
         }
 
-        /* --- FORM E TABELLE --- */
         .table-container {
             background-color: #ffffff;
             border-radius: 10px;
@@ -116,7 +115,7 @@
             margin-bottom: 30px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             border: 1px solid #f0f0f0;
-            overflow-x: auto; /* Permette scorrimento laterale */
+            overflow-x: auto; 
         }
 
         h2 {
@@ -181,7 +180,7 @@
             background-color: #0d422c;
         }
 
-        /* Tabella */
+       
         table {
             width: 100%;
             border-collapse: collapse;
@@ -209,7 +208,6 @@
             padding-bottom: 0;
         }
 
-        /* Colonna azioni (pulsanti) */
         .actions-cell {
             text-align: right;
             white-space: nowrap;
@@ -220,7 +218,7 @@
             border: none;
             cursor: pointer;
             font-size: 18px;
-            margin-left: 10px; /* Margine a sinistra invece che destra, così stanno bene a fondo riga */
+            margin-left: 10px; 
             transition: transform 0.2s;
         }
 
@@ -228,7 +226,7 @@
             transform: scale(1.1);
         }
 
-        /* --- MODALE MODIFICA --- */
+        
         .modal-overlay {
             display: none; 
             position: fixed;
@@ -249,7 +247,7 @@
             
         }
         
-        /* RESPONSIVITÀ PER SCHERMI PICCOLI E FINESTRE STRETTE */
+        
        @media (max-width: 768px) {
             body { 
                 flex-direction: column; 
@@ -290,14 +288,14 @@
                 overflow-y: visible;
             }
             
-            /* FIX TABELLA AMMUCCHIATA SU MOBILE */
+            
             .table-container { 
                 padding: 15px; 
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
             }
             table {
-                min-width: 500px; /* Impedisce che il testo vada a capo in maniera brutta */
+                min-width: 500px; 
             }
 
             .form-grid {

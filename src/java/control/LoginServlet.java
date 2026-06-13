@@ -38,17 +38,17 @@ public class LoginServlet extends HttpServlet {
                     String nome = rs.getString("nome_completo");
                     String ruolo = rs.getString("ruolo");
                     
-                    // Pulizia del ruolo per evitare errori (spazi o maiuscole)
+                    
                     String ruoloPulito = (ruolo != null) ? ruolo.trim().toLowerCase() : "";
                     
                     HttpSession session = request.getSession();
                     
-                    // Salviamo i dati necessari per TUTTE le servlet (Carrello, Checkout, Profilo)
+                    
                     session.setAttribute("id_utente", id);
-                    session.setAttribute("idUtente", id); // Usato nel profilo
+                    session.setAttribute("idUtente", id); 
                     session.setAttribute("nome_completo", nome);
-                    session.setAttribute("nomeUtente", nome); // Usato nel checkout
-                    session.setAttribute("emailUtente", email); // FONDAMENTALE PER PAGARE!
+                    session.setAttribute("nomeUtente", nome); 
+                    session.setAttribute("emailUtente", email);
                     session.setAttribute("ruolo", ruoloPulito);
                     
                     // Logica di reindirizzamento basata sul ruolo

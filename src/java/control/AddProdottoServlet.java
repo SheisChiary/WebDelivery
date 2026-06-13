@@ -27,7 +27,7 @@ public class AddProdottoServlet extends HttpServlet {
         String descrizione = request.getParameter("descrizione");
         String immagine = request.getParameter("immagine");
 
-        // 2. Dati delle varianti/ingredienti extra (Arrivano come Array!)
+        // 2. Dati delle varianti/ingredienti extra 
         String[] varNomi = request.getParameterValues("var_nome");
         String[] varPrezzi = request.getParameterValues("var_prezzo");
 
@@ -35,7 +35,7 @@ public class AddProdottoServlet extends HttpServlet {
         try {
             prezzo = Double.parseDouble(prezzoStr);
         } catch (Exception e) {
-            // Ignora errore parsing
+            
         }
 
         // Tempo di preparazione di default (15 min) e ricetta vuota
@@ -49,13 +49,13 @@ public class AddProdottoServlet extends HttpServlet {
             ps.setDouble(3, prezzo);
             ps.setString(4, (badge != null && !badge.trim().isEmpty()) ? badge : null);
             ps.setString(5, descrizione);
-            ps.setString(6, descrizione); // Usiamo la descrizione come base per gli ingredienti
+            ps.setString(6, descrizione); 
             ps.setString(7, (immagine != null && !immagine.trim().isEmpty()) ? immagine : null);
             
             int affectedRows = ps.executeUpdate();
             
             if (affectedRows > 0) {
-                // Il prodotto è stato salvato! Ora recuperiamo il suo ID (id_prodotto)
+                // id_prodotto
                 try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         int idProdotto = generatedKeys.getInt(1);
@@ -73,14 +73,14 @@ public class AddProdottoServlet extends HttpServlet {
                                         psVar.setInt(1, idProdotto);
                                         psVar.setString(2, varNomi[i]);
                                         psVar.setDouble(3, pVar);
-                                        psVar.executeUpdate(); // Salva l'ingrediente!
+                                        psVar.executeUpdate(); // Salva l'ingrediente
                                     }
                                 }
                             }
                         }
                     }
                 }
-                // Tutto OK!
+                
                 response.setStatus(HttpServletResponse.SC_OK);
             } else {
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Errore salvataggio prodotto.");

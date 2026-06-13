@@ -17,7 +17,7 @@
             color: #333;
         }
 
-        /* BARRA LATERALE */
+        
         .sidebar {
             width: 250px;
             background-color: #ffffff;
@@ -74,7 +74,7 @@
             color: #c9302c;
         }
 
-        /* CONTENUTO PRINCIPALE */
+        
         .main-content {
             flex: 1;
             padding: 40px;
@@ -120,7 +120,7 @@
             border-radius: 50%;
         }
 
-        /* STATS CARDS */
+        
         .stats-container {
             display: flex;
             gap: 20px;
@@ -150,7 +150,7 @@
             margin: 0;
         }
 
-        /* ORDER CARDS */
+        
         .order-list {
             display: flex;
             flex-direction: column;
@@ -275,7 +275,7 @@
             color: #116C4A;
         }
 
-        /* MODALE (POPUP DETTAGLI) */
+        
         .modal-overlay {
             display: none; 
             position: fixed; 
@@ -449,7 +449,7 @@
 
                         let modificatoDa = o.ultimo_staff ? o.ultimo_staff : "Sistema / Cliente";
                         
-                        // FIX PER LA DATA UNDEFINED
+                        
                         let dataSicura = (o.orario && o.orario !== "Data non disp.") ? o.orario : (o.data_richiesta ? o.data_richiesta : 'Il prima possibile');
 
                         const card = `
@@ -520,7 +520,7 @@
                                 opzioniHtml += "</ul>";
                             }
                             
-                            // Info Segrete Cucina
+                            // Info Cucina
                             let secretHtml = `
                             <div style="background:#f9f9f9; padding:10px; border-radius:6px; margin-top:8px; font-size:11px; color:#555; border-left:3px solid #116C4A;">
                                 <div style="margin-bottom:4px;"><b><i class="fas fa-carrot"></i> Ingredienti:</b> ${p.ingredienti}</div>

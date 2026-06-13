@@ -26,18 +26,18 @@ public class EditProdottoServlet extends HttpServlet {
         String descrizione = request.getParameter("descrizione");
         String immagine = request.getParameter("immagine");
 
-        // Dati delle varianti/ingredienti modificati
+      
         String[] varNomi = request.getParameterValues("var_nome");
         String[] varPrezzi = request.getParameterValues("var_prezzo");
 
         int idProdotto = Integer.parseInt(idStr);
         double prezzo = Double.parseDouble(prezzoStr);
 
-        // Query per aggiornare il prodotto base
+       
         String sqlUpdateProdotto = "UPDATE Prodotto SET nome = ?, categoria = ?, prezzo_base = ?, badge = ?, descrizione = ?, ingredienti = ?, immagine_url = ? WHERE id_prodotto = ?";
 
         try (Connection conn = DBConnect.getConnection()) {
-            // Disabilitiamo l'autocommit per fare una "Transazione": o si salva tutto o niente
+            
             conn.setAutoCommit(false);
 
             try {
@@ -54,7 +54,7 @@ public class EditProdottoServlet extends HttpServlet {
                     ps.executeUpdate();
                 }
 
-                // B. Cancello le vecchie varianti per questo piatto (Facciamo pulizia prima di reinserire)
+                // B. Cancello le vecchie varianti per questo piatto 
                 String sqlDeleteVarianti = "DELETE FROM Caratteristica WHERE id_prodotto = ? AND id_gruppo IS NULL";
                 try (PreparedStatement psDel = conn.prepareStatement(sqlDeleteVarianti)) {
                     psDel.setInt(1, idProdotto);
@@ -79,12 +79,12 @@ public class EditProdottoServlet extends HttpServlet {
                     }
                 }
 
-                // Se tutto è andato a buon fine, salviamo nel DB definitivamente
+                // Se tutto è andato a buon fine, salviamo nel DB 
                 conn.commit();
                 response.setStatus(HttpServletResponse.SC_OK);
 
             } catch (Exception e) {
-                // Se qualcosa fallisce, annulliamo le modifiche per non corrompere il DB
+                
                 conn.rollback();
                 throw e;
             } finally {

@@ -7,7 +7,7 @@ import java.sql.SQLException;
 
 public class UtenteDAO {
 
-    // Metodo per recuperare i dati dell'utente
+    // Recupera i dati dell'utente
     public ResultSet getDatiUtente(int id) throws SQLException {
         Connection conn = DBConnect.getConnection();
         String sql = "SELECT nome_completo, email, telefono, indirizzo FROM Utente WHERE id_utente = ?";
@@ -16,7 +16,7 @@ public class UtenteDAO {
         return ps.executeQuery();
     }
 
-    // Metodo per aggiornare i dati
+    // Aggiorna i dati
     public boolean aggiornaProfilo(int id, String nome, String telefono, String indirizzo) {
         String query = "UPDATE Utente SET nome_completo = ?, telefono = ?, indirizzo = ? WHERE id_utente = ?";
         try (Connection conn = DBConnect.getConnection();

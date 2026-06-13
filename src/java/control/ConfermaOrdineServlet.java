@@ -101,7 +101,7 @@ public class ConfermaOrdineServlet extends HttpServlet {
                 return;
             }
 
-            // --- NUOVA EMAIL DI CONFERMA (RICEVUTA BELLISSIMA) ---
+            
             StringBuilder html = new StringBuilder();
             html.append("<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; border: 1px solid #e5e7eb;'>");
             html.append("<h2 style='color: #116C4A; text-align: center; margin-top: 0;'>Riepilogo Ordine #" + numeroOrdine + "</h2>");
@@ -127,7 +127,7 @@ public class ConfermaOrdineServlet extends HttpServlet {
             html.append("<p style='text-align: center; color: #777; font-size: 13px; margin-top: 30px;'>Ti invieremo un'altra email non appena il tuo ordine sarà in arrivo!</p>");
             html.append("</div>");
 
-            try { EmailUtility.inviaEmailRiepilogo(email, "🍕 Il tuo ordine #" + numeroOrdine + " è confermato!", html.toString()); } 
+            try { EmailUtility.inviaEmailRiepilogo(email, " Il tuo ordine #" + numeroOrdine + " è confermato!", html.toString()); } 
             catch (Throwable t) { System.out.println("Email non inviata"); }
             
             session.removeAttribute("carrello");

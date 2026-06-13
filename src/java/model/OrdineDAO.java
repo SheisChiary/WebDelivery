@@ -12,7 +12,7 @@ public class OrdineDAO {
 
     public List<Map<String, Object>> getOrdiniCliente(int idCliente) {
         List<Map<String, Object>> ordini = new ArrayList<>();
-        // Prende gli ordini in ordine cronologico decrescente 
+        
         String sql = "SELECT id_ordine, data_creazione, stato_attuale, prezzo_totale FROM Ordine WHERE id_cliente = ? ORDER BY data_creazione DESC";
         
         try (Connection conn = DBConnect.getConnection();

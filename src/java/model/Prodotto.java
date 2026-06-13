@@ -12,7 +12,7 @@ public class Prodotto {
 
     public Prodotto() {}
 
-    // Getter e Setter
+   
     public int getIdProdotto() { return idProdotto; }
     public void setIdProdotto(int idProdotto) { this.idProdotto = idProdotto; }
 

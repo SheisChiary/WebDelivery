@@ -27,7 +27,7 @@ public class StoricoOrdiniServlet extends HttpServlet {
 
         String sql = "SELECT id_ordine, data_creazione, stato_attuale, prezzo_totale FROM Ordine WHERE id_cliente = ? ORDER BY data_creazione DESC";
         
-        // Connessione ultra-sicura
+       
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
              

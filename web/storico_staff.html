@@ -139,7 +139,7 @@
                     }
 
                     ordiniCompletati.forEach(o => {
-                        // FIX UNDEFINED DATA:
+                        
                         let dataSicura = o.data_consegna ? o.data_consegna : (o.data_richiesta ? o.data_richiesta : "Data Assente");
                         
                         let row = `<tr>
@@ -226,7 +226,7 @@
         }
 
         function chiudiPopup() { document.getElementById('popupDettagli').style.display = 'none'; }
-        window.onclick = function(e) { if (e.target == document.getElementById('popupDettagli')) chiudiPopup(); }
+        window.onclick = function(e) { if (e.target === document.getElementById('popupDettagli')) chiudiPopup(); }
     </script>
 </body>
 </html>

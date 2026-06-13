@@ -21,14 +21,14 @@ public class CheckSessionServlet extends HttpServlet {
 
         if (session != null && session.getAttribute("nome_completo") != null) {
             String nome = (String) session.getAttribute("nome_completo");
-            String ruolo = (String) session.getAttribute("ruolo"); // RECUPERIAMO IL RUOLO!
+            String ruolo = (String) session.getAttribute("ruolo"); // RECUPERO RUOLO
             
-            // Per sicurezza, se il ruolo è nullo lo impostiamo a cliente
+           
             if (ruolo == null) {
                 ruolo = "cliente";
             }
 
-            // Ora restituiamo anche il ruolo nel JSON
+           
             out.print("{\"loggato\": true, \"nome\": \"" + nome + "\", \"ruolo\": \"" + ruolo + "\"}");
         } else {
             out.print("{\"loggato\": false}");

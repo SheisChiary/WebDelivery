@@ -38,7 +38,7 @@ public class AggiornaStatoServlet extends HttpServlet {
 
         int idOrdine = Integer.parseInt(idOrdineStr);
         
-        // Usiamo variabili temporanee perché poi dovranno essere rese "final" per il thread
+        
         String emailClienteTemp = null;
         String nomeClienteTemp = null;
 
@@ -91,8 +91,7 @@ public class AggiornaStatoServlet extends HttpServlet {
             return;
         }
 
-        // --- INVIO DELLE EMAIL AUTOMATICHE IN BASE ALLO STATO ---
-        // IN JAVA: Le variabili usate nei Thread devono essere dichiarate 'final'
+   
         final String emailCliente = emailClienteTemp;
         final String nomeCliente = nomeClienteTemp;
         final int finalIdOrdine = idOrdine;

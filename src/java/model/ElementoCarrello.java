@@ -6,7 +6,7 @@ public class ElementoCarrello {
     private String opzioni;
     private double prezzoExtra;
 
-    // COSTRUTTORE
+ 
     public ElementoCarrello(Prodotto prodotto, int quantita, String opzioni, double prezzoExtra) {
         this.prodotto = prodotto;
         this.quantita = quantita;

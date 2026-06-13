@@ -35,7 +35,9 @@ public class GetOrdiniJSON extends HttpServlet {
                     .append("\"id\":\"").append(o.getIdOrdine()).append("\",")
                     .append("\"cliente\":\"").append(o.getNomeCliente() != null ? o.getNomeCliente().replace("\"", "\\\"") : "").append("\",")
                     .append("\"data_richiesta\":\"").append(o.getDataRichiesta() != null ? o.getDataRichiesta() : "Data non disp.").append("\",")
-                    // Inserimento della data di consegna reale per lo storico
+                    
+// Inserimento della data di consegna  per lo storico
+                        
                     .append("\"data_consegna\":\"").append(o.getDataConsegna() != null ? o.getDataConsegna() : "").append("\",")
                     .append("\"tempo_stimato\":").append(o.getTempoStimato()).append(",")
                     .append("\"totale\":\"").append(o.getTotale()).append("\",")
