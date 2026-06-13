@@ -46,6 +46,11 @@ public class ConfermaOrdineServlet extends HttpServlet {
                 return;
             }
 
+            // --- NUOVI PARAMETRI RECUPERATI DAL FRONTEND ---
+            String tipoOrario = request.getParameter("tipoOrario");
+            String orarioScelto = request.getParameter("orario");
+            int tempoStimatoCalcolato = 40; // Tempo di default
+
             // Calcolo del totale (inclusa eventuale spedizione o costo base)
             double totaleOrdine = 2.50; 
             for (ElementoCarrello el : carrello) {
@@ -58,11 +63,30 @@ public class ConfermaOrdineServlet extends HttpServlet {
             try (Connection conn = DBConnect.getConnection()) {
                 conn.setAutoCommit(false); 
                 
+                // --- LOGICA SQL DINAMICA PER L'ORARIO SCELTO ---
+                String espressioneOrarioSQL = "DATE_ADD(NOW(), INTERVAL ? MINUTE)";
+                boolean isProgrammato = "prog".equals(tipoOrario) && orarioScelto != null && !orarioScelto.trim().isEmpty();
+                
+                if (isProgrammato) {
+                    // Unisce la data di oggi con l'orario scelto (aggiungendo :00 per i secondi)
+                    espressioneOrarioSQL = "CONCAT(CURDATE(), ' ', ?, ':00')"; 
+                }
+
                 // 1. Creazione dell'Ordine "Testata"
-                String sqlOrdine = "INSERT INTO Ordine (id_cliente, orario_consegna_richiesto, stato_attuale, prezzo_totale, tempo_stimato_consegna) VALUES (?, DATE_ADD(NOW(), INTERVAL 40 MINUTE), 'inserito', ?, 40)";
+                String sqlOrdine = "INSERT INTO Ordine (id_cliente, orario_consegna_richiesto, stato_attuale, prezzo_totale, tempo_stimato_consegna) VALUES (?, " + espressioneOrarioSQL + ", 'inserito', ?, ?)";
+                
                 try (PreparedStatement ps = conn.prepareStatement(sqlOrdine, Statement.RETURN_GENERATED_KEYS)) {
-                    ps.setInt(1, idCliente);
-                    ps.setDouble(2, totaleOrdine);
+                    ps.setInt(1, idCliente); // Parametro 1
+                    
+                    if (isProgrammato) {
+                        ps.setString(2, orarioScelto); // Parametro 2 (se programmato)
+                    } else {
+                        ps.setInt(2, tempoStimatoCalcolato); // Parametro 2 (se ASAP)
+                    }
+                    
+                    ps.setDouble(3, totaleOrdine); // Parametro 3
+                    ps.setInt(4, tempoStimatoCalcolato); // Parametro 4
+                    
                     ps.executeUpdate();
                     
                     try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -84,14 +108,15 @@ public class ConfermaOrdineServlet extends HttpServlet {
                         }
                     }
           
+                    // 3. Salvataggio Storico Stati Ordine
                     String sqlStorico = "INSERT INTO Storico_Stati_Ordine (id_ordine, id_personale, stato) VALUES (?, ?, 'inserito')";
                     try (PreparedStatement psStorico = conn.prepareStatement(sqlStorico)) {
                         psStorico.setInt(1, numeroOrdine);
-                        psStorico.setInt(2, idCliente); // Usiamo l'ID del cliente che ha fatto l'ordine!
+                        psStorico.setInt(2, idCliente); 
                         psStorico.executeUpdate();
                     }
                     
-                    conn.commit(); // Salvataggio definitivo nel Database di tutte e 3 le tabelle!
+                    conn.commit(); // Salvataggio definitivo
                     
                 } else {
                     conn.rollback();
@@ -104,7 +129,7 @@ public class ConfermaOrdineServlet extends HttpServlet {
                 return;
             }
 
-            
+            // Invia l'email di conferma
             StringBuilder html = new StringBuilder();
             html.append("<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>");
             html.append("<h2 style='color: #116C4A;'>Grazie per il tuo ordine, ").append(nome).append("!</h2>");

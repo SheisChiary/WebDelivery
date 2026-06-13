@@ -14,19 +14,23 @@ public class CheckSessionServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-       
         response.setContentType("application/json;charset=UTF-8");
         PrintWriter out = response.getWriter();
         
-       
         HttpSession session = request.getSession(false);
 
         if (session != null && session.getAttribute("nome_completo") != null) {
             String nome = (String) session.getAttribute("nome_completo");
-            // Ritorna: {"loggato": true, "nome": "Mario"}
-            out.print("{\"loggato\": true, \"nome\": \"" + nome + "\"}");
+            String ruolo = (String) session.getAttribute("ruolo"); // RECUPERIAMO IL RUOLO!
+            
+            // Per sicurezza, se il ruolo è nullo lo impostiamo a cliente
+            if (ruolo == null) {
+                ruolo = "cliente";
+            }
+
+            // Ora restituiamo anche il ruolo nel JSON
+            out.print("{\"loggato\": true, \"nome\": \"" + nome + "\", \"ruolo\": \"" + ruolo + "\"}");
         } else {
-            // Ritorna: {"loggato": false}
             out.print("{\"loggato\": false}");
         }
     }

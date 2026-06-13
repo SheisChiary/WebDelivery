@@ -24,7 +24,7 @@ public class DBConnect {
         try (Connection con = getConnection()) {
             
             // 1. Prendo tutti gli ordini
-            String queryOrdini = "SELECT o.id_ordine, u.nome_completo, o.data_creazione, o.prezzo_totale, o.stato_attuale " +
+            String queryOrdini = "SELECT o.id_ordine, u.nome_completo, o.orario_consegna_richiesto, o.tempo_stimato_consegna, o.prezzo_totale, o.stato_attuale " +
                                  "FROM Ordine o JOIN Utente u ON o.id_cliente = u.id_utente ORDER BY o.data_creazione DESC";
             
             try (PreparedStatement stmt = con.prepareStatement(queryOrdini);
@@ -32,9 +32,15 @@ public class DBConnect {
                 
                 while (rs.next()) {
                     int id = rs.getInt("id_ordine");
+                    
+                    // Passiamo al costruttore i nuovi dati letti dal DB
                     OrdineAdminDashboard ordine = new OrdineAdminDashboard(
-                        id, rs.getString("nome_completo"), rs.getString("data_creazione"), 
-                        rs.getDouble("prezzo_totale"), rs.getString("stato_attuale")
+                        id, 
+                        rs.getString("nome_completo"), 
+                        rs.getString("orario_consegna_richiesto"), 
+                        rs.getInt("tempo_stimato_consegna"),      
+                        rs.getDouble("prezzo_totale"), 
+                        rs.getString("stato_attuale")
                     );
                     
                     // 2. Per ogni ordine, cerco la sua storia
@@ -47,12 +53,21 @@ public class DBConnect {
                         stmtStoria.setInt(1, id);
                         ResultSet rsStoria = stmtStoria.executeQuery();
                         while (rsStoria.next()) {
+                            
+                            // Estraiamo i dati nelle variabili per poterli controllare
+                            String statoStorico = rsStoria.getString("stato");
+                            String dataModifica = rsStoria.getString("data_ora_modifica");
+                            
                             StoricoStato storico = new StoricoStato(
-                                rsStoria.getString("stato"),
-                                rsStoria.getString("data_ora_modifica"),
+                                statoStorico,
+                                dataModifica,
                                 rsStoria.getString("nome_completo")
                             );
                             ordine.addCronologia(storico);
+                       
+                            if ("consegnato".equalsIgnoreCase(statoStorico)) {
+                                ordine.setDataConsegna(dataModifica);
+                            }
                         }
                     }
                     lista.add(ordine);

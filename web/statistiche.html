@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ordini - Dashboard Proprietario</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>Statistiche - Dashboard Proprietario</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
@@ -17,6 +16,7 @@
             color: #333;
         }
 
+       
         .sidebar {
             width: 260px;
             background-color: #ffffff;
@@ -85,6 +85,7 @@
         .logout:hover {
             background-color: #fdf0f0;
         }
+
 
         /* CONTENUTO PRINCIPALE */
         .main-content {
@@ -155,7 +156,7 @@
         }
         .badge.inserito { background-color: #fff3cd; color: #856404; }
         .badge.inpreparazione { background-color: #cce5ff; color: #004085; }
-        .badge.pronto { background-color: #d1ecf1; color: #0c5460; }
+        .badge.pronto { background-color: #d4edda; color: #155724; }
         .badge.inconsegna { background-color: #e2d9f3; color: #4a238b; }
         .badge.consegnato { background-color: #d4edda; color: #155724; }
 
@@ -253,7 +254,7 @@
             .nav-item { font-size: 13px; padding: 8px 12px; }
             .logout { margin-top: 10px; }
             .main-content { padding: 20px; }
-            .table-container { padding: 15px; overflow-x: auto; -webkit-overflow-scrolling: touch;}
+            .table-container { padding: 15px; overflow-x: auto; }
              table {min-width: 800px; }
         }
     </style>
@@ -263,10 +264,10 @@
     <div class="sidebar">
         <div class="logo">WebDelivery</div>
         <div class="nav-menu">
-            <a href="dashboard_admin.html" class="nav-item active">Ordini</a>
+            <a href="dashboard_admin.html" class="nav-item">Ordini</a>
             <a href="gestione_menu.html" class="nav-item">Gestione del menù</a>
             <a href="gestione_staff.html" class="nav-item">Gestione dello staff</a>
-            <a href="statistiche.html" class="nav-item">Statistiche</a>
+            <a href="statistiche.html" class="nav-item active">Statistiche</a>
         </div>
         <div class="nav-menu" style="margin-top: auto;">
             <a href="LogoutServlet" class="nav-item logout">Esci</a>
@@ -283,7 +284,8 @@
                     <tr>
                         <th>ID ORDINE</th>
                         <th>CLIENTE</th>
-                        <th>ORARIO RICHIESTO</th>
+                        <th>DATA E ORA RICHIESTA</th>
+                        <th> TEMPO STIMATO </th>
                         <th>TOTALE</th>
                         <th>STATO</th>
                         <th>ORDINAZIONE</th>
@@ -304,14 +306,15 @@
                     <tr>
                         <th>ID ORDINE</th>
                         <th>CLIENTE</th>
-                        <th>ORARIO CONSEGNA</th>
+                        <th>DATA E ORA CONSEGNA</th>
+                        <th>TOTALE</th>
                         <th>STATO</th>
                         <th>ORDINAZIONE</th>
                     </tr>
                 </thead>
                 <tbody id="tbody-storico">
                     <tr>
-                        <td colspan="5" class="empty-state">Caricamento ordini completati...</td>
+                        <td colspan="6" class="empty-state">Caricamento ordini completati...</td>
                     </tr>
                 </tbody>
             </table>
@@ -413,72 +416,26 @@
                     tbodyStorico.innerHTML = '';
 
                     data.forEach(o => {
-                        let badgeHtml = `<span class="badge ${o.stato.replace(/\s+/g, '').toLowerCase()}">${o.stato}</span>`;
-                        let btnDettagli = `<button class="btn-azione" onclick="apriPopup('#${o.id}')">Dettagli</button>`;
-
-                        // --- TRUCCHETTO MAGICO PER FORMATTARE LA DATA ---
-                        let rawDate = o.data_richiesta; 
-                        let orarioFormattato = rawDate; // Default se qualcosa va storto
-                        
-                        if (rawDate && rawDate !== "Data non disp.") {
-                            // Cerca l'orario (es. "11:23:44") dentro la stringa di MySQL
-                            let match = rawDate.match(/ (\d{2}:\d{2}):(\d{2})/);
-                            if (match) {
-                                let hhmm = match[1]; // Prende "11:23"
-                                let secondi = match[2]; // Prende "44" o "00"
-
-                                if (secondi === "00") {
-                                    // Se i secondi sono spaccati, il cliente l'ha programmato!
-                                    orarioFormattato = `<span style="color: #2c3e50;"><i class="far fa-calendar-alt"></i> Prog. per le <b>${hhmm}</b></span>`;
-                                } else {
-                                    // Se ci sono secondi casuali, è il calcolo automatico del "Prima possibile"
-                                    orarioFormattato = `<span style="color: #e67e22;"><i class="fas fa-bolt"></i> Subito (entro le <b>${hhmm}</b>)</span>`;
-                                }
-                            }
-                        }
+                        let rowHTML = `<tr>
+                            <td><b>#${o.id}</b></td>
+                            <td>${o.cliente}</td>
+                            <td>${o.data_richiesta}</td> <td>${o.tempo_stimato} min</td> <td>€ ${parseFloat(o.totale).toFixed(2)}</td>
+                            <td><span class="badge ${o.stato.replace(/\s+/g, '').toLowerCase()}">${o.stato}</span></td>
+                            <td><button class="btn-azione" onclick="apriPopup('#${o.id}')">Dettagli</button></td>
+                        </tr>`;
 
                         if (o.stato.toLowerCase() === 'consegnato') {
-                            
-                            let rawConsegna = o.data_consegna;
-                            let dataConsegnaFormattata = "Data assente";
-                            if (rawConsegna && rawConsegna.length > 0) {
-                                let match = rawConsegna.match(/(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})/);
-                                if(match) {
-                                   dataConsegnaFormattata = `<span style="color: #155724;"><i class="fas fa-check-circle"></i> Il ${match[1]} alle <b>${match[2]}</b></span>`;
-                                } else {
-                                   dataConsegnaFormattata = rawConsegna;
-                                }
-                            }
-
-                            // RIGA STORICO
-                            let rowStorico = `<tr>
-                                <td><b>#${o.id}</b></td>
-                                <td>${o.cliente}</td>
-                                <td>${dataConsegnaFormattata}</td>
-                                <td>${badgeHtml}</td>
-                                <td>${btnDettagli}</td>
-                            </tr>`;
-                            tbodyStorico.innerHTML += rowStorico;
+                            tbodyStorico.innerHTML += rowHTML;
                         } else {
-                            // RIGA ORDINI IN CORSO (6 colonne)
-                            let rowInCorso = `<tr>
-                                <td><b>#${o.id}</b></td>
-                                <td>${o.cliente}</td>
-                                <td>${orarioFormattato}</td>
-                                <td>€ ${parseFloat(o.totale).toFixed(2)}</td>
-                                <td>${badgeHtml}</td>
-                                <td>${btnDettagli}</td>
-                            </tr>`;
-                            tbodyInCorso.innerHTML += rowInCorso;
+                            tbodyInCorso.innerHTML += rowHTML;
                         }
                     });
 
-                    // Gestione Empty States con i Colspan corretti
                     if (tbodyInCorso.innerHTML.trim() === '') {
                         tbodyInCorso.innerHTML = '<tr><td colspan="6" class="empty-state">Nessun ordine in corso al momento.</td></tr>';
                     }
                     if (tbodyStorico.innerHTML.trim() === '') {
-                        tbodyStorico.innerHTML = '<tr><td colspan="5" class="empty-state">Nessun ordine completato al momento.</td></tr>';
+                        tbodyStorico.innerHTML = '<tr><td colspan="6" class="empty-state">Nessun ordine completato al momento.</td></tr>';
                     }
                 })
                 .catch(error => {

@@ -318,20 +318,35 @@
         function selezionaOrario(s) { document.getElementById('time-picker-container').style.display = s==='prog'?'block':'none'; document.getElementById('btn-asap').classList.toggle('active', s==='asap'); document.getElementById('btn-prog').classList.toggle('active', s==='prog'); }
 
         // Funzione per inviare l'email, confermare l'ordine e andare allo storico
-        function confermaOrdine() {
+function confermaOrdine() {
             let totale = document.getElementById('totale-testo').innerText;
             if(totale === "€0.00") {
                 alert("Non puoi confermare: il carrello è vuoto!");
                 return;
             }
             
-            // Chiamata RELATIVA alla Servlet per evitare errori di routing
-            fetch('ConfermaOrdineServlet', { method: 'POST' })
+            let tipoOrario = document.getElementById('btn-prog').classList.contains('active') ? 'prog' : 'asap';
+            let orarioScelto = document.getElementById('time-input-value').value;
+
+            
+            if (tipoOrario === 'prog' && !orarioScelto) {
+                alert("Per favore, inserisci a che ora desideri ricevere l'ordine.");
+                return;
+            }
+            
+            const parametri = new URLSearchParams();
+            parametri.append('tipoOrario', tipoOrario);
+            parametri.append('orario', orarioScelto);
+            
+            fetch('ConfermaOrdineServlet', { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: parametri
+            })
                 .then(response => response.json())
                 .then(data => {
                     if(data.successo) {
                         alert(data.messaggio);
-                        // Redirezione automatica alla pagina dei tuoi ordini
                         window.location.href = 'ordini.html';
                     } else {
                         alert("Errore: " + data.messaggio);

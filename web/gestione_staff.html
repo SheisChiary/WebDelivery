@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Staff - WebDelivery</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            height: 100vh;
+            color: #333;
+        }
+
+ 
+        .sidebar {
+            width: 260px;
+            background-color: #ffffff;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #116C4A;
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 25px 20px; /* Più spazio ai lati come nell'immagine */
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: #555;
+            font-size: 15px;
+            font-weight: 500;
+            padding: 14px 20px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover:not(.active) {
+            background-color: #f4f7f6;
+            color: #116C4A;
+        }
+
+        .nav-item.active {
+            background-color: #116C4A;
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(17, 108, 74, 0.2);
+        }
+
+        .logout-container {
+            margin-top: auto;
+            padding: 20px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .logout {
+            color: #d9534f;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            padding: 14px 20px;
+            display: block;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+
+        .logout:hover {
+            background-color: #fdf0f0;
+        }
+
+        /* --- CONTENUTO PRINCIPALE --- */
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        /* --- FORM E TABELLE --- */
+        .table-container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid #f0f0f0;
+            overflow-x: auto;
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        /* Form di registrazione */
+        .form-grid {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .input-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #777;
+            margin-bottom: 8px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+            background-color: #f9f9f9;
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-color: #116C4A;
+        }
+
+        .btn-submit {
+            background-color: #116C4A;
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            height: 42px; 
+        }
+
+        .btn-submit:hover {
+            background-color: #0d422c;
+        }
+
+        /* Tabella */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            font-size: 12px;
+            font-weight: 600;
+            color: #777;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            white-space: nowrap;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 15px 0;
+            font-size: 14px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        /* Bottoni Azione (Matita e Cestino) */
+        .btn-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            margin-right: 10px;
+            transition: transform 0.2s;
+        }
+
+        .btn-icon:hover {
+            transform: scale(1.1);
+        }
+
+        /* --- MODALE MODIFICA --- */
+        .modal-overlay {
+            display: none; 
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            width: 400px;
+            max-width: 90%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            
+        }
+        
+        /* RESPONSIVITÀ PER SCHERMI PICCOLI E FINESTRE STRETTE */
+       @media (max-width: 768px) {
+            body { 
+                flex-direction: column; 
+                height: auto; 
+            }
+            .sidebar { 
+                width: 100%; 
+                height: auto; 
+                border-right: none; 
+                border-bottom: 1px solid #e0e0e0; 
+            }
+            .logo-container {
+                padding: 15px 20px 5px;
+                text-align: center;
+                border-bottom: none;
+            }
+            .nav-menu { 
+                flex-direction: row; 
+                flex-wrap: wrap; 
+                justify-content: center; 
+                gap: 10px; 
+                padding: 10px 15px;
+            }
+            .nav-item { 
+                font-size: 13px; 
+                padding: 8px 12px; 
+            }
+            .logout-container { 
+                margin-top: 0; 
+                padding: 5px 15px 15px; 
+                border-top: none;
+                display: flex;
+                justify-content: center;
+            }
+            .logout { 
+                padding: 8px 12px; 
+                text-align: center;
+            }
+            .main-content { 
+                padding: 20px; 
+            }
+            .table-container { 
+                padding: 15px; 
+            }
+            .form-grid {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .btn-submit {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2 class="logo">WebDelivery</h2>
+        <div class="nav-menu">
+            <a href="dashboard_admin.html" class="nav-item">Ordini</a>
+            <a href="gestione_menu.html" class="nav-item">Gestione del menù</a>
+            <a href="gestione_staff.html" class="nav-item active">Gestione dello staff</a>
+            <a href="statistiche.html" class="nav-item">Statistiche</a>
+        </div>
+        <div class="nav-menu" style="margin-top: auto;">
+            <a href="LogoutServlet" class="nav-item logout">Esci</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <h1>Gestione dello staff</h1>
+        
+        <div class="table-container">
+            <h2>Registra nuovo membro dello Staff</h2>
+            <form id="formRegistrazioneStaff">
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>Nome utente</label>
+                        <input type="text" name="username" id="reg-username" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Email</label>
+                        <input type="email" name="email" id="reg-email" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Password</label>
+                        <input type="password" name="password" id="reg-password" required>
+                    </div>
+                    <button type="submit" class="btn-submit">Conferma</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="table-container">
+            <h2>Membri dello Staff</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>NOME UTENTE</th>
+                        <th>EMAIL</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-staff">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="modaleModifica" class="modal-overlay">
+        <div class="modal-content">
+            <h2 style="margin-top:0;">Modifica Staff</h2>
+            <form id="formModificaStaff">
+                <input type="hidden" id="mod-id">
+                <div class="input-group" style="margin-bottom: 15px;">
+                    <label>Nome utente</label>
+                    <input type="text" id="mod-username" required>
+                </div>
+                <div class="input-group" style="margin-bottom: 15px;">
+                    <label>Email</label>
+                    <input type="email" id="mod-email" required>
+                </div>
+                <div class="input-group" style="margin-bottom: 25px;">
+                    <label>Nuova Password (lascia vuoto per non cambiare)</label>
+                    <input type="password" id="mod-password">
+                </div>
+                <div style="display:flex; justify-content:flex-end; gap:10px;">
+                    <button type="button" onclick="chiudiModale()" style="padding:10px 15px; border:none; border-radius:6px; cursor:pointer; background:#f0f0f0;">Annulla</button>
+                    <button type="submit" class="btn-submit">Salva Modifiche</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 1. CARICAMENTO DATI
+        function caricaStaff() {
+            fetch('GetStaffServlet')
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.getElementById('tbody-staff');
+                    tbody.innerHTML = '';
+                    
+                    if(data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#777; font-style:italic;">Nessun membro dello staff presente.</td></tr>';
+                        return;
+                    }
+
+                    data.forEach(s => {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td style="font-weight:600;">${s.username}</td>
+                                <td>${s.email}</td>
+                                <td>
+                                    <button class="btn-icon" onclick="apriModale('${s.id}', '${s.username}', '${s.email}')" title="Modifica">✏️</button>
+                                    <button class="btn-icon" onclick="eliminaStaff('${s.id}')" title="Rimuovi">🗑️</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                })
+                .catch(err => console.error("Errore caricamento staff:", err));
+        }
+
+        // 2. AGGIUNTA NUOVO STAFF
+        document.getElementById('formRegistrazioneStaff').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const datiForm = new URLSearchParams();
+            datiForm.append('username', document.getElementById('reg-username').value);
+            datiForm.append('email', document.getElementById('reg-email').value);
+            datiForm.append('password', document.getElementById('reg-password').value);
+
+            fetch('AddStaffServlet', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: datiForm
+            })
+            .then(response => {
+                if(response.ok) {
+                    this.reset();
+                    caricaStaff(); // Aggiorna la tabella istantaneamente
+                } else {
+                    alert("Errore durante la registrazione dello staff.");
+                }
+            });
+        });
+
+        // 3. ELIMINAZIONE STAFF
+        function eliminaStaff(id) {
+            if(confirm('Attenzione: sei sicuro di voler rimuovere questo membro dello staff?')) {
+                fetch('DeleteStaffServlet?id=' + id, { method: 'POST' })
+                    .then(response => {
+                        if(response.ok) {
+                            caricaStaff(); // Se va a buon fine, ricarica la tabella
+                        } else {
+                            alert("⚠️ Errore durante l'eliminazione! Codice errore: " + response.status);
+                        }
+                    })
+                    .catch(error => alert("🚨 Errore di rete: " + error));
+            }
+        }
+
+        // 4. GESTIONE MODALE MODIFICA
+        function apriModale(id, username, email) {
+            document.getElementById('mod-id').value = id;
+            document.getElementById('mod-username').value = username;
+            document.getElementById('mod-email').value = email;
+            document.getElementById('mod-password').value = '';
+            document.getElementById('modaleModifica').style.display = 'flex';
+        }
+
+        function chiudiModale() {
+            document.getElementById('modaleModifica').style.display = 'none';
+        }
+
+      document.getElementById('formModificaStaff').addEventListener('submit', function(e) {
+            e.preventDefault(); // Blocca il ricaricamento della pagina
+            
+            const datiModifica = new URLSearchParams();
+            datiModifica.append('id', document.getElementById('mod-id').value);
+            datiModifica.append('username', document.getElementById('mod-username').value);
+            datiModifica.append('email', document.getElementById('mod-email').value);
+            datiModifica.append('password', document.getElementById('mod-password').value);
+
+            // Tasto disabilitato temporaneamente per mostrare che sta caricando
+            const btnSalva = this.querySelector('button[type="submit"]');
+            btnSalva.innerText = "Salvataggio...";
+            btnSalva.disabled = true;
+
+            fetch('EditStaffServlet', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: datiModifica
+            })
+            .then(response => {
+                btnSalva.innerText = "Salva Modifiche";
+                btnSalva.disabled = false;
+                
+                if(response.ok) {
+                    chiudiModale();
+                    caricaStaff(); 
+                } else {
+                    alert("⚠️ Errore dal server! Codice errore: " + response.status + ". (404 = Servlet non trovata, 500 = Errore nel database)");
+                }
+            })
+            .catch(error => {
+                btnSalva.innerText = "Salva Modifiche";
+                btnSalva.disabled = false;
+                alert("🚨 Errore di connessione a Tomcat: " + error);
+            });
+        });
+
+        // Avvia il caricamento all'apertura
+        document.addEventListener("DOMContentLoaded", caricaStaff);
+    </script>
+</body>
+</html>

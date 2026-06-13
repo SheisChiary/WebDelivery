@@ -14,6 +14,8 @@ import model.OrdineAdminDashboard;
 
 @WebServlet(name = "GetOrdiniJson", urlPatterns = {"/GetOrdiniJson"})
 public class GetOrdiniJSON extends HttpServlet {
+    
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
@@ -32,16 +34,23 @@ public class GetOrdiniJSON extends HttpServlet {
                 json.append("{")
                     .append("\"id\":\"").append(o.getIdOrdine()).append("\",")
                     .append("\"cliente\":\"").append(o.getNomeCliente() != null ? o.getNomeCliente().replace("\"", "\\\"") : "").append("\",")
-                    .append("\"data\":\"").append(o.getDataRichiesta() != null ? o.getDataRichiesta() : "Data non disp.").append("\",") // <-- AGGIUNTA LA DATA
+                    .append("\"data_richiesta\":\"").append(o.getDataRichiesta() != null ? o.getDataRichiesta() : "Data non disp.").append("\",")
+                    // Inserimento della data di consegna reale per lo storico
+                    .append("\"data_consegna\":\"").append(o.getDataConsegna() != null ? o.getDataConsegna() : "").append("\",")
+                    .append("\"tempo_stimato\":").append(o.getTempoStimato()).append(",")
                     .append("\"totale\":\"").append(o.getTotale()).append("\",")
                     .append("\"stato\":\"").append(o.getStato() != null ? o.getStato() : "").append("\"")
                     .append("}");
-                if (i < ordini.size() - 1) json.append(",");
+                
+                if (i < ordini.size() - 1) {
+                    json.append(",");
+                }
             }
             json.append("]");
             out.print(json.toString());
             
         } catch (SQLException e) {
+            e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
