@@ -5,14 +5,17 @@ public class Prodotto {
     private String nome;
     private String descrizione;
     private double prezzoBase;
+    
+    private int tempoPreparazione;
+    private String ingredienti;
+    private String ricetta;
+    
     private String categoria;
     private String immagineUrl;
     private String badge;
 
-
     public Prodotto() {}
 
-   
     public int getIdProdotto() { return idProdotto; }
     public void setIdProdotto(int idProdotto) { this.idProdotto = idProdotto; }
 
@@ -24,6 +27,16 @@ public class Prodotto {
 
     public double getPrezzoBase() { return prezzoBase; }
     public void setPrezzoBase(double prezzoBase) { this.prezzoBase = prezzoBase; }
+
+    // Getter e Setter per i nuovi campi
+    public int getTempoPreparazione() { return tempoPreparazione; }
+    public void setTempoPreparazione(int tempoPreparazione) { this.tempoPreparazione = tempoPreparazione; }
+
+    public String getIngredienti() { return ingredienti; }
+    public void setIngredienti(String ingredienti) { this.ingredienti = ingredienti; }
+
+    public String getRicetta() { return ricetta; }
+    public void setRicetta(String ricetta) { this.ricetta = ricetta; }
 
     public String getCategoria() { return categoria; }
     public void setCategoria(String categoria) { this.categoria = categoria; }
