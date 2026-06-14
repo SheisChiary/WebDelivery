@@ -10,37 +10,73 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         
-        body { background-color: #F8F9FA; color: #333; display: flex; flex-direction: column; min-height: 100vh; }
+        body { 
+            background-color: #f4f7f6; 
+            color: #333; 
+            display: flex; 
+            height: 100vh; 
+            overflow: hidden; 
+        }
         
-        
-        header { background: #F9FAF6; height: 64px; padding: 0 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
-        .logo { font-size: 24px; font-weight: bold; color: #116C4A; text-decoration: none; }
-        .nav-actions { display: flex; align-items: center; gap: 15px; }
-        .icon-user-round { font-size: 22px; color: #116C4A; cursor: pointer; }
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 260px;
+            background-color: #ffffff;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            flex-shrink: 0;
+        }
 
-        .dashboard-container { max-width: 1300px; margin: 30px auto; padding: 0 20px; display: flex; gap: 40px; flex: 1; width: 100%; }
-        
-        
-        
-        .sidebar { width: 240px; background: #F0F2F0; border-radius: 12px; padding: 30px 20px; display: flex; flex-direction: column; gap: 8px; height: fit-content; }
-        .user-profile { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .user-profile h3 { font-size: 16px; color: #1a1a1a; font-weight: 700; }
-        .user-profile p { font-size: 12px; color: #666; margin-top: 4px; }
-        
-        .sidebar-menu { display: flex; flex-direction: column; gap: 10px; width: 100%; }
-        .sidebar-item { display: flex; align-items: center; gap: 12px; padding: 12px 15px; border-radius: 8px; text-decoration: none; color: #555; font-weight: 600; font-size: 14px; transition: 0.2s; }
-        .sidebar-item:not(.active):hover { background-color: rgba(0,0,0,0.05); color: #116C4A; }
-        .sidebar-item.active { background-color: #A7F3D0; color: #0b3c29; }
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #116C4A;
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+            text-decoration: none;
+            display: block;
+        }
 
-        
-        .main-content { flex: 1; display: flex; flex-direction: column; padding-top: 5px; }
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 25px 20px;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: #555;
+            font-size: 15px;
+            font-weight: 500;
+            padding: 14px 20px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover:not(.active) {
+            background-color: #f4f7f6;
+            color: #116C4A;
+        }
+
+        .nav-item.active {
+            background-color: #116C4A;
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(17, 108, 74, 0.2);
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content { flex: 1; display: flex; flex-direction: column; padding: 40px; overflow-y: auto; height: 100vh; }
         .page-title { font-size: 32px; color: #0b3c29; font-weight: 800; margin-bottom: 30px; letter-spacing: -0.5px; }
         .section-title { font-size: 18px; font-weight: 700; color: #2c3e50; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         
-        
+        /* Dettagli Ordine in corso */
         .active-order-card { background: white; border-radius: 12px; border: 1px solid #E6E9E8; padding: 30px; margin-bottom: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
         .express-badge { background: #A7F3D0; color: #0b3c29; font-size: 11px; font-weight: 800; padding: 6px 12px; border-radius: 20px; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 5px; }
-        
         
         .tracker-container { display: flex; justify-content: space-between; position: relative; margin: 40px 10px 50px 10px; }
         .tracker-line { position: absolute; top: 16px; left: 0; width: 100%; height: 3px; background: #e0e0e0; z-index: 1; }
@@ -56,7 +92,6 @@
         .step-active .step-icon { background: white; border: 3px solid #116C4A; color: #116C4A; box-shadow: 0 0 0 3px rgba(17,108,74,0.2); }
         .step-active .step-label { color: #116C4A; font-weight: 700; }
 
-        
         .active-order-details { display: flex; justify-content: space-between; border-top: 1px solid #f0f0f0; padding-top: 25px; gap: 20px; }
         .detail-block { display: flex; gap: 15px; flex: 1; }
         .detail-icon { width: 40px; height: 40px; border-radius: 8px; background: #A7F3D0; color: #0b3c29; display: flex; justify-content: center; align-items: center; font-size: 18px; flex-shrink: 0; }
@@ -67,9 +102,8 @@
         .items-list { list-style: none; font-size: 12px; color: #555; }
         .items-list li { display: flex; justify-content: space-between; margin-bottom: 4px; }
 
-       
+        /* Storico Ordini */
         .history-container { background: white; border-radius: 12px; border: 1px solid #E6E9E8; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.01); }
-        
         table { width: 100%; border-collapse: collapse; text-align: left; }
         th { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; padding: 15px 20px; border-bottom: 1px solid #E6E9E8; background: #fafafa; }
         td { padding: 20px; font-size: 13px; color: #333; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
@@ -91,77 +125,71 @@
         .btn-full-history:hover { background: #f1f3f5; border-color: #bbb; }
 
         .empty-state { text-align: center; padding: 40px; color: #777; font-style: italic; }
+
+        /* Responsive Mobile */
+        @media (max-width: 768px) {
+            body { flex-direction: column; height: auto; overflow-y: auto; }
+            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #e0e0e0; }
+            .nav-menu { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 15px; }
+            .nav-item { font-size: 13px; padding: 8px 12px; }
+            .main-content { padding: 20px; overflow-y: visible; height: auto; }
+            .history-container { overflow-x: auto; }
+            table { min-width: 600px; }
+            .active-order-details { flex-direction: column; }
+        }
     </style>
 </head>
 <body>
 
-    <header>
-        <a href="index.html" class="logo"><i class="fas fa-utensils"></i> WebDelivery</a>
-        <div class="nav-actions">
-            <a href="profilo.html" style="text-decoration:none; color:inherit;"><i class="fas fa-user-circle icon-user-round"></i></a>
-            <a href="LogoutServlet" style="color: #666; font-size: 14px; font-weight: 600; text-decoration: none;">Esci</a>
+    <div class="sidebar">
+        <a href="dashboard.html" class="logo">WebDelivery</a>
+        <div class="nav-menu">
+            <a href="dashboard.html" class="nav-item"><i class="fas fa-arrow-left"></i> Torna al menù</a>
+            <a href="profilo.html" class="nav-item">Il mio profilo</a>
+            <a href="ordini.html" class="nav-item active">I tuoi ordini</a>
         </div>
-    </header>
-
-    <div class="dashboard-container">
-        <aside class="sidebar">
-            <a href="profilo.html" style="text-decoration:none; color:inherit;">
-                <div class="user-profile">
-                    <h3 id="nome-utente">...</h3>
-                    <p>Cliente</p>
-                </div>
-            </a>
-            <nav class="sidebar-menu">
-                <a href="dashboard.html" class="sidebar-item"><i class="fas fa-file-alt"></i> Menù</a>
-                <a href="#" class="sidebar-item active"><i class="fas fa-utensils"></i> I tuoi ordini</a>
-            </nav>
-        </aside>
-        
-        <main class="main-content">
-            <h1 class="page-title">I Tuoi Ordini</h1>
-
-            <div id="sezione-ordine-attivo"></div>
-
-            <div class="section-title">
-                <span>Storico Ordini</span>
-            </div>
-            
-            <div class="history-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID Ordine</th>
-                            <th>Data</th>
-                            <th>Articoli</th>
-                            <th>Totale</th>
-                            <th>Stato</th>
-                            <th>Azione</th>
-                        </tr>
-                    </thead>
-                    <tbody id="lista-ordini">
-                        <tr>
-                            <td colspan="6" class="empty-state">Caricamento ordini in corso...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <button class="btn-full-history">Mostra tutto lo storico <i class="fas fa-arrow-down"></i></button>
-
-        </main>
     </div>
+
+    <main class="main-content">
+        <h1 class="page-title">I Tuoi Ordini</h1>
+
+        <div id="sezione-ordine-attivo"></div>
+
+        <div class="section-title">
+            <span>Storico Ordini</span>
+        </div>
+        
+        <div class="history-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Ordine</th>
+                        <th>Data</th>
+                        <th>Articoli</th>
+                        <th>Totale</th>
+                        <th>Stato</th>
+                        <th>Azione</th>
+                    </tr>
+                </thead>
+                <tbody id="lista-ordini">
+                    <tr>
+                        <td colspan="6" class="empty-state">Caricamento ordini in corso...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <button class="btn-full-history">Mostra tutto lo storico <i class="fas fa-arrow-down"></i></button>
+
+    </main>
 
     <script>
         var indirizzoSalvato = "Indirizzo non specificato nel profilo";
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Carica Profilo e Indirizzo
             fetch('ProfiloServlet').then(function(r) { return r.json(); }).then(function(data) {
-                if (data && data.nome) document.getElementById('nome-utente').innerText = data.nome;
                 if (data && data.indirizzo && data.indirizzo.trim() !== "") indirizzoSalvato = data.indirizzo;
-                
                 caricaStoricoOrdini();
             }).catch(function(e) { 
-                document.getElementById('nome-utente').innerText = "Cliente"; 
                 caricaStoricoOrdini();
             });
         });
@@ -180,7 +208,6 @@
                     return;
                 }
 
-                // Trova il primo ordine in corso
                 var ordineAttivo = null;
                 for(var i=0; i<ordini.length; i++) {
                     if(ordini[i].stato.toLowerCase() !== 'consegnato' && ordini[i].stato.toLowerCase() !== 'annullato') {
@@ -193,7 +220,6 @@
                     renderizzaOrdineAttivo(ordineAttivo, attivoContainer);
                 }
 
-                // Renderizza la tabella per gli ordini
                 ordini.forEach(function(o) {
                     var badgeClass = o.stato.toLowerCase() === 'annullato' ? 'annullato' : '';
                     
@@ -207,7 +233,6 @@
                     "</tr>";
                     tbody.innerHTML += html;
 
-                    
                     fetch('GetDettaglioOrdineJson?id=' + o.id)
                     .then(function(res) { return res.json(); })
                     .then(function(dettagli) {
@@ -304,7 +329,6 @@
                 "</div>" +
             "</div>";
 
-            // Recuperiamo i prodotti dell'ordine attivo
             fetch('GetDettaglioOrdineJson?id=' + o.id)
             .then(function(res) { return res.json(); })
             .then(function(dettagli) {
