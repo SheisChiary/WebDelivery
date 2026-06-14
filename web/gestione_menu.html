@@ -19,7 +19,6 @@
             overflow: hidden;
         }
 
-       
         .sidebar {
             width: 260px;
             background-color: #ffffff;
@@ -64,19 +63,24 @@
         .logout { color: #d9534f; text-decoration: none; font-size: 15px; font-weight: 500; padding: 14px 20px; display: block; border-radius: 8px; transition: 0.2s; }
         .logout:hover { background-color: #fdf0f0; }
 
-        
-        .main-content { flex: 1; padding: 40px; overflow-y: auto; height: 100vh; }
+
+        .main-content { 
+            flex: 1; 
+            padding: 40px; 
+            overflow-y: auto; 
+            height: 100vh; 
+        }
 
         h1 { font-size: 28px; font-weight: 600; margin-top: 0; margin-bottom: 30px; color: #333; }
 
         .table-container {
-            background-color: #ffffff; border-radius: 10px; padding: 25px; margin-bottom: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #e0e0e0;
+            background-color: #ffffff; border-radius: 10px; padding: 25px; margin-bottom: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #e0e0e0; overflow-x: auto;
         }
         h2 { font-size: 18px; font-weight: 600; margin-top: 0; margin-bottom: 20px; color: #333; }
 
-        
-        .split-layout { display: flex; gap: 30px; align-items: flex-start; }
-        .form-section { flex: 1; }
+ 
+        .split-layout { display: flex; gap: 30px; align-items: flex-start; flex-wrap: wrap; }
+        .form-section { flex: 1; min-width: 300px; }
         
         .preview-section {
             width: 300px; background: #f4f7f6; padding: 20px; border-radius: 10px; border: 1px dashed #ccc; display: flex; flex-direction: column; align-items: center; position: sticky; top: 20px;
@@ -115,7 +119,6 @@
         }
         .btn-azione:hover { background-color: #f0fdf4; }
 
-        
         table { width: 100%; border-collapse: collapse; text-align: left; }
         th { font-size: 12px; font-weight: 600; color: #777; padding-bottom: 15px; border-bottom: 1px solid #e0e0e0; text-transform: uppercase; }
         td { padding: 15px 0; font-size: 14px; border-bottom: 1px solid #f5f5f5; vertical-align: middle; color: #333; }
@@ -126,9 +129,26 @@
         .btn-icon:hover { transform: scale(1.1); color: #116C4A; }
         .delete-icon:hover { color: #d9534f; }
 
-       
+
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; justify-content: center; align-items: center; }
         .modal-content { background-color: #fff; padding: 30px; border-radius: 10px; width: 600px; max-width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+
+
+          @media (max-width: 768px) {
+            body { flex-direction: column; height: auto; overflow-y: auto;}
+            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #e0e0e0; }
+            .logo-container { padding: 15px 20px 5px; text-align: center; border-bottom: none; }
+            .nav-menu { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 10px 15px;}
+            .nav-item { font-size: 13px; padding: 8px 12px; }
+            .logout-container { margin-top: 0; padding: 5px 15px 15px; border-top: none; display: flex; justify-content: center;}
+            .logout { padding: 8px 12px; text-align: center; }
+            .main-content { padding: 20px; height: auto;}
+            .table-container { padding: 15px; }
+            .form-grid { flex-direction: column; align-items: stretch; }
+            .btn-submit { width: 100%; }
+            .preview-section { width: 100%; position: relative; top: 0; }
+            table { min-width: 600px; }
+        }
     </style>
 </head>
 <body>
@@ -386,7 +406,6 @@
             dati.append('descrizione', document.getElementById('reg-descrizione').value);
             dati.append('immagine', document.getElementById('reg-immagine').value);
 
-            // Aggiungo tutte le varianti inserite
             document.querySelectorAll('#varianti-container .variante-row').forEach(row => {
                 dati.append('var_nome', row.querySelector('.var-nome').value);
                 dati.append('var_prezzo', row.querySelector('.var-prezzo').value);
