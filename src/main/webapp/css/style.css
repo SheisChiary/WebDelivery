@@ -1,0 +1,98 @@
+/* Importiamo un font moderno e leggibile */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+/* Reset globale */
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Inter', sans-serif; 
+}
+
+/* Layout base dell'app */
+body { 
+    background-color: #f4f7f6; /* Grigio chiarissimo di sfondo */
+    color: #2d3748; 
+    display: flex; 
+    min-height: 100vh; 
+}
+
+.sidebar { 
+    width: 260px; 
+    background-color: #1a202c;
+    color: #ffffff; 
+    display: flex; 
+    flex-direction: column; 
+    padding: 2.5rem 1.5rem; 
+    box-shadow: 4px 0 15px rgba(0,0,0,0.05); 
+}
+
+.sidebar h2 { 
+    font-size: 1.5rem; 
+    font-weight: 700; 
+    margin-bottom: 3rem; 
+    color: #63b3ed;
+    letter-spacing: -0.5px; 
+}
+
+.sidebar ul { 
+    list-style: none; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 0.8rem; 
+}
+
+.sidebar a { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    color: #cbd5e0; 
+    text-decoration: none; 
+    padding: 12px 16px; 
+    border-radius: 8px; 
+    font-weight: 600; 
+    transition: all 0.2s ease; 
+}
+
+
+.sidebar a:hover { 
+    background-color: #2d3748; 
+    color: #ffffff; 
+    transform: translateX(6px); 
+}
+
+.content { 
+    flex-grow: 1; 
+    padding: 3rem 4rem; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 2.5rem; 
+}
+
+.content header h1 { 
+    font-size: 2.5rem; 
+    font-weight: 700; 
+    color: #1a202c; 
+    letter-spacing: -1px; 
+}
+
+.dashboard-card { 
+    background: #ffffff; 
+    padding: 2rem; 
+    border-radius: 16px; 
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03); 
+    border: 1px solid #edf2f7; 
+    border-left: 5px solid #48bb78;
+    max-width: 600px;
+}
+
+.dashboard-card p { 
+    font-size: 1.1rem; 
+    line-height: 1.6; 
+    color: #4a5568; 
+}
+
+.dashboard-card strong { 
+    color: #2f855a; 
+    font-size: 1.4rem; 
+}
