@@ -24,62 +24,39 @@ public class Utente {
     @Column(nullable = false)
     private String ruolo;
 
-    @Column(nullable = false)
+    @Column(name = "nome_completo",nullable = false)
     private String nome;
 
     @Column(nullable = false)
-    private String cognome;
+    private String telefono;
+    
+    @Column(name = "indirizzo")
+    private String indirizzo;
 
     
     public Utente() {
     }
 
    
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id;}
+    public void setId(Long id) { this.id = id;}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getEmail() { return email;}
+    public void setEmail(String email) { this.email = email;}
 
-    public String getEmail() {
-        return email;
-    }
+    public String getPassword() { return password;}
+    public void setPassword(String password) { this.password = password;}
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public String getRuolo() { return ruolo;}
+    public void setRuolo(String ruolo) { this.ruolo = ruolo;}
 
-    public String getPassword() {
-        return password;
-    }
+    public String getNome() { return nome;}
+    public void setNome(String nome) { this.nome = nome;}
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    public String getTelefono() { return telefono;}
+    public void setTelefono(String telefono) { this.telefono = telefono;}
+    
+    public String getIndirizzo() { return indirizzo;}
+    public void setIndirizzo(String indirizzo) { this.indirizzo = indirizzo;}
 
-    public String getRuolo() {
-        return ruolo;
-    }
-
-    public void setRuolo(String ruolo) {
-        this.ruolo = ruolo;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getCognome() {
-        return cognome;
-    }
-
-    public void setCognome(String cognome) {
-        this.cognome = cognome;
-    }
 }
