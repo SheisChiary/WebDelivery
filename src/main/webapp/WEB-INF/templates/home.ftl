@@ -38,17 +38,35 @@
     </header>
 
     <section class="popular-section">
-        <h2>I Più Scelti</h2>
-        <div class="cards-container">
-            <div class="food-card">
-                <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500" alt="Pizza">
-            </div>
-            <div class="food-card">
-                <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500" alt="Burger">
-            </div>
-            <div class="food-card">
-                <img src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=500" alt="Sushi">
-            </div>
+        <h2>I Nostri Piatti</h2>
+<div class="cards-container" style="flex-wrap: wrap; gap: 30px; margin-top: 20px;">
+            
+            <#if prodotti?has_content>
+                <#list prodotti as prodotto>
+                    <div class="food-card" style="height: auto; padding-bottom: 15px;">
+                        
+                        <img src="${prodotto.immagine}" alt="${prodotto.nome}">
+                        
+                        <div style="padding: 15px;">
+                            <h3 style="font-size: 1.2rem; margin-bottom: 8px;">${prodotto.nome}</h3>
+                            <p style="color: #666; font-size: 0.9rem; margin-bottom: 15px;">
+                                ${prodotto.descrizione!''}
+                            </p>
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <strong style="color: #116C4A; font-size: 1.3rem;">€ ${prodotto.prezzo}</strong>
+                                
+                                <a href="login" class="btn btn-solid" style="padding: 8px 15px; font-size: 0.9rem; text-decoration: none;">
+                                    Accedi per ordinare
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </#list>
+            <#else>
+                <p>Nessun prodotto trovato nel database.</p>
+            </#if>
+
         </div>
     </section>
 

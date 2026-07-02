@@ -1,5 +1,4 @@
 package controller;
-
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import jakarta.servlet.ServletException;
@@ -23,21 +22,26 @@ public class HomeServlet extends HttpServlet {
         cfg.setDefaultEncoding("UTF-8");
     }
 
-    @Override
+@Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
         response.setContentType("text/html;charset=UTF-8");
-
-        Map<String, Object> datiPerIlTemplate = new HashMap<>();
-        datiPerIlTemplate.put("nomeUtente", "Chiara");
-        datiPerIlTemplate.put("piattiDelGiorno", 14);
-
+        jakarta.persistence.EntityManager em = util.JpaUtil.getEntityManagerFactory().createEntityManager();
+        
         try {
-            Template template = cfg.getTemplate("home.ftl");
-            template.process(datiPerIlTemplate, response.getWriter());
+            java.util.List<model.Prodotto> catalogo = em.createQuery("SELECT p FROM Prodotto p", model.Prodotto.class).getResultList();
+
+            java.util.Map<String, Object> templateData = new java.util.HashMap<>();
+            templateData.put("prodotti", catalogo);
+
+            freemarker.template.Template template = cfg.getTemplate("home.ftl");
+            template.process(templateData, response.getWriter());
+
         } catch (Exception e) {
-            throw new ServletException("Errore durante il rendering del template", e);
+            throw new ServletException("Errore durante il caricamento dei prodotti in Home", e);
+        } finally {
+            em.close();
         }
     }
 }
