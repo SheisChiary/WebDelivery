@@ -29,6 +29,12 @@ public class Utente {
 
     @Column(nullable = false)
     private String cognome;
+    
+    @Column(nullable = false)
+    private String telefono;
+
+    @Column(nullable = false)
+    private String indirizzo;
 
     
     public Utente() {
@@ -82,4 +88,10 @@ public class Utente {
     public void setCognome(String cognome) {
         this.cognome = cognome;
     }
+    
+    public String getTelefono() { return telefono; }
+    public void setTelefono(String telefono) { this.telefono = telefono; }
+
+    public String getIndirizzo() { return indirizzo; }
+    public void setIndirizzo(String indirizzo) { this.indirizzo = indirizzo; }
 }

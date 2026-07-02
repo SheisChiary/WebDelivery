@@ -4,7 +4,7 @@
 
 body { background-color: #ffffff; color: #333; }
 
-/* --- NAVBAR --- */
+
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -20,7 +20,7 @@ body { background-color: #ffffff; color: #333; }
 .logo {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #116C4A; /* Verde scuro dell'immagine */
+    color: #116C4A; 
     display: flex;
     align-items: center;
     gap: 10px;
@@ -83,10 +83,10 @@ body { background-color: #ffffff; color: #333; }
 .btn-outline:hover { background: #f0fdf4; }
 .btn-solid:hover { background: #0e5c3e; }
 
-/* --- HERO SECTION --- */
+
 .hero {
     height: 480px;
-    /* Immagine di sfondo scurita con un gradiente nero semitrasparente per far leggere il testo */
+    
     background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2070') center/cover;
     display: flex;
     align-items: center;
@@ -109,7 +109,7 @@ body { background-color: #ffffff; color: #333; }
     display: flex;
     flex-direction: column;
     gap: 15px;
-    align-items: flex-start; /* Allinea le spunte a sinistra, come in foto */
+    align-items: flex-start; 
     margin: 0 auto;
     width: fit-content;
 }
@@ -122,11 +122,11 @@ body { background-color: #ffffff; color: #333; }
 }
 
 .hero-features i { 
-    color: #48bb78; /* Verde chiaro delle spunte */
+    color: #48bb78; 
     font-size: 1.3rem;
 }
 
-/* --- SEZIONE I PIÙ SCELTI --- */
+
 .popular-section {
     padding: 60px 50px;
     max-width: 1300px;
@@ -158,11 +158,126 @@ body { background-color: #ffffff; color: #333; }
 }
 
 .food-card:hover {
-    transform: translateY(-5px); /* Effetto sollevamento quando passi col mouse */
+    transform: translateY(-5px); 
 }
 
 .food-card img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.auth-body {
+    background-color: #f8f9fa;
+}
+
+.auth-header {
+    background-color: white;
+    padding: 20px 0;
+    text-align: center;
+    border-top: 4px solid #116C4A;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: center;
+}
+
+.auth-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 50px;
+    min-height: calc(100vh - 80px);
+}
+
+.auth-card {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    width: 100%;
+    max-width: 450px;
+}
+
+.auth-title {
+    text-align: center;
+    color: #116C4A;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.auth-subtitle {
+    text-align: center;
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 30px;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+}
+
+.half {
+    width: 50%;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+    font-size: 0.85rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    outline: none;
+    font-size: 0.95rem;
+    background: #fafafa;
+}
+
+.form-group input:focus {
+    border-color: #116C4A;
+}
+
+.btn-auth {
+    width: 100%;
+    padding: 14px;
+    background-color: #116C4A;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-top: 10px;
+}
+
+.btn-auth:hover {
+    background-color: #0e5c3e;
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.auth-footer a {
+    color: #116C4A;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
 }

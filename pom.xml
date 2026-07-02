@@ -49,7 +49,12 @@
             <artifactId>hibernate-core</artifactId>
             <version>6.5.2.Final</version>
         </dependency>
-        
+        <dependency>
+            <groupId>com.yishuifengxiao.common</groupId>
+            <artifactId>common-spring-boot-autoconfigure</artifactId>
+            <version>4.2.3</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
     
     <build>
