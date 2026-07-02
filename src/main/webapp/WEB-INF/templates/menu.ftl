@@ -9,51 +9,115 @@
 </head>
 <body>
 
-    <nav class="navbar">
+    <nav class="navbar menu-navbar">
         <div class="logo">
             <i class="fa-solid fa-utensils"></i> WebDelivery
         </div>
+        
+        <div class="search-bar-center">
+            <input type="text" placeholder="Cerca il tuo piatto...">
+            <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+        
         <div class="nav-buttons">
-            <a href="home" class="btn btn-outline">Home</a>
             <a href="carrello" class="btn btn-solid"><i class="fa-solid fa-cart-shopping"></i> Carrello</a>
+            <a href="profilo" class="btn btn-icon"><i class="fa-solid fa-user"></i></a>
         </div>
     </nav>
 
-    <section class="popular-section">
-        <h2>Il Nostro Menù</h2>
+    <div class="menu-container">
         
-        <div class="cards-container" style="flex-wrap: wrap; gap: 30px; margin-top: 20px;">
-            
+        <header class="menu-header">
+            <#if nomeUtente?has_content>
+                <h1>Ciao ${nomeUtente}!</h1>
+            <#else>
+                <h1>Ciao!</h1>
+            </#if>
+            <p>Esplora i prodotti freschi di oggi.</p>
+        </header>
+
+        <div class="category-filters">
+            <button class="pill active" onclick="filtra('Tutti', this)">Tutti</button>
+            <button class="pill" onclick="filtra('Pizze', this)">Pizze</button>
+            <button class="pill" onclick="filtra('Burger', this)">Burger</button>
+            <button class="pill" onclick="filtra('Sushi', this)">Sushi</button>
+            <button class="pill" onclick="filtra('Fritti', this)">Fritti</button>
+            <button class="pill" onclick="filtra('Dolci', this)">Dolci</button>
+            <button class="pill" onclick="filtra('Bevande', this)">Bevande</button>
+        </div>
+
+        <div class="menu-grid">
             <#if prodotti?has_content>
                 <#list prodotti as prodotto>
-                    <div class="food-card" style="height: auto; padding-bottom: 15px;">
-                        <img src="${prodotto.immagine!'https://via.placeholder.com/500x300?text=Cibo+Delizioso'}" alt="${prodotto.nome}">
+                    <div class="menu-card" data-categoria="${prodotto.categoria!''}">
                         
-                        <div style="padding: 15px;">
-                            <h3 style="font-size: 1.2rem; margin-bottom: 8px;">${prodotto.nome}</h3>
-                            <p style="color: #666; font-size: 0.9rem; margin-bottom: 15px; min-height: 40px;">
-                                ${prodotto.descrizione!''}
-                            </p>
+                        <div class="card-image-wrapper">
+                            <#if prodotto.badge?has_content>
+                                <span class="badge">${prodotto.badge}</span>
+                            </#if>
+                            <img src="${prodotto.immagine!'https://via.placeholder.com/600x400?text=Immagine+Non+Disponibile'}" alt="${prodotto.nome}">
+                        </div>
+                        
+                        <div class="card-body">
+                            <div class="card-title-row">
+                                <h3>${prodotto.nome}</h3>
+                                <span class="price">${prodotto.prezzo?string("0.00")} €</span>
+                            </div>
                             
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <strong style="color: #116C4A; font-size: 1.3rem;">€ ${prodotto.prezzo}</strong>
-                                
+                            <p class="description">${prodotto.descrizione!''}</p>
+                            
+                            <div class="card-actions">
+                                <a href="personalizza?id=${prodotto.id}" class="btn btn-outline-small">
+                                    <i class="fa-solid fa-sliders"></i> Personalizza
+                                </a>
                                 <form action="aggiungi-carrello" method="POST" style="margin: 0;">
                                     <input type="hidden" name="idProdotto" value="${prodotto.id}">
-                                    <button type="submit" class="btn btn-solid" style="padding: 8px 15px; font-size: 0.9rem;">
-                                        Aggiungi
+                                    <button type="submit" class="btn btn-round-solid">
+                                        <i class="fa-solid fa-basket-shopping"></i>
                                     </button>
                                 </form>
                             </div>
                         </div>
+
                     </div>
                 </#list>
             <#else>
-                <p style="font-size: 1.2rem; color: #666;">Al momento non ci sono prodotti disponibili nel menù.</p>
+                <p style="font-size: 1.2rem; color: #666; grid-column: span 2;">
+                    Al momento non ci sono prodotti disponibili nel menù.
+                </p>
             </#if>
-
         </div>
-    </section>
+
+    </div>
+
+    <script>
+        function filtra(categoria, elementoBottone) {
+            
+            let bottoni = document.querySelectorAll('.pill');
+            bottoni.forEach(b => b.classList.remove('active'));
+            
+           
+            elementoBottone.classList.add('active');
+
+           
+            let cards = document.querySelectorAll('.menu-card');
+            
+           
+            cards.forEach(card => {
+                if (categoria === 'Tutti') {
+                    card.style.display = 'block';
+                } else {
+                    let catProdotto = card.getAttribute('data-categoria');
+                  
+                    if (catProdotto && catProdotto.toLowerCase() === categoria.toLowerCase()) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                }
+            });
+        }
+    </script>
 
 </body>
 </html>

@@ -24,13 +24,11 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        
-        cfg = new Configuration(Configuration.VERSION_2_3_32);
+        cfg = new Configuration(Configuration.VERSION_2_3_33);
         cfg.setServletContextForTemplateLoading(getServletContext(), "/WEB-INF/templates");
         cfg.setDefaultEncoding("UTF-8");
     }
 
-  
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -38,9 +36,8 @@ public class LoginServlet extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         Map<String, Object> dataModel = new HashMap<>();
         
-        
         if (request.getParameter("error") != null) {
-            dataModel.put("errore", "Credenziali non valide. Riprova!");
+            dataModel.put("errore", "Credenziali non valide o utente non trovato nel DB!");
         }
 
         try {
@@ -51,7 +48,6 @@ public class LoginServlet extends HttpServlet {
         }
     }
 
-    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -59,28 +55,35 @@ public class LoginServlet extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-     
         EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
         
         try {
-           
             Utente utente = em.createQuery("SELECT u FROM Utente u WHERE u.email = :email AND u.password = :password", Utente.class)
                               .setParameter("email", email)
                               .setParameter("password", password)
                               .getSingleResult();
             
-           
             HttpSession session = request.getSession(true);
             session.setAttribute("utente_id", utente.getId());
             session.setAttribute("utente_ruolo", utente.getRuolo());
-            session.setAttribute("utente_nome", utente.getNome());
-            response.sendRedirect("menu");
+            session.setAttribute("utente_nome", utente.getNomeCompleto()); 
+            
+            String ruolo = utente.getRuolo();
+            
+            if (ruolo != null && ruolo.equalsIgnoreCase("proprietario")) {
+                response.sendRedirect("admin_ordine");
+            } else if (ruolo != null && ruolo.equalsIgnoreCase("personale")) {
+                response.sendRedirect("staff_ordine");
+            } else {
+                response.sendRedirect("menu");
+            }
             
         } catch (NoResultException e) {
-           
+            response.sendRedirect("login?error=1");
+        } catch (Exception e) {
             response.sendRedirect("login?error=1");
         } finally {
-            em.close(); 
+            em.close();
         }
     }
 }

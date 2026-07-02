@@ -22,15 +22,10 @@
             </#if>
 
             <form action="registrazione" method="POST">
-                <div class="form-row">
-                    <div class="form-group half">
-                        <label for="nome">Nome</label>
-                        <input type="text" id="nome" name="nome" required placeholder="es. Mario">
-                    </div>
-                    <div class="form-group half">
-                        <label for="cognome">Cognome</label>
-                        <input type="text" id="cognome" name="cognome" required placeholder="es. Rossi">
-                    </div>
+                
+                <div class="form-group">
+                    <label for="nomeCompleto">Nome Completo</label>
+                    <input type="text" id="nomeCompleto" name="nomeCompleto" required placeholder="es. Mario Rossi">
                 </div>
 
                 <div class="form-group">

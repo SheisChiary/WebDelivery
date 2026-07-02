@@ -1,4 +1,5 @@
 package controller;
+
 import model.Prodotto;
 import util.JpaUtil;
 import freemarker.template.Configuration;
@@ -8,6 +9,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.persistence.EntityManager;
 import java.io.IOException;
 import java.util.HashMap;
@@ -21,6 +23,7 @@ public class MenuServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
+      
         cfg = new Configuration(Configuration.VERSION_2_3_33);
         cfg.setServletContextForTemplateLoading(getServletContext(), "/WEB-INF/templates");
         cfg.setDefaultEncoding("UTF-8");
@@ -32,20 +35,35 @@ public class MenuServlet extends HttpServlet {
         
         response.setContentType("text/html;charset=UTF-8");
 
+       
         EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
         
         try {
+           
             List<Prodotto> catalogo = em.createQuery("SELECT p FROM Prodotto p", Prodotto.class).getResultList();
 
+            
+            HttpSession session = request.getSession(false); 
+            String nomeUtente = "";
+            
+            if (session != null && session.getAttribute("utente_nome") != null) {
+              
+                nomeUtente = (String) session.getAttribute("utente_nome"); 
+            }
+
+           
             Map<String, Object> templateData = new HashMap<>();
             templateData.put("prodotti", catalogo);
+            templateData.put("nomeUtente", nomeUtente); 
 
+          
             Template template = cfg.getTemplate("menu.ftl");
             template.process(templateData, response.getWriter());
 
         } catch (Exception e) {
             throw new ServletException("Errore durante il caricamento del menù", e);
         } finally {
+            
             em.close();
         }
     }
