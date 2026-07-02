@@ -64,18 +64,16 @@ public class LoginServlet extends HttpServlet {
                               .getSingleResult();
             
             HttpSession session = request.getSession(true);
-            session.setAttribute("utente_id", utente.getId());
-            session.setAttribute("utente_ruolo", utente.getRuolo());
-            session.setAttribute("utente_nome", utente.getNomeCompleto()); 
+            session.setAttribute("utente", utente);
             
             String ruolo = utente.getRuolo();
             
             if (ruolo != null && ruolo.equalsIgnoreCase("proprietario")) {
-                response.sendRedirect("admin_ordine");
+                response.sendRedirect(request.getContextPath() + "/admin/ordini");
             } else if (ruolo != null && ruolo.equalsIgnoreCase("personale")) {
-                response.sendRedirect("staff_ordine");
+                response.sendRedirect(request.getContextPath() + "/staff"); 
             } else {
-                response.sendRedirect("menu");
+                response.sendRedirect(request.getContextPath() + "/menu");
             }
             
         } catch (NoResultException e) {

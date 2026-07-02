@@ -10,7 +10,9 @@
 
     <aside class="sidebar">
         <div class="sidebar-logo">
-            <img src="../img/logo_admin.png" alt="WebDelivery Logo"> 
+           <a href="ordini" class="logo-text">
+           <i class="fa-solid fa-utensils"></i> WebDelivery
+           </a>
         </div>
         
         <nav class="sidebar-nav">
@@ -21,7 +23,7 @@
         </nav>
         
         <div class="sidebar-footer">
-            <a href="../logout" class="nav-item logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Esci</a>
+            <a href="../home" class="nav-item logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Esci</a>
         </div>
     </aside>
 
@@ -69,7 +71,7 @@
         </section>
 
         <section class="admin-section" style="margin-top: 40px;">
-            <h2><i class="fa-solid fa-check-double"></i> Storico Ordini (Conclusi/Annullati)</h2>
+            <h2><i class="fa-solid fa-check-double"></i> Storico Ordini</h2>
             <table class="admin-table">
                 <thead>
                     <tr>

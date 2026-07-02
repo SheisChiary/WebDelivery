@@ -10,7 +10,9 @@
 
     <aside class="sidebar">
         <div class="sidebar-logo">
-            <img src="../img/logo_admin.png" alt="WebDelivery Logo">
+          <a href="ordini" class="logo-text">
+          <i class="fa-solid fa-utensils"></i> WebDelivery
+          </a>
         </div>
         <nav class="sidebar-nav">
             <a href="ordini" class="nav-item active"><i class="fa-solid fa-receipt"></i> Ordini</a>
@@ -19,7 +21,7 @@
             <a href="statistiche" class="nav-item"><i class="fa-solid fa-chart-line"></i> Statistiche</a>
         </nav>
         <div class="sidebar-footer">
-            <a href="../logout" class="nav-item logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Esci</a>
+            <a href="../home" class="nav-item logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Esci</a>
         </div>
     </aside>
 
@@ -73,6 +75,37 @@
                         </#list>
                     <#else>
                         <tr><td colspan="4" style="text-align: center;">Nessun prodotto trovato.</td></tr>
+                    </#if>
+                </tbody>
+            </table>
+        </section>
+
+    </section>
+        <section class="admin-section" style="margin-top: 30px; background-color: #f8fafc; border: 1px solid #e2e8f0;">
+            <h3 style="color: #4a5568;"><i class="fa-solid fa-clock-rotate-left"></i> Cronologia Modifiche Stato</h3>
+            
+            <table class="admin-table" style="background-color: white;">
+                <thead>
+                    <tr>
+                        <th>Data e Ora</th>
+                        <th>Nuovo Stato</th>
+                        <th>Modificato da</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <#if ordine.storicoStati?has_content>
+                        <#list ordine.storicoStati?sort_by("dataOraModifica")?reverse as storico>
+                            <tr>
+                                <td>${storico.dataOraModifica}</td>
+                                <td><span class="status-badge status-${storico.stato?replace(' ', '-')}">${storico.stato?upper_case}</span></td>
+                                <td>
+                                    <i class="fa-solid fa-user-gear" style="color: #718096; margin-right: 5px;"></i>
+                                    <strong>${storico.personale.nomeCompleto}</strong>
+                                </td>
+                            </tr>
+                        </#list>
+                    <#else>
+                        <tr><td colspan="3" style="text-align: center; color: #718096;">Nessuna modifica registrata. L'ordine è appena stato inserito.</td></tr>
                     </#if>
                 </tbody>
             </table>

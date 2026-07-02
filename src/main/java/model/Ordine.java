@@ -69,4 +69,10 @@ public class Ordine {
 
     public List<DettaglioOrdine> getDettagli() { return dettagli;}
     public void setDettagli(List<DettaglioOrdine> dettagli) { this.dettagli = dettagli;}
+
+    @jakarta.persistence.OneToMany(mappedBy = "ordine", fetch = jakarta.persistence.FetchType.EAGER)
+    private java.util.Set<StoricoStatiOrdine> storicoStati;
+
+    public java.util.Set<StoricoStatiOrdine> getStoricoStati() { return storicoStati; }
+    public void setStoricoStati(java.util.Set<StoricoStatiOrdine> storicoStati) { this.storicoStati = storicoStati; }
 }
