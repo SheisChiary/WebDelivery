@@ -24,11 +24,11 @@ public class Prodotto {
     @Column(nullable = false)
     private Double prezzo;
 
-    // ATTENZIONE: Costruttore vuoto sempre obbligatorio per JPA
+   
     public Prodotto() {
     }
 
-    // --- GETTER E SETTER ---
+  
 
     public Long getId() {
         return id;

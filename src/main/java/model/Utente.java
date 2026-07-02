@@ -22,7 +22,7 @@ public class Utente {
     private String password;
 
     @Column(nullable = false)
-    private String ruolo; // Es: "cliente", "staff", "admin"
+    private String ruolo;
 
     @Column(nullable = false)
     private String nome;
@@ -30,12 +30,11 @@ public class Utente {
     @Column(nullable = false)
     private String cognome;
 
-    // ATTENZIONE: Il costruttore vuoto è OBBLIGATORIO per JPA
+    
     public Utente() {
     }
 
-    // --- GETTER E SETTER ---
-
+   
     public Long getId() {
         return id;
     }
