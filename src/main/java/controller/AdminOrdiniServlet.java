@@ -30,30 +30,23 @@ public class AdminOrdiniServlet extends HttpServlet {
         cfg.setDefaultEncoding("UTF-8");
     }
 
-    @Override
+@Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
         response.setContentType("text/html;charset=UTF-8");
         HttpSession session = request.getSession();
         Utente utenteLoggato = (Utente) session.getAttribute("utente");
-        
+
         if (utenteLoggato == null || !utenteLoggato.getRuolo().equals("proprietario")) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
-        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
-        
         try {
-            List<Ordine> ordiniInCorso = em.createQuery(
-                "SELECT o FROM Ordine o WHERE o.stato NOT IN ('consegnato', 'annullato') ORDER BY o.orarioConsegnaRichiesto ASC", 
-                Ordine.class).getResultList();
-
-
-            List<Ordine> ordiniPassati = em.createQuery(
-                "SELECT o FROM Ordine o WHERE o.stato IN ('consegnato', 'annullato') ORDER BY o.dataCreazione DESC", 
-                Ordine.class).getResultList();
+            dao.OrdineDAO ordineDao = new dao.OrdineDAO();
+            List<Ordine> ordiniInCorso = ordineDao.getOrdiniInCorso();
+            List<Ordine> ordiniPassati = ordineDao.getStoricoOrdini();
 
             Map<String, Object> templateData = new HashMap<>();
             templateData.put("ordiniInCorso", ordiniInCorso);
@@ -64,9 +57,7 @@ public class AdminOrdiniServlet extends HttpServlet {
             template.process(templateData, response.getWriter());
 
         } catch (Exception e) {
-            throw new ServletException("Errore nel caricamento della dashboard ordini", e);
-        } finally {
-            em.close();
+            throw new ServletException("Errore nel caricamento degli ordini", e);
         }
     }
 }

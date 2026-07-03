@@ -1,10 +1,10 @@
 package controller;
 
+import dao.UtenteDAO;
+import model.Utente;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.NoResultException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -14,8 +14,6 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import model.Utente;
-import util.JpaUtil;
 
 @WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
 public class LoginServlet extends HttpServlet {
@@ -55,14 +53,10 @@ public class LoginServlet extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
+UtenteDAO dao = new UtenteDAO();
+        Utente utente = dao.getUtenteByEmailPassword(email, password);
         
-        try {
-            Utente utente = em.createQuery("SELECT u FROM Utente u WHERE u.email = :email AND u.password = :password", Utente.class)
-                              .setParameter("email", email)
-                              .setParameter("password", password)
-                              .getSingleResult();
-            
+        if (utente != null) {
             HttpSession session = request.getSession(true);
             session.setAttribute("utente", utente);
             
@@ -75,13 +69,8 @@ public class LoginServlet extends HttpServlet {
             } else {
                 response.sendRedirect(request.getContextPath() + "/menu");
             }
-            
-        } catch (NoResultException e) {
+        } else {
             response.sendRedirect("login?error=1");
-        } catch (Exception e) {
-            response.sendRedirect("login?error=1");
-        } finally {
-            em.close();
         }
     }
 }

@@ -1,8 +1,8 @@
 package controller;
 
+import dao.OrdineDAO;
 import model.Ordine;
 import model.Utente;
-import util.JpaUtil;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import jakarta.servlet.ServletException;
@@ -11,7 +11,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import jakarta.persistence.EntityManager;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +20,7 @@ import java.util.Map;
 public class StaffStoricoOrdiniServlet extends HttpServlet {
 
     private Configuration cfg;
+    private OrdineDAO ordineDao;
 
     @Override
     public void init() throws ServletException {
@@ -29,6 +29,8 @@ public class StaffStoricoOrdiniServlet extends HttpServlet {
             new freemarker.ext.jakarta.servlet.WebappTemplateLoader(getServletContext(), "/WEB-INF/templates");
         cfg.setTemplateLoader(templateLoader);
         cfg.setDefaultEncoding("UTF-8");
+        
+        ordineDao = new OrdineDAO();
     }
 
     @Override
@@ -44,12 +46,8 @@ public class StaffStoricoOrdiniServlet extends HttpServlet {
             return;
         }
 
-        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
-        
         try {
-            List<Ordine> storicoOrdini = em.createQuery(
-                "SELECT o FROM Ordine o WHERE o.stato IN ('consegnato', 'annullato') ORDER BY o.dataCreazione DESC", 
-                Ordine.class).getResultList();
+            List<Ordine> storicoOrdini = ordineDao.getStoricoOrdini();
 
             Map<String, Object> templateData = new HashMap<>();
             templateData.put("storicoOrdini", storicoOrdini);
@@ -60,8 +58,6 @@ public class StaffStoricoOrdiniServlet extends HttpServlet {
 
         } catch (Exception e) {
             throw new ServletException("Errore nel recupero dello storico ordini", e);
-        } finally {
-            em.close();
         }
     }
 }

@@ -1,8 +1,8 @@
 package controller;
 
+import dao.ProdottoDAO;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
-import jakarta.persistence.EntityManager;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -17,18 +17,20 @@ import java.util.Map;
 import model.CartItem;
 import model.Prodotto;
 import model.Caratteristica;
-import util.JpaUtil;
 
 @WebServlet(name = "CarrelloServlet", urlPatterns = {"/carrello", "/aggiungi-carrello"})
 public class CarrelloServlet extends HttpServlet {
 
     private Configuration cfg;
+    private ProdottoDAO prodottoDao;
 
     @Override
     public void init() throws ServletException {
         cfg = new Configuration(Configuration.VERSION_2_3_33);
         cfg.setServletContextForTemplateLoading(getServletContext(), "/WEB-INF/templates");
         cfg.setDefaultEncoding("UTF-8");
+        
+        prodottoDao = new ProdottoDAO();
     }
 
     @Override
@@ -54,38 +56,25 @@ public class CarrelloServlet extends HttpServlet {
 
         double costoConsegna = 2.50;
         double totale = subtotale + costoConsegna;
-        
         int tempoMinimo = tempoPreparazioneBase + 10;
         int tempoMassimo = tempoPreparazioneBase + 20;
 
-        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
-        List<Prodotto> bevande = new ArrayList<>();
+        List<Prodotto> bevande = prodottoDao.getBevande(2);
         Map<String, Map<String, List<Caratteristica>>> customizzazioni = new HashMap<>();
         
-        try {
-            bevande = em.createQuery("SELECT p FROM Prodotto p WHERE p.categoria = 'Bevande'", Prodotto.class)
-                        .setMaxResults(2)
-                        .getResultList();
-
-            for (CartItem item : carrello) {
-                String pid = String.valueOf(item.getProdotto().getId());
-                if (!customizzazioni.containsKey(pid)) {
-                    Map<String, List<Caratteristica>> gruppi = new HashMap<>();
-                    
-                    List<Caratteristica> list = em.createQuery("SELECT c FROM Caratteristica c LEFT JOIN FETCH c.gruppo WHERE c.prodotto.id = :pid", Caratteristica.class)
-                                                  .setParameter("pid", item.getProdotto().getId())
-                                                  .getResultList();
-                    
-                    for (Caratteristica c : list) {
-                        String key = (c.getGruppo() != null) ? c.getGruppo().getNomeGruppo() : "Extra";
-                        gruppi.putIfAbsent(key, new ArrayList<>());
-                        gruppi.get(key).add(c);
-                    }
-                    customizzazioni.put(pid, gruppi);
+        for (CartItem item : carrello) {
+            String pid = String.valueOf(item.getProdotto().getId());
+            if (!customizzazioni.containsKey(pid)) {
+                Map<String, List<Caratteristica>> gruppi = new HashMap<>();
+                List<Caratteristica> list = prodottoDao.getCaratteristicheByProdotto(item.getProdotto().getId());
+                
+                for (Caratteristica c : list) {
+                    String key = (c.getGruppo() != null) ? c.getGruppo().getNomeGruppo() : "Extra";
+                    gruppi.putIfAbsent(key, new ArrayList<>());
+                    gruppi.get(key).add(c);
                 }
+                customizzazioni.put(pid, gruppi);
             }
-        } finally {
-            em.close();
         }
 
         Map<String, Object> dataModel = new HashMap<>();
@@ -133,30 +122,22 @@ public class CarrelloServlet extends HttpServlet {
                     }
                 }
                 if (!found) {
-                    EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
-                    try {
-                        Prodotto p = em.find(Prodotto.class, idProdotto);
-                        if (p != null) {
-                            CartItem newItem = new CartItem(p, 1);
-                            
-                            List<Caratteristica> defaults = em.createQuery("SELECT c FROM Caratteristica c WHERE c.prodotto.id = :pid AND c.isDefault = true", Caratteristica.class)
-                                                              .setParameter("pid", idProdotto)
-                                                              .getResultList();
-                            
-                            double extraCost = 0.0;
-                            StringBuilder pers = new StringBuilder();
-                            for (Caratteristica c : defaults) {
-                                extraCost += c.getDifferenzaPrezzo();
-                                if (pers.length() > 0) pers.append(", ");
-                                pers.append(c.getNome());
-                            }
-                            newItem.setCostoExtra(extraCost);
-                            newItem.setPersonalizzazioni(pers.toString());
-                            
-                            carrello.add(newItem);
+                    Prodotto p = prodottoDao.getProdottoById(idProdotto);
+                    if (p != null) {
+                        CartItem newItem = new CartItem(p, 1);
+                        List<Caratteristica> defaults = prodottoDao.getDefaultCaratteristiche(idProdotto);
+                        
+                        double extraCost = 0.0;
+                        StringBuilder pers = new StringBuilder();
+                        for (Caratteristica c : defaults) {
+                            extraCost += c.getDifferenzaPrezzo();
+                            if (pers.length() > 0) pers.append(", ");
+                            pers.append(c.getNome());
                         }
-                    } finally {
-                        em.close();
+                        newItem.setCostoExtra(extraCost);
+                        newItem.setPersonalizzazioni(pers.toString());
+                        
+                        carrello.add(newItem);
                     }
                 }
             } else if ("remove".equals(action)) {
@@ -185,18 +166,13 @@ public class CarrelloServlet extends HttpServlet {
                     StringBuilder pers = new StringBuilder();
                     
                     if (caratteristicheIds != null && caratteristicheIds.length > 0) {
-                        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
-                        try {
-                            for (String cid : caratteristicheIds) {
-                                Caratteristica c = em.find(Caratteristica.class, Long.parseLong(cid));
-                                if (c != null) {
-                                    extraCost += c.getDifferenzaPrezzo();
-                                    if (pers.length() > 0) pers.append(", ");
-                                    pers.append(c.getNome());
-                                }
+                        for (String cid : caratteristicheIds) {
+                            Caratteristica c = prodottoDao.getCaratteristicaById(Long.parseLong(cid));
+                            if (c != null) {
+                                extraCost += c.getDifferenzaPrezzo();
+                                if (pers.length() > 0) pers.append(", ");
+                                pers.append(c.getNome());
                             }
-                        } finally {
-                            em.close();
                         }
                     }
                     

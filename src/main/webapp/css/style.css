@@ -185,7 +185,7 @@ body { background-color: #ffffff; color: #333; }
 .admin-body {
     display: flex;
     min-height: 100vh;
-    background-color: #f8fafc;
+    background-color: #edf8f1;
     margin: 0;
 }
 
@@ -246,18 +246,13 @@ body { background-color: #ffffff; color: #333; }
     font-weight: bold;
 }
 
-.sidebar-footer {
-    padding: 20px;
-    border-top: 1px solid #2d3748;
-}
-
 .logout-btn {
-    color: #f41111;
+    color: #da0000;
 }
 
 .logout-btn:hover {
-    background-color: rgba(252, 129, 129, 0.1);
-    color: #e53e3e;
+    background-color: #da0000;
+    color: #ffffff;
 }
 
 .admin-content {
@@ -446,7 +441,7 @@ body { background-color: #ffffff; color: #333; }
 }
 
 /* FORM E AUTENTICAZIONE */
-.auth-body { background-color: #f8f9fa; }
+.auth-body { background-color: #edf8f1 }
 
 .auth-header {
     background-color: white;
@@ -744,7 +739,7 @@ body { background-color: #ffffff; color: #333; }
 }
 
 /* CARRELLO E CHECKOUT */
-.cart-page { background-color: #f8f9fa; }
+.cart-page { background-color: #edf8f1; }
 
 .cart-navbar { 
     display: flex; justify-content: space-between; align-items: center; 

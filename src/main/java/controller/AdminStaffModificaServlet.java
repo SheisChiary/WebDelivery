@@ -1,16 +1,15 @@
 package controller;
 
+import dao.UtenteDAO;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import model.Utente;
-import util.JpaUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import jakarta.persistence.EntityManager;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,12 +18,15 @@ import java.util.Map;
 public class AdminStaffModificaServlet extends HttpServlet {
 
     private Configuration cfg;
+    private UtenteDAO utenteDao;
 
     @Override
     public void init() throws ServletException {
         cfg = new Configuration(Configuration.VERSION_2_3_33);
         cfg.setServletContextForTemplateLoading(getServletContext(), "/WEB-INF/templates");
         cfg.setDefaultEncoding("UTF-8");
+        
+        utenteDao = new UtenteDAO();
     }
 
     @Override
@@ -44,9 +46,8 @@ public class AdminStaffModificaServlet extends HttpServlet {
             return;
         }
 
-        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
         try {
-            Utente dipendente = em.find(Utente.class, Long.parseLong(idParam));
+            Utente dipendente = utenteDao.getUtenteById(Long.parseLong(idParam));
             
             Map<String, Object> templateData = new HashMap<>();
             templateData.put("dipendente", dipendente);
@@ -57,8 +58,6 @@ public class AdminStaffModificaServlet extends HttpServlet {
             
         } catch (Exception e) {
             throw new ServletException("Errore", e);
-        } finally {
-            em.close();
         }
     }
 
@@ -72,27 +71,10 @@ public class AdminStaffModificaServlet extends HttpServlet {
         String telefono = request.getParameter("telefono");
         String nuovaPassword = request.getParameter("password");
 
-        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
-        
         try {
-            em.getTransaction().begin();
-            Utente utenteDaModificare = em.find(Utente.class, idUtente);
-            
-            if (utenteDaModificare != null) {
-                utenteDaModificare.setNomeCompleto(nome);
-                utenteDaModificare.setEmail(email);
-                utenteDaModificare.setTelefono(telefono);
-                
-                if (nuovaPassword != null && !nuovaPassword.trim().isEmpty()) {
-                    utenteDaModificare.setPassword(nuovaPassword);
-                }
-            }
-            em.getTransaction().commit();
+            utenteDao.aggiornaStaff(idUtente, nome, email, telefono, nuovaPassword);
         } catch (Exception e) {
-            if (em.getTransaction().isActive()) em.getTransaction().rollback();
             throw new ServletException("Errore update", e);
-        } finally {
-            em.close();
         }
 
         response.sendRedirect("staff");

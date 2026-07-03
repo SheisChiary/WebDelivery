@@ -1,8 +1,8 @@
 package controller;
 
+import dao.OrdineDAO;
 import model.Ordine;
 import model.Utente;
-import util.JpaUtil;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import jakarta.servlet.ServletException;
@@ -11,7 +11,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import jakarta.persistence.EntityManager;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +19,7 @@ import java.util.Map;
 public class StaffDettaglioOrdineServlet extends HttpServlet {
 
     private Configuration cfg;
+    private OrdineDAO ordineDao;
 
     @Override
     public void init() throws ServletException {
@@ -28,6 +28,8 @@ public class StaffDettaglioOrdineServlet extends HttpServlet {
             new freemarker.ext.jakarta.servlet.WebappTemplateLoader(getServletContext(), "/WEB-INF/templates");
         cfg.setTemplateLoader(templateLoader);
         cfg.setDefaultEncoding("UTF-8");
+        
+        ordineDao = new OrdineDAO();
     }
 
     @Override
@@ -49,13 +51,9 @@ public class StaffDettaglioOrdineServlet extends HttpServlet {
             return;
         }
 
-        Long idOrdine = Long.parseLong(idOrdineParam);
-        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
-        
         try {
-            Ordine ordine = em.createQuery("SELECT o FROM Ordine o WHERE o.id = :id", Ordine.class)
-                .setParameter("id", idOrdine)
-                .getSingleResult();
+            Long idOrdine = Long.parseLong(idOrdineParam);
+            Ordine ordine = ordineDao.getOrdineById(idOrdine);
 
             Map<String, Object> templateData = new HashMap<>();
             templateData.put("ordine", ordine);
@@ -66,8 +64,6 @@ public class StaffDettaglioOrdineServlet extends HttpServlet {
 
         } catch (Exception e) {
             throw new ServletException("Errore nel recupero dell'ordine", e);
-        } finally {
-            em.close();
         }
     }
 }

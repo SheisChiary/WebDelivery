@@ -1,7 +1,7 @@
 package controller;
 
+import dao.UtenteDAO;
 import model.Utente;
-import util.JpaUtil;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import jakarta.servlet.ServletException;
@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import jakarta.persistence.EntityManager;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +19,7 @@ import java.util.Map;
 public class AdminStaffServlet extends HttpServlet {
 
     private Configuration cfg;
+    private UtenteDAO utenteDao;
 
     @Override
     public void init() throws ServletException {
@@ -28,6 +28,8 @@ public class AdminStaffServlet extends HttpServlet {
             new freemarker.ext.jakarta.servlet.WebappTemplateLoader(getServletContext(), "/WEB-INF/templates");
         cfg.setTemplateLoader(templateLoader);
         cfg.setDefaultEncoding("UTF-8");
+        
+        utenteDao = new UtenteDAO();
     }
 
     @Override
@@ -43,12 +45,8 @@ public class AdminStaffServlet extends HttpServlet {
             return;
         }
 
-        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
-        
         try {
-            List<Utente> staffList = em.createQuery(
-                "SELECT u FROM Utente u WHERE u.ruolo = 'personale' ORDER BY u.nomeCompleto ASC", 
-                Utente.class).getResultList();
+            List<Utente> staffList = utenteDao.getStaffList();
 
             Map<String, Object> templateData = new HashMap<>();
             templateData.put("staffList", staffList);
@@ -56,11 +54,8 @@ public class AdminStaffServlet extends HttpServlet {
 
             Template template = cfg.getTemplate("admin_staff.ftl");
             template.process(templateData, response.getWriter());
-
         } catch (Exception e) {
             throw new ServletException("Errore nel caricamento dello staff", e);
-        } finally {
-            em.close();
         }
     }
 
@@ -68,33 +63,17 @@ public class AdminStaffServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
-        
-        String nome = request.getParameter("nome_completo");
-        String email = request.getParameter("email");
-        String telefono = request.getParameter("telefono");
-        String password = request.getParameter("password");
-
-        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
+        Utente nuovoStaff = new Utente();
+        nuovoStaff.setNomeCompleto(request.getParameter("nome_completo"));
+        nuovoStaff.setEmail(request.getParameter("email"));
+        nuovoStaff.setTelefono(request.getParameter("telefono"));
+        nuovoStaff.setPassword(request.getParameter("password"));
+        nuovoStaff.setRuolo("personale"); 
         
         try {
-            em.getTransaction().begin();
-            
-            Utente nuovoStaff = new Utente();
-            nuovoStaff.setNomeCompleto(nome);
-            nuovoStaff.setEmail(email);
-            nuovoStaff.setTelefono(telefono);
-            nuovoStaff.setPassword(password);
-            nuovoStaff.setRuolo("personale"); 
-            em.persist(nuovoStaff);
-            em.getTransaction().commit();
-
+            utenteDao.salvaUtente(nuovoStaff);
         } catch (Exception e) {
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
             throw new ServletException("Errore durante il salvataggio del nuovo membro dello staff", e);
-        } finally {
-            em.close();
         }
 
         response.sendRedirect("staff");

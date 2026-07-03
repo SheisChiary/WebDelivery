@@ -39,13 +39,13 @@
         <section class="admin-section">
             <div style="display: flex; justify-content: space-between; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #e2e8f0;">
                 <div>
-                    <h3 style="color: #4a5568; margin-top: 0;"><i class="fa-solid fa-user"></i> Dati Cliente</h3>
+                    <h2 style="color: #4a5568; margin-top: 0;"><i class="fa-solid fa-user"></i> Dati Cliente</h2>
                     <p><strong>Nome:</strong> ${ordine.utente.nomeCompleto}</p>
                     <p><strong>Orario Richiesto:</strong> ${ordine.orarioConsegnaRichiesto}</p>
                     <p><strong>Tempo Preparazione:</strong> ${ordine.tempoStimatoConsegna} min</p>
                 </div>
                 <div style="text-align: right;">
-                    <h3 style="color: #4a5568; margin-top: 0;"><i class="fa-solid fa-info-circle"></i> Info Ordine</h3>
+                    <h2 style="color: #4a5568; margin-top: 0;"><i class="fa-solid fa-info-circle"></i> Info Ordine</h2>
                     <p><strong>Stato:</strong> <span class="status-badge status-${ordine.stato?replace(' ', '-')}">${ordine.stato?upper_case}</span></p>
                     
                     <p style="margin-top: 10px; font-size: 0.95rem; color: #718096;">
@@ -59,7 +59,7 @@
                 </div>
             </div>
 
-            <h3 style="color: #4a5568;"><i class="fa-solid fa-list"></i> Prodotti Ordinati</h3>
+            <h2 style="color: #4a5568;"><i class="fa-solid fa-list"></i> Prodotti Ordinati</h2>
             <table class="admin-table">
                 <thead>
                     <tr>
@@ -101,7 +101,7 @@
         </section>
 
         <section class="admin-section" style="margin-top: 30px; background-color: #f8fafc; border: 1px solid #e2e8f0;">
-            <h3 style="color: #4a5568;"><i class="fa-solid fa-clock-rotate-left"></i> Cronologia Modifiche Stato</h3>
+            <h2 style="color: #4a5568;"><i class="fa-solid fa-clock-rotate-left"></i> Cronologia Modifiche Stato</h2>
             
             <table class="admin-table" style="background-color: white;">
                 <thead>
