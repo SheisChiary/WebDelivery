@@ -1,10 +1,9 @@
 package controller;
 
+import dao.ProdottoDAO;
 import model.Prodotto;
-import model.Caratteristica;
-import model.GruppoEsclusione;
 import model.Utente;
-import util.JpaUtil;
+import model.Caratteristica;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import jakarta.servlet.ServletException;
@@ -13,7 +12,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import jakarta.persistence.EntityManager;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +21,7 @@ import java.util.Map;
 public class AdminMenuModificaServlet extends HttpServlet {
 
     private Configuration cfg;
+    private ProdottoDAO prodottoDao;
 
     @Override
     public void init() throws ServletException {
@@ -31,13 +30,14 @@ public class AdminMenuModificaServlet extends HttpServlet {
             new freemarker.ext.jakarta.servlet.WebappTemplateLoader(getServletContext(), "/WEB-INF/templates");
         cfg.setTemplateLoader(templateLoader);
         cfg.setDefaultEncoding("UTF-8");
+        
+        prodottoDao = new ProdottoDAO();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
-        response.setContentType("text/html;charset=UTF-8");
         HttpSession session = request.getSession();
         Utente utenteLoggato = (Utente) session.getAttribute("utente");
         if (utenteLoggato == null || !utenteLoggato.getRuolo().equals("proprietario")) {
@@ -45,29 +45,26 @@ public class AdminMenuModificaServlet extends HttpServlet {
             return;
         }
 
-        Long idProdotto = Long.parseLong(request.getParameter("id"));
-        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
-        
-        try {
-            Prodotto prodotto = em.find(Prodotto.class, idProdotto);
-            List<Caratteristica> caratteristiche = em.createQuery(
-                "SELECT c FROM Caratteristica c WHERE c.prodotto.id = :pid", Caratteristica.class)
-                .setParameter("pid", idProdotto).getResultList();
-            
-            List<GruppoEsclusione> gruppi = em.createQuery("SELECT g FROM GruppoEsclusione g", GruppoEsclusione.class).getResultList();
+        String idParam = request.getParameter("id");
+        if (idParam == null || idParam.isEmpty()) {
+            response.sendRedirect("menu");
+            return;
+        }
 
+        try {
+            Long idProdotto = Long.parseLong(idParam);
+            Prodotto prodotto = prodottoDao.getProdottoById(idProdotto);
+            List<Caratteristica> caratteristiche = prodottoDao.getCaratteristicheByProdotto(idProdotto);
+            
             Map<String, Object> templateData = new HashMap<>();
             templateData.put("prodotto", prodotto);
             templateData.put("caratteristiche", caratteristiche);
-            templateData.put("gruppi", gruppi);
             templateData.put("utenteLoggato", utenteLoggato);
-
+            
             Template template = cfg.getTemplate("admin_menu_modifica.ftl");
             template.process(templateData, response.getWriter());
         } catch (Exception e) {
-            throw new ServletException(e);
-        } finally {
-            em.close();
+            throw new ServletException("Errore", e);
         }
     }
 
@@ -75,58 +72,38 @@ public class AdminMenuModificaServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
-        HttpSession session = request.getSession();
-        Utente utenteLoggato = (Utente) session.getAttribute("utente");
-        if (utenteLoggato == null || !utenteLoggato.getRuolo().equals("proprietario")) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
+        String subAction = request.getParameter("sub_action");
+        Long idProdotto = Long.parseLong(request.getParameter("id_prodotto"));
 
-        Long idProdotto = Long.parseLong(request.getParameter("id"));
-        String subAction = request.getParameter("subAction");
-
-        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
         try {
-            em.getTransaction().begin();
-
             if ("update_prodotto".equals(subAction)) {
-                Prodotto p = em.find(Prodotto.class, idProdotto);
-                p.setNome(request.getParameter("nome"));
-                p.setPrezzo(Double.parseDouble(request.getParameter("prezzo")));
-                p.setDescrizione(request.getParameter("descrizione"));
-                p.setCategoria(request.getParameter("categoria"));
-                p.setImmagine(request.getParameter("immagine"));
-                p.setTempoPreparazione(Integer.parseInt(request.getParameter("tempo_preparazione")));
-                p.setBadge(request.getParameter("badge"));
-                
+                prodottoDao.aggiornaProdotto(
+                    idProdotto,
+                    request.getParameter("nome"),
+                    Double.parseDouble(request.getParameter("prezzo")),
+                    request.getParameter("descrizione"),
+                    request.getParameter("categoria"),
+                    request.getParameter("immagine"),
+                    Integer.parseInt(request.getParameter("tempo_preparazione")),
+                    request.getParameter("badge")
+                );
             } else if ("add_caratteristica".equals(subAction)) {
-                Prodotto p = em.find(Prodotto.class, idProdotto);
-                Caratteristica c = new Caratteristica();
-                c.setNome(request.getParameter("caratt_nome"));
-                c.setDifferenzaPrezzo(Double.parseDouble(request.getParameter("caratt_prezzo")));
-                c.setIsDefault(request.getParameter("caratt_default") != null);
-                c.setProdotto(p);
-
                 String idGruppoStr = request.getParameter("id_gruppo");
-                if (idGruppoStr != null && !idGruppoStr.isEmpty()) {
-                    c.setGruppo(em.find(GruppoEsclusione.class, Long.parseLong(idGruppoStr)));
-                }
-                em.persist(c);
-
+                Long idGruppo = (idGruppoStr != null && !idGruppoStr.isEmpty()) ? Long.parseLong(idGruppoStr) : null;
+                
+                prodottoDao.aggiungiCaratteristica(
+                    idProdotto,
+                    request.getParameter("caratt_nome"),
+                    Double.parseDouble(request.getParameter("caratt_prezzo")),
+                    request.getParameter("caratt_default") != null,
+                    idGruppo
+                );
             } else if ("delete_caratteristica".equals(subAction)) {
                 Long idCaratt = Long.parseLong(request.getParameter("id_caratteristica"));
-                Caratteristica c = em.find(Caratteristica.class, idCaratt);
-                if (c != null) {
-                    em.remove(c);
-                }
+                prodottoDao.eliminaCaratteristica(idCaratt);
             }
-
-            em.getTransaction().commit();
         } catch (Exception e) {
-            if (em.getTransaction().isActive()) em.getTransaction().rollback();
             throw new ServletException(e);
-        } finally {
-            em.close();
         }
 
         response.sendRedirect("menu-modifica?id=" + idProdotto);

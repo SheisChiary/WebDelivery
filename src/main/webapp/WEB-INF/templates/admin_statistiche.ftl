@@ -21,7 +21,7 @@
             <a href="statistiche" class="nav-item active"><i class="fa-solid fa-chart-line"></i> Statistiche</a>
         </nav>
         <div class="sidebar-footer">
-            <a href="../home" class="nav-item logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Esci</a>
+            <a href="../logout" class="nav-item logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Esci</a>
         </div>
     </aside>
 

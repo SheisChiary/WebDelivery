@@ -7,6 +7,8 @@ import util.JpaUtil;
 import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.List;
+import jakarta.persistence.Query;
+import model.CartItem;
 
 public class OrdineDAO {
 
@@ -75,4 +77,62 @@ public class OrdineDAO {
         if (statoAttuale.equalsIgnoreCase("in consegna") && nuovoStato.equalsIgnoreCase("consegnato")) return true;
         return false;
         }
+        
+        public List<Object[]> getStoricoOrdiniCliente(Long idCliente) {
+        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
+        try {
+            return em.createNativeQuery(
+                "SELECT id_ordine, data_creazione, stato_attuale, prezzo_totale, tempo_stimato_consegna FROM Ordine WHERE id_cliente = ? ORDER BY data_creazione DESC")
+                .setParameter(1, idCliente)
+                .getResultList();
+        } finally {
+            em.close();
+        }
+    }
+        
+        public Long salvaNuovoOrdine(Long idCliente, LocalDateTime orarioConsegna, double totale, int tempoStimato, List<CartItem> carrello) {
+        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
+        try {
+            em.getTransaction().begin();
+
+            Query q = em.createNativeQuery("INSERT INTO Ordine (id_cliente, orario_consegna_richiesto, stato_attuale, prezzo_totale, tempo_stimato_consegna) VALUES (?, ?, 'inserito', ?, ?)");
+            q.setParameter(1, idCliente);
+            q.setParameter(2, orarioConsegna);
+            q.setParameter(3, totale);
+            q.setParameter(4, tempoStimato);
+            q.executeUpdate();
+
+            Number idOrdine = (Number) em.createNativeQuery("SELECT LAST_INSERT_ID()").getSingleResult();
+
+            for (CartItem item : carrello) {
+                Query qDet = em.createNativeQuery("INSERT INTO Dettaglio_Ordine (id_ordine, id_prodotto, quantita, prezzo_unitario) VALUES (?, ?, ?, ?)");
+                qDet.setParameter(1, idOrdine.longValue());
+                qDet.setParameter(2, item.getProdotto().getId());
+                qDet.setParameter(3, item.getQuantita());
+                qDet.setParameter(4, item.getProdotto().getPrezzo() + item.getCostoExtra());
+                qDet.executeUpdate();
+
+                Number idDettaglio = (Number) em.createNativeQuery("SELECT LAST_INSERT_ID()").getSingleResult();
+
+                if (item.getCaratteristicheScelte() != null) {
+                    for (Long idCaratt : item.getCaratteristicheScelte()) {
+                        Query qCar = em.createNativeQuery("INSERT INTO Dettaglio_Ordine_Caratteristiche (id_dettaglio, id_caratteristica) VALUES (?, ?)");
+                        qCar.setParameter(1, idDettaglio.longValue());
+                        qCar.setParameter(2, idCaratt);
+                        qCar.executeUpdate();
+                    }
+                }
+            }
+            em.getTransaction().commit();
+            return idOrdine.longValue();
+
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
 }

@@ -19,7 +19,7 @@
             <a href="storico-ordini" class="nav-item active"><i class="fa-solid fa-clock-rotate-left"></i> Storico Ordini</a>
         </nav>
         <div class="sidebar-footer">
-            <a href="../home" class="nav-item logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Esci</a>
+            <a href="../logout" class="nav-item logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Esci</a>
         </div>
     </aside>
 

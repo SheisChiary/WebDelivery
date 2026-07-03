@@ -1,7 +1,7 @@
 package controller;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
+import dao.OrdineDAO;
+import model.Utente;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -14,17 +14,25 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import model.CartItem;
-import util.JpaUtil;
 
 @WebServlet(name = "ConfermaOrdineServlet", urlPatterns = {"/conferma-ordine"})
 public class ConfermaOrdineServlet extends HttpServlet {
+
+    private OrdineDAO ordineDao;
+
+    @Override
+    public void init() throws ServletException {
+        ordineDao = new OrdineDAO();
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
         HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("utente_id") == null) {
+        
+        Utente utenteLoggato = (session != null) ? (Utente) session.getAttribute("utente") : null;
+        if (utenteLoggato == null) {
             response.sendRedirect("login");
             return;
         }
@@ -35,7 +43,7 @@ public class ConfermaOrdineServlet extends HttpServlet {
             return;
         }
 
-        Long idCliente = (Long) session.getAttribute("utente_id");
+        Long idCliente = utenteLoggato.getId();
         String orarioStr = request.getParameter("orarioProgrammato");
 
         double subtotale = 0.0;
@@ -56,43 +64,14 @@ public class ConfermaOrdineServlet extends HttpServlet {
             }
         }
 
-        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
         try {
-            em.getTransaction().begin();
-
-            Query q = em.createNativeQuery("INSERT INTO Ordine (id_cliente, orario_consegna_richiesto, stato_attuale, prezzo_totale, tempo_stimato_consegna) VALUES (?, ?, 'inserito', ?, ?)");
-            q.setParameter(1, idCliente);
-            q.setParameter(2, orarioConsegna);
-            q.setParameter(3, totale);
-            q.setParameter(4, tempoStimato);
-            q.executeUpdate();
-
-            Number idOrdine = (Number) em.createNativeQuery("SELECT LAST_INSERT_ID()").getSingleResult();
-
-            for (CartItem item : carrello) {
-                Query qDet = em.createNativeQuery("INSERT INTO Dettaglio_Ordine (id_ordine, id_prodotto, quantita, prezzo_unitario) VALUES (?, ?, ?, ?)");
-                qDet.setParameter(1, idOrdine.longValue());
-                qDet.setParameter(2, item.getProdotto().getId());
-                qDet.setParameter(3, item.getQuantita());
-                qDet.setParameter(4, item.getProdotto().getPrezzo() + item.getCostoExtra());
-                qDet.executeUpdate();
-
-                Number idDettaglio = (Number) em.createNativeQuery("SELECT LAST_INSERT_ID()").getSingleResult();
-
-                for (Long idCaratt : item.getCaratteristicheScelte()) {
-                    Query qCar = em.createNativeQuery("INSERT INTO Dettaglio_Ordine_Caratteristiche (id_dettaglio, id_caratteristica) VALUES (?, ?)");
-                    qCar.setParameter(1, idDettaglio.longValue());
-                    qCar.setParameter(2, idCaratt);
-                    qCar.executeUpdate();
-                }
-            }
-            em.getTransaction().commit();
+            Long idOrdine = ordineDao.salvaNuovoOrdine(idCliente, orarioConsegna, totale, tempoStimato, carrello);
 
             System.out.println("\n=======================================================");
-            System.out.println("📧 NUOVA EMAIL INVIATA AL CLIENTE");
+            System.out.println(" NUOVA EMAIL INVIATA AL CLIENTE");
             System.out.println("=======================================================");
-            System.out.println("Oggetto: Conferma Ordine #" + idOrdine.longValue() + " - WebDelivery");
-            System.out.println("Ciao " + session.getAttribute("utente_nome") + ",");
+            System.out.println("Oggetto: Conferma Ordine #" + idOrdine + " - WebDelivery");
+            System.out.println("Ciao " + utenteLoggato.getNomeCompleto() + ",");
             System.out.println("Il tuo ordine di €" + String.format("%.2f", totale) + " è stato ricevuto con successo.");
             System.out.println("Orario di consegna previsto: " + orarioConsegna.format(DateTimeFormatter.ofPattern("HH:mm")));
             System.out.println("Grazie per aver scelto WebDelivery!");
@@ -103,12 +82,7 @@ public class ConfermaOrdineServlet extends HttpServlet {
             response.sendRedirect("carrello");
 
         } catch (Exception e) {
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            throw new ServletException(e);
-        } finally {
-            em.close();
+            throw new ServletException("Errore durante il salvataggio dell'ordine", e);
         }
     }
 }

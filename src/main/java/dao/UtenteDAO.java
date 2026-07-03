@@ -92,4 +92,23 @@ public class UtenteDAO {
             em.close();
         }
     }
+    
+    public void aggiornaProfilo(Long id, String nomeCompleto, String telefono, String indirizzo) {
+        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
+        try {
+            em.getTransaction().begin();
+            Utente utente = em.find(Utente.class, id);
+            if (utente != null) {
+                utente.setNomeCompleto(nomeCompleto);
+                utente.setTelefono(telefono);
+                utente.setIndirizzo(indirizzo);
+            }
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
 }

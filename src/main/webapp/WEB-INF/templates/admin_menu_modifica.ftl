@@ -20,6 +20,7 @@
             <a href="staff" class="nav-item"><i class="fa-solid fa-users"></i> Gestione Staff</a>
             <a href="statistiche" class="nav-item"><i class="fa-solid fa-chart-line"></i> Statistiche</a>
         </nav>
+
     </aside>
 
     <main class="admin-content">

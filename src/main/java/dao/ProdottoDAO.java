@@ -67,4 +67,100 @@ public class ProdottoDAO {
             em.close();
         }
     }
+    
+    public void eliminaProdotto(Long idProdotto) {
+        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
+        try {
+            em.getTransaction().begin();
+            Prodotto p = em.find(Prodotto.class, idProdotto);
+            if (p != null) {
+                em.remove(p);
+            }
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    public void aggiornaProdotto(Long id, String nome, double prezzo, String descrizione, String categoria, String immagine, int tempoPreparazione, String badge) {
+        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
+        try {
+            em.getTransaction().begin();
+            Prodotto p = em.find(Prodotto.class, id);
+            if (p != null) {
+                p.setNome(nome);
+                p.setPrezzo(prezzo);
+                p.setDescrizione(descrizione);
+                p.setCategoria(categoria);
+                p.setImmagine(immagine);
+                p.setTempoPreparazione(tempoPreparazione);
+                p.setBadge(badge);
+            }
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+    
+    public void salva(Prodotto p) {
+        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
+        try {
+            em.getTransaction().begin();
+            em.persist(p);
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    public void aggiungiCaratteristica(Long idProdotto, String nome, double differenzaPrezzo, boolean isDefault, Long idGruppo) {
+        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
+        try {
+            em.getTransaction().begin();
+            Prodotto p = em.find(Prodotto.class, idProdotto);
+            Caratteristica c = new Caratteristica();
+            c.setNome(nome);
+            c.setDifferenzaPrezzo(differenzaPrezzo);
+            c.setIsDefault(isDefault);
+            c.setProdotto(p);
+
+            if (idGruppo != null) {
+                model.GruppoEsclusione g = em.find(model.GruppoEsclusione.class, idGruppo);
+                c.setGruppo(g);
+            }
+            em.persist(c);
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    public void eliminaCaratteristica(Long idCaratt) {
+        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
+        try {
+            em.getTransaction().begin();
+            Caratteristica c = em.find(Caratteristica.class, idCaratt);
+            if (c != null) {
+                em.remove(c);
+            }
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
 }

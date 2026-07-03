@@ -35,7 +35,7 @@ public class LoginServlet extends HttpServlet {
         Map<String, Object> dataModel = new HashMap<>();
         
         if (request.getParameter("error") != null) {
-            dataModel.put("errore", "Credenziali non valide o utente non trovato nel DB!");
+            dataModel.put("errore", "Email o Password sbagliate. Riprova!");
         }
 
         try {

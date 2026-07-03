@@ -1,8 +1,8 @@
 package controller;
 
+import dao.UtenteDAO;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
-import jakarta.persistence.EntityManager;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -13,18 +13,20 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import model.Utente;
-import util.JpaUtil;
 
 @WebServlet(name = "ProfiloServlet", urlPatterns = {"/profilo"})
 public class ProfiloServlet extends HttpServlet {
 
     private Configuration cfg;
+    private UtenteDAO utenteDao;
 
     @Override
     public void init() throws ServletException {
         cfg = new Configuration(Configuration.VERSION_2_3_33);
         cfg.setServletContextForTemplateLoading(getServletContext(), "/WEB-INF/templates");
         cfg.setDefaultEncoding("UTF-8");
+        
+        utenteDao = new UtenteDAO();
     }
 
     @Override
@@ -33,28 +35,29 @@ public class ProfiloServlet extends HttpServlet {
         
         response.setContentType("text/html;charset=UTF-8");
         HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("utente_id") == null) {
+        
+        Utente utenteLoggato = (session != null) ? (Utente) session.getAttribute("utente") : null;
+        if (utenteLoggato == null) {
             response.sendRedirect("login");
             return;
         }
 
-        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
         try {
-            Long idUtente = (Long) session.getAttribute("utente_id");
-            Utente utente = em.find(Utente.class, idUtente);
-            
+            Long idUtente = utenteLoggato.getId();
+            Utente utente = utenteDao.getUtenteById(idUtente);
+
             Map<String, Object> dataModel = new HashMap<>();
             dataModel.put("utente", utente);
+
             if (request.getParameter("success") != null) {
-                dataModel.put("successMessage", "Profilo aggiornato con successo!");
+                dataModel.put("success_msg", "Profilo aggiornato con successo!");
             }
-            
+
             Template template = cfg.getTemplate("profilo.ftl");
             template.process(dataModel, response.getWriter());
+
         } catch (Exception e) {
             throw new ServletException(e);
-        } finally {
-            em.close();
         }
     }
 
@@ -63,33 +66,28 @@ public class ProfiloServlet extends HttpServlet {
             throws ServletException, IOException {
         
         HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("utente_id") == null) {
+        Utente utenteLoggato = (session != null) ? (Utente) session.getAttribute("utente") : null;
+        if (utenteLoggato == null) {
             response.sendRedirect("login");
             return;
         }
 
+        Long idUtente = utenteLoggato.getId();
         String nomeCompleto = request.getParameter("nomeCompleto");
         String telefono = request.getParameter("telefono");
         String indirizzo = request.getParameter("indirizzo");
 
-        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
         try {
-            em.getTransaction().begin();
-            Long idUtente = (Long) session.getAttribute("utente_id");
-            Utente utente = em.find(Utente.class, idUtente);
+            utenteDao.aggiornaProfilo(idUtente, nomeCompleto, telefono, indirizzo);
             
-            utente.setNomeCompleto(nomeCompleto);
-            utente.setTelefono(telefono);
-            utente.setIndirizzo(indirizzo);
+            utenteLoggato.setNomeCompleto(nomeCompleto);
+            utenteLoggato.setTelefono(telefono);
+            utenteLoggato.setIndirizzo(indirizzo);
+            session.setAttribute("utente", utenteLoggato);
             
-            em.getTransaction().commit();
-            session.setAttribute("utente_nome", nomeCompleto);
             response.sendRedirect("profilo?success=1");
         } catch (Exception e) {
-            if (em.getTransaction().isActive()) em.getTransaction().rollback();
-            throw new ServletException(e);
-        } finally {
-            em.close();
+            throw new ServletException("Errore nell'aggiornamento del profilo", e);
         }
     }
 }

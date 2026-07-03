@@ -739,7 +739,7 @@ body { background-color: #ffffff; color: #333; }
 }
 
 /* CARRELLO E CHECKOUT */
-.cart-page { background-color: #edf8f1; }
+.cart-page { background-color: #ffffff; }
 
 .cart-navbar { 
     display: flex; justify-content: space-between; align-items: center; 

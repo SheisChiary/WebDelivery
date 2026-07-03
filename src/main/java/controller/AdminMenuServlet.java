@@ -1,8 +1,8 @@
 package controller;
 
+import dao.ProdottoDAO;
 import model.Prodotto;
 import model.Utente;
-import util.JpaUtil;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import jakarta.servlet.ServletException;
@@ -11,7 +11,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import jakarta.persistence.EntityManager;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +20,7 @@ import java.util.Map;
 public class AdminMenuServlet extends HttpServlet {
 
     private Configuration cfg;
+    private ProdottoDAO prodottoDao;
 
     @Override
     public void init() throws ServletException {
@@ -29,6 +29,8 @@ public class AdminMenuServlet extends HttpServlet {
             new freemarker.ext.jakarta.servlet.WebappTemplateLoader(getServletContext(), "/WEB-INF/templates");
         cfg.setTemplateLoader(templateLoader);
         cfg.setDefaultEncoding("UTF-8");
+        
+        prodottoDao = new ProdottoDAO();
     }
 
     @Override
@@ -44,20 +46,16 @@ public class AdminMenuServlet extends HttpServlet {
             return;
         }
 
-        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
         try {
-            List<Prodotto> menu = em.createQuery("SELECT p FROM Prodotto p ORDER BY p.categoria, p.nome", Prodotto.class).getResultList();
-            
+            List<Prodotto> menuList = prodottoDao.getAllProdotti();
             Map<String, Object> templateData = new HashMap<>();
-            templateData.put("menu", menu);
+            templateData.put("menuList", menuList);
             templateData.put("utenteLoggato", utenteLoggato);
 
             Template template = cfg.getTemplate("admin_menu.ftl");
             template.process(templateData, response.getWriter());
         } catch (Exception e) {
             throw new ServletException(e);
-        } finally {
-            em.close();
         }
     }
 
@@ -65,40 +63,19 @@ public class AdminMenuServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
-        HttpSession session = request.getSession();
-        Utente utenteLoggato = (Utente) session.getAttribute("utente");
-        if (utenteLoggato == null || !utenteLoggato.getRuolo().equals("proprietario")) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
+        Prodotto p = new Prodotto();
+        p.setNome(request.getParameter("nome"));
+        p.setPrezzo(Double.parseDouble(request.getParameter("prezzo")));
+        p.setDescrizione(request.getParameter("descrizione"));
+        p.setCategoria(request.getParameter("categoria"));
+        p.setImmagine(request.getParameter("immagine"));
+        p.setTempoPreparazione(Integer.parseInt(request.getParameter("tempo_preparazione")));
+        p.setBadge(request.getParameter("badge"));
 
-        String nome = request.getParameter("nome");
-        double prezzo = Double.parseDouble(request.getParameter("prezzo"));
-        String descrizione = request.getParameter("descrizione");
-        String categoria = request.getParameter("categoria");
-        String immagine = request.getParameter("immagine");
-        int tempoPreparazione = Integer.parseInt(request.getParameter("tempo_preparazione"));
-        String badge = request.getParameter("badge");
-
-        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
         try {
-            em.getTransaction().begin();
-            Prodotto p = new Prodotto();
-            p.setNome(nome);
-            p.setPrezzo(prezzo);
-            p.setDescrizione(descrizione);
-            p.setCategoria(categoria);
-            p.setImmagine(immagine);
-            p.setTempoPreparazione(tempoPreparazione);
-            p.setBadge(badge);
-            
-            em.persist(p);
-            em.getTransaction().commit();
+            prodottoDao.salva(p);
         } catch (Exception e) {
-            if (em.getTransaction().isActive()) em.getTransaction().rollback();
             throw new ServletException(e);
-        } finally {
-            em.close();
         }
 
         response.sendRedirect("menu");
