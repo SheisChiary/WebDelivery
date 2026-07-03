@@ -14,10 +14,11 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.persistence.EntityManager;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-@WebServlet(name = "AdminDettaglioOrdineServlet", urlPatterns = {"/admin/dettaglio-ordine"})
-public class AdminDettaglioOrdineServlet extends HttpServlet {
+@WebServlet(name = "StaffStoricoOrdiniServlet", urlPatterns = {"/staff/storico-ordini"})
+public class StaffStoricoOrdiniServlet extends HttpServlet {
 
     private Configuration cfg;
 
@@ -38,34 +39,27 @@ public class AdminDettaglioOrdineServlet extends HttpServlet {
         HttpSession session = request.getSession();
         Utente utenteLoggato = (Utente) session.getAttribute("utente");
 
-        if (utenteLoggato == null || !utenteLoggato.getRuolo().equals("proprietario")) {
+        if (utenteLoggato == null || !utenteLoggato.getRuolo().equals("personale")) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
-        String idOrdineParam = request.getParameter("id");
-        if (idOrdineParam == null || idOrdineParam.isEmpty()) {
-            response.sendRedirect("ordini");
-            return;
-        }
-
-        Long idOrdine = Long.parseLong(idOrdineParam);
         EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
         
         try {
-            Ordine ordine = em.createQuery("SELECT o FROM Ordine o WHERE o.id = :id", Ordine.class)
-                .setParameter("id", idOrdine)
-                .getSingleResult();
+            List<Ordine> storicoOrdini = em.createQuery(
+                "SELECT o FROM Ordine o WHERE o.stato IN ('consegnato', 'annullato') ORDER BY o.dataCreazione DESC", 
+                Ordine.class).getResultList();
 
             Map<String, Object> templateData = new HashMap<>();
-            templateData.put("ordine", ordine);
+            templateData.put("storicoOrdini", storicoOrdini);
             templateData.put("utenteLoggato", utenteLoggato);
 
-            Template template = cfg.getTemplate("admin_dettaglio_ordine.ftl");
+            Template template = cfg.getTemplate("staff_storico_ordini.ftl");
             template.process(templateData, response.getWriter());
 
         } catch (Exception e) {
-            throw new ServletException("Errore nel recupero dell'ordine", e);
+            throw new ServletException("Errore nel recupero dello storico ordini", e);
         } finally {
             em.close();
         }

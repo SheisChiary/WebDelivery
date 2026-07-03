@@ -52,7 +52,12 @@
                             <tr>
                                 <td>#${ordine.id}</td>
                                 <td>${ordine.utente.nomeCompleto}</td>
-                                <td>${ordine.orarioConsegnaRichiesto}</td>
+                                
+                                <td style="font-weight: 500; color: #4a5568;">
+                                    <i class="fa-regular fa-calendar" style="color: #718096; margin-right: 5px;"></i>
+                                    Prog. per le ${ordine.orarioConsegnaRichiesto?string?substring(11, 16)}
+                                </td>
+                                
                                 <td><span class="status-badge status-${ordine.stato?replace(' ', '-')}">${ordine.stato?upper_case}</span></td>
                                 <td>€ ${ordine.prezzoTotale}</td>
                                 <td>
@@ -77,7 +82,7 @@
                     <tr>
                         <th>ID</th>
                         <th>Cliente</th>
-                        <th>Data Creazione</th>
+                        <th>Orario Consegna</th>
                         <th>Stato</th>
                         <th>Totale</th>
                     </tr>
@@ -88,7 +93,17 @@
                             <tr class="row-disabled">
                                 <td>#${ordine.id}</td>
                                 <td>${ordine.utente.nomeCompleto}</td>
-                                <td>${ordine.dataCreazione}</td>
+                                
+                                <td>
+                                    <#if ordine.storicoStati?has_content>
+                                        <#assign dataConsegna = ordine.storicoStati?sort_by("dataOraModifica")?reverse[0].dataOraModifica>
+                                        <i class="fa-solid fa-circle-check" style="color: #48bb78; margin-right: 5px;"></i>
+                                        <span style="color: #4a5568; font-weight: 500;">
+                                            Il ${dataConsegna?string?substring(0, 10)} alle ${dataConsegna?string?substring(11, 16)}
+                                        </span>
+                                    </#if>
+                                </td>
+                                
                                 <td><span class="status-badge status-${ordine.stato}">${ordine.stato?upper_case}</span></td>
                                 <td>€ ${ordine.prezzoTotale}</td>
                             </tr>

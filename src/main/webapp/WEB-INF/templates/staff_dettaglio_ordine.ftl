@@ -10,15 +10,13 @@
 
     <aside class="sidebar">
         <div class="sidebar-logo">
-          <a href="ordini" class="logo-text">
-          <i class="fa-solid fa-utensils"></i> WebDelivery
-          </a>
+            <a href="ordini-live" class="logo-text">
+                <i class="fa-solid fa-utensils"></i> WebDelivery
+            </a>
         </div>
         <nav class="sidebar-nav">
-            <a href="ordini" class="nav-item active"><i class="fa-solid fa-receipt"></i> Ordini</a>
-            <a href="menu" class="nav-item"><i class="fa-solid fa-burger"></i> Gestione Menù</a>
-            <a href="staff" class="nav-item"><i class="fa-solid fa-users"></i> Gestione Staff</a>
-            <a href="statistiche" class="nav-item"><i class="fa-solid fa-chart-line"></i> Statistiche</a>
+            <a href="ordini-live" class="nav-item active"><i class="fa-solid fa-fire-burner"></i> Ordini Live</a>
+            <a href="storico-ordini" class="nav-item"><i class="fa-solid fa-clock-rotate-left"></i> Storico Ordini</a>
         </nav>
         <div class="sidebar-footer">
             <a href="../home" class="nav-item logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Esci</a>
@@ -29,13 +27,13 @@
         <header class="admin-header">
             <div>
                 <h1>
-                    <a href="ordini" style="color: #4a5568; text-decoration: none; margin-right: 15px;">
+                    <a href="ordini-live" style="color: #4a5568; text-decoration: none; margin-right: 15px;">
                         <i class="fa-solid fa-arrow-left"></i>
                     </a> 
                     Dettaglio Ordine #${ordine.id}
                 </h1>
             </div>
-            <div class="user-badge">Operatore: ${utenteLoggato.nomeCompleto}</div>
+            <div class="user-badge">Operatore: ${(utenteLoggato.nomeCompleto)!''}</div>
         </header>
 
         <section class="admin-section">
@@ -44,12 +42,20 @@
                     <h3 style="color: #4a5568; margin-top: 0;"><i class="fa-solid fa-user"></i> Dati Cliente</h3>
                     <p><strong>Nome:</strong> ${ordine.utente.nomeCompleto}</p>
                     <p><strong>Orario Richiesto:</strong> ${ordine.orarioConsegnaRichiesto}</p>
-                    <p><strong>Tempo Preparazione Stimato:</strong> ${ordine.tempoStimatoConsegna} min</p>
+                    <p><strong>Tempo Preparazione:</strong> ${ordine.tempoStimatoConsegna} min</p>
                 </div>
                 <div style="text-align: right;">
                     <h3 style="color: #4a5568; margin-top: 0;"><i class="fa-solid fa-info-circle"></i> Info Ordine</h3>
                     <p><strong>Stato:</strong> <span class="status-badge status-${ordine.stato?replace(' ', '-')}">${ordine.stato?upper_case}</span></p>
-                    <p style="font-size: 1.2rem;"><strong>Totale:</strong> € ${ordine.prezzoTotale}</p>
+                    
+                    <p style="margin-top: 10px; font-size: 0.95rem; color: #718096;">
+                        <i class="fa-solid fa-user-gear"></i> <strong>Gestito da:</strong> 
+                        <#if ordine.storicoStati?has_content>
+                            ${ordine.storicoStati?sort_by("dataOraModifica")?reverse[0].personale.nomeCompleto}
+                        </#if>
+                    </p>
+                    
+                    <p style="font-size: 1.2rem; margin-top: 15px;"><strong>Totale:</strong> € ${ordine.prezzoTotale}</p>
                 </div>
             </div>
 
@@ -63,14 +69,28 @@
                         <th>Subtotale</th>
                     </tr>
                 </thead>
-                <tbody>
+               <tbody>
                     <#if ordine.dettagli?has_content>
                         <#list ordine.dettagli as dettaglio>
                             <tr>
-                                <td>${dettaglio.prodotto.nome}</td>
-                                <td>x ${dettaglio.quantita}</td>
-                                <td>€ ${dettaglio.prodotto.prezzo}</td>
-                                <td>€ ${dettaglio.quantita * dettaglio.prodotto.prezzo}</td>
+                                <td>
+                                    <div style="font-weight: 600; color: #2d3748;">${dettaglio.prodotto.nome}</div>
+                                    
+                                    <div style="font-size: 0.85rem; color: #4a5568; margin-top: 5px;">
+                                        <i class="fa-solid fa-leaf" style="color: #48bb78;"></i> 
+                                        <strong>Ingredienti:</strong> 
+                                        ${(dettaglio.prodotto.ingredienti)!'Nessun ingrediente specificato.'}
+                                    </div>
+                                    
+                                    <div style="font-size: 0.85rem; color: #718096; margin-top: 3px; font-style: italic;">
+                                        <i class="fa-solid fa-fire-burner" style="color: #e53e3e;"></i> 
+                                        <strong>Preparazione:</strong> 
+                                        ${(dettaglio.prodotto.ricetta)!'Nessuna istruzione di cottura.'}
+                                    </div>
+                                </td>
+                                <td style="vertical-align: top; padding-top: 15px;">x ${dettaglio.quantita}</td>
+                                <td style="vertical-align: top; padding-top: 15px;">€ ${dettaglio.prodotto.prezzo}</td>
+                                <td style="vertical-align: top; padding-top: 15px; font-weight: bold;">€ ${dettaglio.quantita * dettaglio.prodotto.prezzo}</td>
                             </tr>
                         </#list>
                     <#else>

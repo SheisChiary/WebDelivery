@@ -38,7 +38,7 @@ public class AdminOrdiniServlet extends HttpServlet {
         HttpSession session = request.getSession();
         Utente utenteLoggato = (Utente) session.getAttribute("utente");
         
-        if (utenteLoggato == null || utenteLoggato.getRuolo().equals("cliente")||utenteLoggato.getRuolo().equals("personale")) {
+        if (utenteLoggato == null || !utenteLoggato.getRuolo().equals("proprietario")) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }

@@ -16,8 +16,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-@WebServlet(name = "AdminDettaglioOrdineServlet", urlPatterns = {"/admin/dettaglio-ordine"})
-public class AdminDettaglioOrdineServlet extends HttpServlet {
+@WebServlet(name = "StaffDettaglioOrdineServlet", urlPatterns = {"/staff/dettaglio-ordine"})
+public class StaffDettaglioOrdineServlet extends HttpServlet {
 
     private Configuration cfg;
 
@@ -38,14 +38,14 @@ public class AdminDettaglioOrdineServlet extends HttpServlet {
         HttpSession session = request.getSession();
         Utente utenteLoggato = (Utente) session.getAttribute("utente");
 
-        if (utenteLoggato == null || !utenteLoggato.getRuolo().equals("proprietario")) {
+        if (utenteLoggato == null || !utenteLoggato.getRuolo().equals("personale")) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
         String idOrdineParam = request.getParameter("id");
         if (idOrdineParam == null || idOrdineParam.isEmpty()) {
-            response.sendRedirect("ordini");
+            response.sendRedirect("ordini-live"); 
             return;
         }
 
@@ -61,7 +61,7 @@ public class AdminDettaglioOrdineServlet extends HttpServlet {
             templateData.put("ordine", ordine);
             templateData.put("utenteLoggato", utenteLoggato);
 
-            Template template = cfg.getTemplate("admin_dettaglio_ordine.ftl");
+            Template template = cfg.getTemplate("staff_dettaglio_ordine.ftl");
             template.process(templateData, response.getWriter());
 
         } catch (Exception e) {
