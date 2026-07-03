@@ -42,7 +42,14 @@
                                     <p class="item-desc">${item.prodotto.descrizione!''}</p>
                                     
                                     <#if item.personalizzazioni?has_content>
-                                        <p style="color: #116C4A; font-size: 0.85rem; margin-top: -10px; margin-bottom: 15px;"><strong>Scelte:</strong> ${item.personalizzazioni}</p>
+                                        <div style="display: flex; align-items: center; gap: 10px; margin-top: -10px; margin-bottom: 15px;">
+                                            <p style="color: #116C4A; font-size: 0.85rem; margin: 0;"><strong>Scelte:</strong> ${item.personalizzazioni}</p>
+                                            <form action="carrello" method="POST" style="margin: 0;">
+                                                <input type="hidden" name="action" value="clear_customize">
+                                                <input type="hidden" name="itemIndex" value="${item?index}">
+                                                <button type="submit" style="background: none; border: none; color: #ef4444; text-decoration: underline; font-size: 0.75rem; cursor: pointer; padding: 0;">(Azzera)</button>
+                                            </form>
+                                        </div>
                                     </#if>
                                     
                                     <div class="item-actions">
@@ -156,7 +163,7 @@
                 <div class="modal-card">
                     <div class="modal-header">
                         <h2>Personalizza ${item.prodotto.nome}</h2>
-                        <button type="button" class="btn-close-modal" onclick="chiudiModal('${item?index}')"><i class="fa-solid fa-xmark"></i></button>
+                        <button type="button" class="btn-close-modal" onclick="chiudiModal('modal-personalizza-${item?index}')"><i class="fa-solid fa-xmark"></i></button>
                     </div>
                     
                     <form action="carrello" method="POST">
@@ -172,7 +179,7 @@
                                     <div class="extra-options">
                                         <#list custom[nomeGruppo] as c>
                                             <label>
-                                                <span><input type="checkbox" name="caratteristica" value="${c.id}" <#if c.isDefault>checked</#if>> ${c.nome}</span>
+                                                <span><input type="checkbox" name="caratteristica" value="${c.id}" <#if item.caratteristicheScelte?seq_contains(c.id)>checked</#if>> ${c.nome}</span>
                                                 <strong><#if c.differenzaPrezzo &gt; 0>+€${c.differenzaPrezzo?string("0.00")}<#elseif c.differenzaPrezzo &lt; 0>-€${(c.differenzaPrezzo * -1)?string("0.00")}<#else>€0.00</#if></strong>
                                             </label>
                                         </#list>
@@ -180,7 +187,7 @@
                                 <#else>
                                     <select name="caratteristica">
                                         <#list custom[nomeGruppo] as c>
-                                            <option value="${c.id}" <#if c.isDefault>selected</#if>>${c.nome} (<#if c.differenzaPrezzo &gt; 0>+€${c.differenzaPrezzo?string("0.00")}<#elseif c.differenzaPrezzo &lt; 0>-€${(c.differenzaPrezzo * -1)?string("0.00")}<#else>€0.00</#if>)</option>
+                                            <option value="${c.id}" <#if item.caratteristicheScelte?seq_contains(c.id)>selected</#if>>${c.nome} (<#if c.differenzaPrezzo &gt; 0>+€${c.differenzaPrezzo?string("0.00")}<#elseif c.differenzaPrezzo &lt; 0>-€${(c.differenzaPrezzo * -1)?string("0.00")}<#else>€0.00</#if>)</option>
                                         </#list>
                                     </select>
                                 </#if>
@@ -192,6 +199,17 @@
                 </div>
             </div>
         </#list>
+    </#if>
+
+    <#if ordineCompletato?? && ordineCompletato>
+        <div id="modal-success" class="modal-overlay" style="display: flex;">
+            <div class="modal-card" style="text-align: center;">
+                <i class="fa-solid fa-circle-check" style="font-size: 5rem; color: #116C4A; margin-bottom: 20px;"></i>
+                <h2 style="font-size: 2rem; color: #1a202c; margin-bottom: 10px;">Ordine Confermato!</h2>
+                <p style="color: #64748b; margin-bottom: 25px;">Ti abbiamo inviato un'email con il riepilogo. Il ristorante è già all'opera!</p>
+                <button onclick="document.getElementById('modal-success').style.display='none'" class="btn-checkout">Chiudi e torna al Carrello</button>
+            </div>
+        </div>
     </#if>
 
     <script>
@@ -214,8 +232,8 @@
             document.getElementById('modal-personalizza-' + index).style.display = 'flex';
         }
 
-        function chiudiModal(index) {
-            document.getElementById('modal-personalizza-' + index).style.display = 'none';
+        function chiudiModal(id) {
+            document.getElementById(id).style.display = 'none';
         }
     </script>
 </body>
