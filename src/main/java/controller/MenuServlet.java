@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 
 @WebServlet(name = "MenuServlet", urlPatterns = {"/menu"})
 public class MenuServlet extends HttpServlet {
@@ -41,14 +42,14 @@ public class MenuServlet extends HttpServlet {
 
             HttpSession session = request.getSession(false); 
             String nomeUtente = "";
-            
             if (session != null && session.getAttribute("utente_nome") != null) {
                 nomeUtente = (String) session.getAttribute("utente_nome"); 
             }
 
             Map<String, Object> templateData = new HashMap<>();
             templateData.put("prodotti", catalogo);
-            templateData.put("nomeUtente", nomeUtente); 
+            templateData.put("nomeUtente", nomeUtente);
+            templateData.put("customizzazioni", customizzazioni);
 
             Template template = cfg.getTemplate("menu.ftl");
             template.process(templateData, response.getWriter());

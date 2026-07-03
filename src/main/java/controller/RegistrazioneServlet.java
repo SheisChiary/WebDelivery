@@ -45,7 +45,7 @@ public class RegistrazioneServlet extends HttpServlet {
         }
     }
 
-@Override
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         

@@ -87,6 +87,12 @@ public class CarrelloServlet extends HttpServlet {
         dataModel.put("bevande", bevande);
         dataModel.put("customizzazioni", customizzazioni);
 
+        Boolean ordineCompletato = (Boolean) session.getAttribute("ordineCompletato");
+        if (ordineCompletato != null && ordineCompletato) {
+            dataModel.put("ordineCompletato", true);
+            session.removeAttribute("ordineCompletato");
+        }
+
         try {
             Template template = cfg.getTemplate("carrello.ftl");
             template.process(dataModel, response.getWriter());
@@ -140,6 +146,41 @@ public class CarrelloServlet extends HttpServlet {
                         carrello.add(newItem);
                     }
                 }
+                response.sendRedirect("carrello");
+                return;
+            } else if ("add_customized".equals(action)) {
+                EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
+                try {
+                    Prodotto p = em.find(Prodotto.class, idProdotto);
+                    if (p != null) {
+                        CartItem newItem = new CartItem(p, 1);
+                        String[] caratteristicheIds = request.getParameterValues("caratteristica");
+                        double extraCost = 0.0;
+                        StringBuilder pers = new StringBuilder();
+                        List<Long> scelti = new ArrayList<>();
+                        
+                        if (caratteristicheIds != null) {
+                            for (String cid : caratteristicheIds) {
+                                Long idC = Long.parseLong(cid);
+                                scelti.add(idC);
+                                Caratteristica c = em.find(Caratteristica.class, idC);
+                                if (c != null) {
+                                    extraCost += c.getDifferenzaPrezzo();
+                                    if (pers.length() > 0) pers.append(", ");
+                                    pers.append(c.getNome());
+                                }
+                            }
+                        }
+                        newItem.setCostoExtra(extraCost);
+                        newItem.setPersonalizzazioni(pers.toString());
+                        newItem.setCaratteristicheScelte(scelti);
+                        carrello.add(newItem);
+                    }
+                } finally {
+                    em.close();
+                }
+                response.sendRedirect("carrello");
+                return;
             } else if ("remove".equals(action)) {
                 carrello.removeIf(item -> item.getProdotto().getId().equals(idProdotto));
             } else if ("decrease".equals(action)) {
@@ -164,6 +205,7 @@ public class CarrelloServlet extends HttpServlet {
                     CartItem item = carrello.get(itemIndex);
                     double extraCost = 0.0;
                     StringBuilder pers = new StringBuilder();
+                    List<Long> scelti = new ArrayList<>();
                     
                     if (caratteristicheIds != null && caratteristicheIds.length > 0) {
                         for (String cid : caratteristicheIds) {
@@ -178,9 +220,41 @@ public class CarrelloServlet extends HttpServlet {
                     
                     item.setCostoExtra(extraCost);
                     item.setPersonalizzazioni(pers.toString());
+                    item.setCaratteristicheScelte(scelti);
+                }
+            }
+        } else if ("clear_customize".equals(action)) {
+            String indexStr = request.getParameter("itemIndex");
+            if (indexStr != null) {
+                int itemIndex = Integer.parseInt(indexStr);
+                if (itemIndex >= 0 && itemIndex < carrello.size()) {
+                    CartItem item = carrello.get(itemIndex);
+                    
+                    EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
+                    try {
+                        List<Caratteristica> defaults = em.createQuery("SELECT c FROM Caratteristica c WHERE c.prodotto.id = :pid AND c.isDefault = true", Caratteristica.class)
+                                                          .setParameter("pid", item.getProdotto().getId())
+                                                          .getResultList();
+                        
+                        double extraCost = 0.0;
+                        StringBuilder pers = new StringBuilder();
+                        List<Long> scelti = new ArrayList<>();
+                        for (Caratteristica c : defaults) {
+                            extraCost += c.getDifferenzaPrezzo();
+                            if (pers.length() > 0) pers.append(", ");
+                            pers.append(c.getNome());
+                            scelti.add(c.getId());
+                        }
+                        item.setCostoExtra(extraCost);
+                        item.setPersonalizzazioni(pers.toString());
+                        item.setCaratteristicheScelte(scelti);
+                    } finally {
+                        em.close();
+                    }
                 }
             }
         }
+        
         response.sendRedirect("carrello");
     }
 }

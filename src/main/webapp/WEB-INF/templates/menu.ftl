@@ -67,9 +67,9 @@
                             <p class="description">${prodotto.descrizione!''}</p>
                             
                             <div class="card-actions">
-                                <a href="personalizza?id=${prodotto.id}" class="btn btn-outline-small">
+                                <button type="button" class="btn btn-outline-small" onclick="apriModal('${prodotto?index}')">
                                     <i class="fa-solid fa-sliders"></i> Personalizza
-                                </a>
+                                </button>
                                 <form action="aggiungi-carrello" method="POST" style="margin: 0;">
                                     <input type="hidden" name="idProdotto" value="${prodotto.id}">
                                     <button type="submit" class="btn btn-round-solid">
@@ -90,25 +90,62 @@
 
     </div>
 
+    <#if prodotti?has_content>
+        <#list prodotti as prodotto>
+            <div id="modal-menu-personalizza-${prodotto?index}" class="modal-overlay">
+                <div class="modal-card">
+                    <div class="modal-header">
+                        <h2>Personalizza ${prodotto.nome}</h2>
+                        <button type="button" class="btn-close-modal" onclick="chiudiModal('${prodotto?index}')"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    
+                    <form action="aggiungi-carrello" method="POST">
+                        <input type="hidden" name="action" value="add_customized">
+                        <input type="hidden" name="idProdotto" value="${prodotto.id}">
+                        
+                        <#assign custom = customizzazioni[prodotto.id?string]!{}>
+                        
+                        <#list custom?keys as nomeGruppo>
+                            <div class="modal-group">
+                                <label>${nomeGruppo}</label>
+                                <#if nomeGruppo == "Extra">
+                                    <div class="extra-options">
+                                        <#list custom[nomeGruppo] as c>
+                                            <label>
+                                                <span><input type="checkbox" name="caratteristica" value="${c.id}" <#if c.isDefault>checked</#if>> ${c.nome}</span>
+                                                <strong><#if c.differenzaPrezzo &gt; 0>+€${c.differenzaPrezzo?string("0.00")}<#elseif c.differenzaPrezzo &lt; 0>-€${(c.differenzaPrezzo * -1)?string("0.00")}<#else>€0.00</#if></strong>
+                                            </label>
+                                        </#list>
+                                    </div>
+                                <#else>
+                                    <select name="caratteristica">
+                                        <#list custom[nomeGruppo] as c>
+                                            <option value="${c.id}" <#if c.isDefault>selected</#if>>${c.nome} (<#if c.differenzaPrezzo &gt; 0>+€${c.differenzaPrezzo?string("0.00")}<#elseif c.differenzaPrezzo &lt; 0>-€${(c.differenzaPrezzo * -1)?string("0.00")}<#else>€0.00</#if>)</option>
+                                        </#list>
+                                    </select>
+                                </#if>
+                            </div>
+                        </#list>
+                        
+                        <button type="submit" class="btn-checkout" style="width:100%; background:#064e3b; color:white; border:none; padding:15px; border-radius:8px; font-size:1.1rem; font-weight:700; cursor:pointer;">Aggiungi e vai al Carrello</button>
+                    </form>
+                </div>
+            </div>
+        </#list>
+    </#if>
+
     <script>
         function filtra(categoria, elementoBottone) {
-            
             let bottoni = document.querySelectorAll('.pill');
             bottoni.forEach(b => b.classList.remove('active'));
-            
-           
             elementoBottone.classList.add('active');
 
-           
             let cards = document.querySelectorAll('.menu-card');
-            
-           
             cards.forEach(card => {
                 if (categoria === 'Tutti') {
                     card.style.display = 'block';
                 } else {
                     let catProdotto = card.getAttribute('data-categoria');
-                  
                     if (catProdotto && catProdotto.toLowerCase() === categoria.toLowerCase()) {
                         card.style.display = 'block';
                     } else {
@@ -116,6 +153,14 @@
                     }
                 }
             });
+        }
+
+        function apriModal(index) {
+            document.getElementById('modal-menu-personalizza-' + index).style.display = 'flex';
+        }
+
+        function chiudiModal(index) {
+            document.getElementById('modal-menu-personalizza-' + index).style.display = 'none';
         }
     </script>
 

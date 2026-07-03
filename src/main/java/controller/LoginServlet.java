@@ -53,7 +53,7 @@ public class LoginServlet extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-UtenteDAO dao = new UtenteDAO();
+        UtenteDAO dao = new UtenteDAO();
         Utente utente = dao.getUtenteByEmailPassword(email, password);
         
         if (utente != null) {
