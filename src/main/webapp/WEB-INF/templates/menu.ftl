@@ -15,8 +15,8 @@
         </div>
         
         <div class="search-bar-center">
-            <input type="text" placeholder="Cerca il tuo piatto...">
-            <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <input type="text" id="searchInput" placeholder="Cerca il tuo piatto..." onkeyup="applicaFiltri()">
+            <button type="button" onclick="applicaFiltri()"><i class="fa-solid fa-magnifying-glass"></i></button>
         </div>
         
         <div class="nav-buttons">
@@ -134,35 +134,70 @@
         </#list>
     </#if>
 
-    <script>
+<script>
+        let categoriaAttuale = 'Tutti';
+
         function filtra(categoria, elementoBottone) {
             let bottoni = document.querySelectorAll('.pill');
             bottoni.forEach(b => b.classList.remove('active'));
-            elementoBottone.classList.add('active');
+            if(elementoBottone) elementoBottone.classList.add('active');
+            
+            categoriaAttuale = categoria;
+            applicaFiltri();
+        }
 
+        function applicaFiltri() {
+            let inputElement = document.getElementById('searchInput');
+            if (!inputElement) return; // Se la barra non esiste, si ferma senza errori
+            
+            let searchTesto = inputElement.value.toLowerCase().trim();
             let cards = document.querySelectorAll('.menu-card');
+
             cards.forEach(card => {
-                if (categoria === 'Tutti') {
+                let catProdotto = (card.getAttribute('data-categoria') || '').toLowerCase().trim();
+                
+                let tagH3 = card.querySelector('h3');
+                let tagDesc = card.querySelector('.description');
+                
+                let nomeProdotto = tagH3 ? tagH3.textContent.toLowerCase() : '';
+                let descProdotto = tagDesc ? tagDesc.textContent.toLowerCase() : '';
+
+                let catSelezionata = categoriaAttuale.toLowerCase();
+                let matchCategoria = false;
+                
+                if (catSelezionata === 'tutti') {
+                    matchCategoria = true;
+                } else {
+ 
+                    let radice = catSelezionata.substring(0, 4);
+                    if (catProdotto.includes(radice) || catSelezionata === catProdotto) {
+                        matchCategoria = true;
+                    }
+                }
+
+                let matchTesto = false;
+                if (searchTesto === '') {
+                    matchTesto = true; // Se la barra è vuota, passa il controllo
+                } else if (nomeProdotto.includes(searchTesto) || descProdotto.includes(searchTesto)) {
+                    matchTesto = true; // Se il testo c'è nel titolo o nella descrizione, passa
+                }
+
+                if (matchCategoria && matchTesto) {
                     card.style.display = 'block';
                 } else {
-                    let catProdotto = card.getAttribute('data-categoria');
-                    if (catProdotto && catProdotto.toLowerCase() === categoria.toLowerCase()) {
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
-                    }
+                    card.style.display = 'none';
                 }
             });
         }
-
         function apriModal(index) {
-            document.getElementById('modal-menu-personalizza-' + index).style.display = 'flex';
+            let modal = document.getElementById('modal-menu-personalizza-' + index);
+            if(modal) modal.style.display = 'flex';
         }
 
         function chiudiModal(index) {
-            document.getElementById('modal-menu-personalizza-' + index).style.display = 'none';
+            let modal = document.getElementById('modal-menu-personalizza-' + index);
+            if(modal) modal.style.display = 'none';
         }
     </script>
-
 </body>
 </html>

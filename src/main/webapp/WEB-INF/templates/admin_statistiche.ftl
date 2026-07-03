@@ -8,22 +8,22 @@
 </head>
 <body class="admin-body">
 
-    <aside class="sidebar">
-        <div class="sidebar-logo">
-           <a href="ordini" class="logo-text">
-           <i class="fa-solid fa-utensils"></i> WebDelivery
-           </a>
-        </div>
-        <nav class="sidebar-nav">
-            <a href="ordini" class="nav-item"><i class="fa-solid fa-receipt"></i> Ordini</a>
-            <a href="menu" class="nav-item"><i class="fa-solid fa-burger"></i> Gestione Menù</a>
-            <a href="staff" class="nav-item"><i class="fa-solid fa-users"></i> Gestione Staff</a>
-            <a href="statistiche" class="nav-item active"><i class="fa-solid fa-chart-line"></i> Statistiche</a>
-        </nav>
-        <div class="sidebar-footer">
-            <a href="../logout" class="nav-item logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Esci</a>
-        </div>
-    </aside>
+   <aside class="dash-sidebar">
+            <div class="dash-logo" style="margin-top: 10px;">
+                <i class="fa-solid fa-utensils"></i> WebDelivery
+            </div>
+            
+            <ul class="dash-nav">
+                <li><a href="ordini"><i class="fa-solid fa-receipt"></i> Ordini</a></li>
+                <li><a href="menu"><i class="fa-solid fa-burger"></i> Gestione Menù</a></li>
+                <li><a href="staff"><i class="fa-solid fa-users"></i> Gestione Staff</a></li>
+                <li><a href="statistiche" class="active"><i class="fa-solid fa-chart-line"></i> Statistiche</a></li>
+                
+                <li style="margin-top: auto;">
+                    <a href="../logout" class="danger"><i class="fa-solid fa-arrow-right-from-bracket"></i> Esci</a>
+                </li>
+            </ul>
+        </aside>
 
     <main class="admin-content">
         <header class="admin-header">

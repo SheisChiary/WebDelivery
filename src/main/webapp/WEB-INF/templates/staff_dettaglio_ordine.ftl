@@ -8,21 +8,20 @@
 </head>
 <body class="admin-body">
 
-    <aside class="sidebar">
-        <div class="sidebar-logo">
-            <a href="ordini-live" class="logo-text">
+   <aside class="dash-sidebar">
+            <div class="dash-logo" style="margin-top: 10px;">
                 <i class="fa-solid fa-utensils"></i> WebDelivery
-            </a>
-        </div>
-        <nav class="sidebar-nav">
-            <a href="ordini-live" class="nav-item active"><i class="fa-solid fa-fire-burner"></i> Ordini Live</a>
-            <a href="storico-ordini" class="nav-item"><i class="fa-solid fa-clock-rotate-left"></i> Storico Ordini</a>
-        </nav>
-        <div class="sidebar-footer">
-            <a href="../logout" class="nav-item logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Esci</a>
-        </div>
-    </aside>
-
+            </div>
+            
+            <ul class="dash-nav">
+                <li><a href="ordini-live" class="active"><i class="fa-solid fa-fire-burner"></i> Ordini Live</a></li>
+                <li><a href="storico-ordini"><i class="fa-solid fa-burger"></i> Storico Ordini</a></li>
+                                
+                <li style="margin-top: auto;">
+                    <a href="../logout" class="danger"><i class="fa-solid fa-arrow-right-from-bracket"></i> Esci</a>
+                </li>
+            </ul>
+        </aside>
     <main class="admin-content">
         <header class="admin-header">
             <div>

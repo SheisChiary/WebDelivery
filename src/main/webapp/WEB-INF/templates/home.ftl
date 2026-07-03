@@ -14,10 +14,10 @@
             <i class="fa-solid fa-utensils"></i> WebDelivery
         </div>
         
-        <div class="search-bar">
-            <input type="text" placeholder="Cerca piatti o ingredienti...">
+        <form action="menu" method="GET" class="search-bar">
+            <input type="text" name="q" placeholder="Cerca piatti o ingredienti...">
             <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
-        </div>
+        </form>
         
         <div class="nav-buttons">
             <a href="login" class="btn btn-outline">Accedi</a>

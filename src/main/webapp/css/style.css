@@ -214,7 +214,7 @@ body { background-color: #ffffff; color: #333; }
 .logout-btn { color: #da0000; }
 .logout-btn:hover { background-color: #da0000; color: #ffffff; }
 
-.admin-content { margin-left: 260px; padding: 40px; flex-grow: 1; width: calc(100% - 260px); }
+.admin-content {padding: 40px; flex-grow: 1; width: calc(100% - 260px); }
 
 .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
 .admin-header h1 { font-size: 2rem; color: #2d3748; }
@@ -370,7 +370,7 @@ body { background-color: #ffffff; color: #333; }
 .btn-outline-small { border: 1px solid #116C4A; color: #116C4A; padding: 6px 15px; border-radius: 20px; text-decoration: none; font-weight: 600; font-size: 0.85rem; }
 .btn-round-solid { background-color: #116C4A; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
 
-.cart-page { background-color: #ffffff; }
+.cart-page { background-color: #edf8f1; }
 .cart-navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 40px; background: white; border-bottom: 1px solid #eee; }
 .nav-back { display: flex; align-items: center; gap: 20px; }
 .nav-back a { text-decoration: none; color: #116C4A; font-weight: 700; display: flex; align-items: center; gap: 8px; }
@@ -453,10 +453,10 @@ body { background-color: #ffffff; color: #333; }
 .extra-options strong { color: #64748b; }
 
 /* --- DASHBOARD CLIENTE (PROFILO E STORICO) --- */
-.dash-container { display: flex; min-height: 100vh; background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-.dash-sidebar { width: 280px; background-color: #ffffff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; padding: 30px 0; }
+.dash-container { display: flex; min-height: 100vh; background-color: #edf8f1; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+.dash-sidebar { width: 280px;min-width: 280px;flex-shrink: 0; background-color: #ffffff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; padding: 30px 0;height: 100vh;position: sticky; top: 0;}
 .dash-logo { font-size: 1.8rem; color: #116C4A; font-weight: 800; text-align: center; margin-bottom: 40px; }
-.dash-nav { list-style: none; padding: 0; margin: 0; flex-grow: 1; }
+.dash-nav { list-style: none; padding: 0; margin: 0; flex-grow: 1; display: flex; flex-direction: column;}
 .dash-nav li { margin-bottom: 5px; padding: 0 20px; }
 .dash-nav a { display: flex; align-items: center; gap: 15px; padding: 15px 20px; text-decoration: none; color: #64748b; font-weight: 600; border-radius: 12px; transition: 0.3s; }
 .dash-nav a i { font-size: 1.2rem; width: 20px; text-align: center; }
