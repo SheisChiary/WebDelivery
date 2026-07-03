@@ -1,9 +1,10 @@
 package controller;
 
-import dao.ProdottoDAO;
 import model.Prodotto;
-import model.Utente;
 import model.Caratteristica;
+import model.GruppoEsclusione;
+import model.Utente;
+import util.JpaUtil;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import jakarta.servlet.ServletException;
@@ -12,6 +13,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.persistence.EntityManager;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +23,6 @@ import java.util.Map;
 public class AdminMenuModificaServlet extends HttpServlet {
 
     private Configuration cfg;
-    private ProdottoDAO prodottoDao;
 
     @Override
     public void init() throws ServletException {
@@ -30,12 +31,48 @@ public class AdminMenuModificaServlet extends HttpServlet {
             new freemarker.ext.jakarta.servlet.WebappTemplateLoader(getServletContext(), "/WEB-INF/templates");
         cfg.setTemplateLoader(templateLoader);
         cfg.setDefaultEncoding("UTF-8");
-        
-        prodottoDao = new ProdottoDAO();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        response.setContentType("text/html;charset=UTF-8");
+        HttpSession session = request.getSession();
+        Utente utenteLoggato = (Utente) session.getAttribute("utente");
+        if (utenteLoggato == null || !utenteLoggato.getRuolo().equals("proprietario")) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        Long idProdotto = Long.parseLong(request.getParameter("id"));
+        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
+        
+        try {
+            Prodotto prodotto = em.find(Prodotto.class, idProdotto);
+            List<Caratteristica> caratteristiche = em.createQuery(
+                "SELECT c FROM Caratteristica c WHERE c.prodotto.id = :pid", Caratteristica.class)
+                .setParameter("pid", idProdotto).getResultList();
+            
+            List<GruppoEsclusione> gruppi = em.createQuery("SELECT g FROM GruppoEsclusione g", GruppoEsclusione.class).getResultList();
+
+            Map<String, Object> templateData = new HashMap<>();
+            templateData.put("prodotto", prodotto);
+            templateData.put("caratteristiche", caratteristiche);
+            templateData.put("gruppi", gruppi);
+            templateData.put("utenteLoggato", utenteLoggato);
+
+            Template template = cfg.getTemplate("admin_menu_modifica.ftl");
+            template.process(templateData, response.getWriter());
+        } catch (Exception e) {
+            throw new ServletException(e);
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
         HttpSession session = request.getSession();
@@ -45,65 +82,66 @@ public class AdminMenuModificaServlet extends HttpServlet {
             return;
         }
 
-        String idParam = request.getParameter("id");
-        if (idParam == null || idParam.isEmpty()) {
-            response.sendRedirect("menu");
-            return;
-        }
+        Long idProdotto = Long.parseLong(request.getParameter("id"));
+        String subAction = request.getParameter("subAction");
 
+        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
         try {
-            Long idProdotto = Long.parseLong(idParam);
-            Prodotto prodotto = prodottoDao.getProdottoById(idProdotto);
-            List<Caratteristica> caratteristiche = prodottoDao.getCaratteristicheByProdotto(idProdotto);
-            
-            Map<String, Object> templateData = new HashMap<>();
-            templateData.put("prodotto", prodotto);
-            templateData.put("caratteristiche", caratteristiche);
-            templateData.put("utenteLoggato", utenteLoggato);
-            
-            Template template = cfg.getTemplate("admin_menu_modifica.ftl");
-            template.process(templateData, response.getWriter());
-        } catch (Exception e) {
-            throw new ServletException("Errore", e);
-        }
-    }
+            em.getTransaction().begin();
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
-            throws ServletException, IOException {
-        
-        String subAction = request.getParameter("sub_action");
-        Long idProdotto = Long.parseLong(request.getParameter("id_prodotto"));
-
-        try {
             if ("update_prodotto".equals(subAction)) {
-                prodottoDao.aggiornaProdotto(
-                    idProdotto,
-                    request.getParameter("nome"),
-                    Double.parseDouble(request.getParameter("prezzo")),
-                    request.getParameter("descrizione"),
-                    request.getParameter("categoria"),
-                    request.getParameter("immagine"),
-                    Integer.parseInt(request.getParameter("tempo_preparazione")),
-                    request.getParameter("badge")
-                );
-            } else if ("add_caratteristica".equals(subAction)) {
-                String idGruppoStr = request.getParameter("id_gruppo");
-                Long idGruppo = (idGruppoStr != null && !idGruppoStr.isEmpty()) ? Long.parseLong(idGruppoStr) : null;
+                Prodotto p = em.find(Prodotto.class, idProdotto);
+                p.setNome(request.getParameter("nome"));
+                p.setDescrizione(request.getParameter("descrizione"));
+                p.setCategoria(request.getParameter("categoria"));
+                p.setImmagine(request.getParameter("immagine"));
+                p.setBadge(request.getParameter("badge"));
+
+                String prezzoStr = request.getParameter("prezzo");
+                if (prezzoStr != null && !prezzoStr.trim().isEmpty()) {
+                    p.setPrezzo(Double.parseDouble(prezzoStr.replace(",", ".")));
+                }
+
+                String tempoStr = request.getParameter("tempo_preparazione");
+                if (tempoStr != null && !tempoStr.trim().isEmpty()) {
+                    p.setTempoPreparazione(Integer.parseInt(tempoStr));
+                }
                 
-                prodottoDao.aggiungiCaratteristica(
-                    idProdotto,
-                    request.getParameter("caratt_nome"),
-                    Double.parseDouble(request.getParameter("caratt_prezzo")),
-                    request.getParameter("caratt_default") != null,
-                    idGruppo
-                );
+            } else if ("add_caratteristica".equals(subAction)) {
+                Prodotto p = em.find(Prodotto.class, idProdotto);
+                Caratteristica c = new Caratteristica();
+                c.setNome(request.getParameter("caratt_nome"));
+                
+                String carattPrezzoStr = request.getParameter("caratt_prezzo");
+                if (carattPrezzoStr != null && !carattPrezzoStr.trim().isEmpty()) {
+                    c.setDifferenzaPrezzo(Double.parseDouble(carattPrezzoStr.replace(",", ".")));
+                } else {
+                    c.setDifferenzaPrezzo(0.0);
+                }
+
+                c.setIsDefault(request.getParameter("caratt_default") != null);
+                c.setProdotto(p);
+
+                String idGruppoStr = request.getParameter("id_gruppo");
+                if (idGruppoStr != null && !idGruppoStr.isEmpty()) {
+                    c.setGruppo(em.find(GruppoEsclusione.class, Long.parseLong(idGruppoStr)));
+                }
+                em.persist(c);
+
             } else if ("delete_caratteristica".equals(subAction)) {
                 Long idCaratt = Long.parseLong(request.getParameter("id_caratteristica"));
-                prodottoDao.eliminaCaratteristica(idCaratt);
+                Caratteristica c = em.find(Caratteristica.class, idCaratt);
+                if (c != null) {
+                    em.remove(c);
+                }
             }
+
+            em.getTransaction().commit();
         } catch (Exception e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
             throw new ServletException(e);
+        } finally {
+            em.close();
         }
 
         response.sendRedirect("menu-modifica?id=" + idProdotto);

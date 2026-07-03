@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebDelivery - Home</title>
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
@@ -39,34 +38,34 @@
 
     <section class="popular-section">
         <h2>I Nostri Piatti</h2>
-<div class="cards-container" style="flex-wrap: wrap; gap: 30px; margin-top: 20px;">
-            
+        <div class="cards-container">
             <#if prodotti?has_content>
                 <#list prodotti as prodotto>
-                    <div class="food-card" style="height: auto; padding-bottom: 15px;">
-                        
-                        <img src="${prodotto.immagine}" alt="${prodotto.nome}">
-                        
-                        <div style="padding: 15px;">
-                            <h3 style="font-size: 1.2rem; margin-bottom: 8px;">${prodotto.nome}</h3>
-                            <p style="color: #666; font-size: 0.9rem; margin-bottom: 15px;">
-                                ${prodotto.descrizione!''}
-                            </p>
+                    <div class="food-card">
+                        <img src="${prodotto.immagine!''}" alt="${prodotto.nome}">
+                        <div class="food-card-body">
                             
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <strong style="color: #116C4A; font-size: 1.3rem;">€ ${prodotto.prezzo}</strong>
-                                
-                                <a href="login" class="btn btn-solid" style="padding: 8px 15px; font-size: 0.9rem; text-decoration: none;">
-                                    Accedi per ordinare
-                                </a>
+                            <div class="food-card-tags">
+                                <span class="tag-categoria">${prodotto.categoria}</span>
+                                <#if prodotto.badge?? && prodotto.badge != ''>
+                                    <span class="tag-badge"><i class="fa-solid fa-star" style="font-size: 0.7rem;"></i> ${prodotto.badge}</span>
+                                </#if>
                             </div>
+
+                            <h3 class="food-card-title">${prodotto.nome}</h3>
+                            <p class="food-card-desc">${prodotto.descrizione!''}</p>
+                            
+                            <div class="food-card-footer">
+                                <span class="food-card-price">€ ${prodotto.prezzo?string("0.00")}</span>
+                                <a href="login" class="btn-login-order">Accedi per ordinare</a>
+                            </div>
+                            
                         </div>
                     </div>
                 </#list>
             <#else>
                 <p>Nessun prodotto trovato nel database.</p>
             </#if>
-
         </div>
     </section>
 

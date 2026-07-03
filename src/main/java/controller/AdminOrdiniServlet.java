@@ -55,6 +55,8 @@ public class AdminOrdiniServlet extends HttpServlet {
 
             Template template = cfg.getTemplate("admin_ordini.ftl");
             template.process(templateData, response.getWriter());
+            
+            
 
         } catch (Exception e) {
             throw new ServletException("Errore nel caricamento degli ordini", e);

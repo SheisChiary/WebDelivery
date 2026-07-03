@@ -32,6 +32,11 @@
         </header>
 
         <section class="admin-section" style="margin-bottom: 40px;">
+          <#if successMessage??>
+    <div style="background-color: #ecfdf5; color: #059669; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 600; border: 1px solid #a7f3d0;">
+        <i class="fa-solid fa-circle-check"></i> ${successMessage}
+    </div>
+</#if>  
             <h2><i class="fa-solid fa-plus" style="color: #116C4A; margin-right: 10px;"></i> Aggiungi Nuovo Prodotto</h2>
             <form action="menu" method="POST" style="margin-top: 20px;">
                 <div class="form-grid">

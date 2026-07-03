@@ -212,6 +212,17 @@
         </div>
     </#if>
 
+<#if ordineCompletato?? && ordineCompletato>
+    <div id="modal-success" class="modal-overlay" style="display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 9999;">
+        <div class="modal-card" style="background: white; padding: 40px; border-radius: 20px; text-align: center; max-width: 400px; width: 90%;">
+            <i class="fa-solid fa-circle-check" style="font-size: 5rem; color: #116C4A; margin-bottom: 20px;"></i>
+            <h2 style="font-size: 2rem; color: #1a202c; margin-bottom: 10px;">Ordine Confermato!</h2>
+            <p style="color: #64748b; margin-bottom: 25px;">Il tuo ordine è stato inviato. Il ristorante è già all'opera!</p>
+            <button onclick="document.getElementById('modal-success').style.display='none'" style="background: #116C4A; color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%;">Chiudi e Torna al Menù</button>
+        </div>
+    </div>
+</#if>
+
     <script>
         function impostaProgrammazione(mostra, bottoneCliccato) {
             const bottoni = document.querySelectorAll('.time-btn');
