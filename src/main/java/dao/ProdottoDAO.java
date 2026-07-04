@@ -11,7 +11,7 @@ public class ProdottoDAO {
     public List<Prodotto> getAllProdotti() {
         EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
         try {
-            return em.createQuery("SELECT p FROM Prodotto p", Prodotto.class).getResultList();
+            return em.createQuery("SELECT DISTINCT p FROM Prodotto p LEFT JOIN FETCH p.caratteristiche", Prodotto.class).getResultList();
         } finally {
             em.close();
         }
@@ -142,6 +142,29 @@ public class ProdottoDAO {
         } catch (Exception e) {
             if (em.getTransaction().isActive()) em.getTransaction().rollback();
             throw e;
+        } finally {
+            em.close();
+        }
+    }
+    
+    public List<model.Prodotto> getProdottiFiltrati(String search, String categoria) {
+        jakarta.persistence.EntityManager em = util.JpaUtil.getEntityManagerFactory().createEntityManager();
+        try {
+            String jpql = "SELECT p FROM Prodotto p WHERE 1=1";
+            if (categoria != null && !categoria.trim().isEmpty() && !categoria.equals("Tutti")) {
+                jpql += " AND p.categoria = :categoria";
+            }
+            if (search != null && !search.trim().isEmpty()) {
+                jpql += " AND (LOWER(p.nome) LIKE :search OR LOWER(p.descrizione) LIKE :search)";
+            }
+            var query = em.createQuery(jpql, model.Prodotto.class);
+            if (categoria != null && !categoria.trim().isEmpty() && !categoria.equals("Tutti")) {
+                query.setParameter("categoria", categoria);
+            }
+            if (search != null && !search.trim().isEmpty()) {
+                query.setParameter("search", "%" + search.toLowerCase() + "%");
+            }
+            return query.getResultList();
         } finally {
             em.close();
         }

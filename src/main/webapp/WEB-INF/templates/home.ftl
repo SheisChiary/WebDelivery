@@ -14,8 +14,9 @@
             <i class="fa-solid fa-utensils"></i> WebDelivery
         </div>
         
-        <form action="menu" method="GET" class="search-bar">
-            <input type="text" name="q" placeholder="Cerca piatti o ingredienti...">
+        <form action="home" method="GET" class="search-bar">
+            <input type="text" name="search" placeholder="Cerca piatti o ingredienti..." value="${searchParam!''}">
+            <input type="hidden" name="categoria" value="${categoriaParam!'Tutti'}">
             <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
         </form>
         
@@ -38,6 +39,17 @@
 
     <section class="popular-section">
         <h2>I Nostri Piatti</h2>
+        
+        <div class="category-filters" style="display: flex; gap: 15px; margin-bottom: 30px; overflow-x: auto; justify-content: center;">
+            <a href="home?categoria=Tutti&search=${searchParam!''}" class="pill <#if (categoriaParam!'Tutti') == 'Tutti'>active</#if>">Tutti</a>
+            <a href="home?categoria=Pizze&search=${searchParam!''}" class="pill <#if (categoriaParam!'') == 'Pizze'>active</#if>">Pizze</a>
+            <a href="home?categoria=Burger&search=${searchParam!''}" class="pill <#if (categoriaParam!'') == 'Burger'>active</#if>">Burger</a>
+            <a href="home?categoria=Sushi&search=${searchParam!''}" class="pill <#if (categoriaParam!'') == 'Sushi'>active</#if>">Sushi</a>
+            <a href="home?categoria=Fritti&search=${searchParam!''}" class="pill <#if (categoriaParam!'') == 'Fritti'>active</#if>">Fritti</a>
+            <a href="home?categoria=Dolci&search=${searchParam!''}" class="pill <#if (categoriaParam!'') == 'Dolci'>active</#if>">Dolci</a>
+            <a href="home?categoria=Bevande&search=${searchParam!''}" class="pill <#if (categoriaParam!'') == 'Bevande'>active</#if>">Bevande</a>
+        </div>
+
         <div class="cards-container">
             <#if prodotti?has_content>
                 <#list prodotti as prodotto>
@@ -64,7 +76,7 @@
                     </div>
                 </#list>
             <#else>
-                <p>Nessun prodotto trovato nel database.</p>
+                <p>Nessun prodotto trovato nel database per la ricerca impostata.</p>
             </#if>
         </div>
     </section>

@@ -26,7 +26,6 @@ public class MenuServlet extends HttpServlet {
         cfg = new Configuration(Configuration.VERSION_2_3_33);
         cfg.setServletContextForTemplateLoading(getServletContext(), "/WEB-INF/templates");
         cfg.setDefaultEncoding("UTF-8");
-        
         prodottoDao = new ProdottoDAO();
     }
 
@@ -36,8 +35,15 @@ public class MenuServlet extends HttpServlet {
         
         response.setContentType("text/html;charset=UTF-8");
 
+        String searchParam = request.getParameter("search");
+        String categoriaParam = request.getParameter("categoria");
+        
+        if (categoriaParam == null || categoriaParam.isEmpty()) {
+            categoriaParam = "Tutti";
+        }
+
         try {
-            List<Prodotto> catalogo = prodottoDao.getAllProdotti();
+            List<Prodotto> catalogo = prodottoDao.getProdottiFiltrati(searchParam, categoriaParam);
 
             HttpSession session = request.getSession(false); 
             String nomeUtente = "";
@@ -50,12 +56,17 @@ public class MenuServlet extends HttpServlet {
             Map<String, Object> templateData = new HashMap<>();
             templateData.put("prodotti", catalogo);
             templateData.put("nomeUtente", nomeUtente); 
+            templateData.put("searchParam", searchParam);
+            templateData.put("categoriaParam", categoriaParam);
+            
+            
+            templateData.put("customizzazioni", new HashMap<String, Object>());
 
             Template template = cfg.getTemplate("menu.ftl");
             template.process(templateData, response.getWriter());
 
         } catch (Exception e) {
-            throw new ServletException("Errore durante il caricamento del menù", e);
+            throw new ServletException(e);
         }
     }
 }

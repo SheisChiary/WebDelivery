@@ -22,10 +22,9 @@ public class HomeServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        cfg = new Configuration(Configuration.VERSION_2_3_32);
+        cfg = new Configuration(Configuration.VERSION_2_3_33);
         cfg.setServletContextForTemplateLoading(getServletContext(), "/WEB-INF/templates");
         cfg.setDefaultEncoding("UTF-8");
-        
         prodottoDao = new ProdottoDAO();
     }
 
@@ -34,18 +33,26 @@ public class HomeServlet extends HttpServlet {
             throws ServletException, IOException {
         
         response.setContentType("text/html;charset=UTF-8");
+
+        String searchParam = request.getParameter("search");
+        String categoriaParam = request.getParameter("categoria");
+        
+        if (categoriaParam == null || categoriaParam.isEmpty()) {
+            categoriaParam = "Tutti";
+        }
         
         try {
-            List<Prodotto> catalogo = prodottoDao.getAllProdotti();
+            List<Prodotto> catalogo = prodottoDao.getProdottiFiltrati(searchParam, categoriaParam);
 
             Map<String, Object> templateData = new HashMap<>();
             templateData.put("prodotti", catalogo);
+            templateData.put("searchParam", searchParam);
+            templateData.put("categoriaParam", categoriaParam);
 
             Template template = cfg.getTemplate("home.ftl");
             template.process(templateData, response.getWriter());
-
         } catch (Exception e) {
-            throw new ServletException("Errore durante il caricamento dei prodotti in Home", e);
+            throw new ServletException(e);
         }
     }
 }

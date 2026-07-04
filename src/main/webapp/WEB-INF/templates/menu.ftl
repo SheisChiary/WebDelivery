@@ -14,10 +14,11 @@
             <i class="fa-solid fa-utensils"></i> WebDelivery
         </div>
         
-        <div class="search-bar-center">
-            <input type="text" id="searchInput" placeholder="Cerca il tuo piatto..." onkeyup="applicaFiltri()">
-            <button type="button" onclick="applicaFiltri()"><i class="fa-solid fa-magnifying-glass"></i></button>
-        </div>
+        <form action="menu" method="GET" class="search-bar-center">
+            <input type="text" name="search" placeholder="Cerca il tuo piatto..." value="${searchParam!''}">
+            <input type="hidden" name="categoria" value="${categoriaParam!'Tutti'}">
+            <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </form>
         
         <div class="nav-buttons">
             <a href="carrello" class="btn btn-solid"><i class="fa-solid fa-cart-shopping"></i> Carrello</a>
@@ -36,20 +37,20 @@
             <p>Esplora i prodotti freschi di oggi.</p>
         </header>
 
-        <div class="category-filters">
-            <button class="pill active" onclick="filtra('Tutti', this)">Tutti</button>
-            <button class="pill" onclick="filtra('Pizze', this)">Pizze</button>
-            <button class="pill" onclick="filtra('Burger', this)">Burger</button>
-            <button class="pill" onclick="filtra('Sushi', this)">Sushi</button>
-            <button class="pill" onclick="filtra('Fritti', this)">Fritti</button>
-            <button class="pill" onclick="filtra('Dolci', this)">Dolci</button>
-            <button class="pill" onclick="filtra('Bevande', this)">Bevande</button>
+        <div class="category-filters" style="display: flex; gap: 15px; margin-bottom: 30px; overflow-x: auto;">
+            <a href="menu?categoria=Tutti&search=${searchParam!''}" class="pill <#if (categoriaParam!'Tutti') == 'Tutti'>active</#if>">Tutti</a>
+            <a href="menu?categoria=Pizze&search=${searchParam!''}" class="pill <#if (categoriaParam!'') == 'Pizze'>active</#if>">Pizze</a>
+            <a href="menu?categoria=Burger&search=${searchParam!''}" class="pill <#if (categoriaParam!'') == 'Burger'>active</#if>">Burger</a>
+            <a href="menu?categoria=Sushi&search=${searchParam!''}" class="pill <#if (categoriaParam!'') == 'Sushi'>active</#if>">Sushi</a>
+            <a href="menu?categoria=Fritti&search=${searchParam!''}" class="pill <#if (categoriaParam!'') == 'Fritti'>active</#if>">Fritti</a>
+            <a href="menu?categoria=Dolci&search=${searchParam!''}" class="pill <#if (categoriaParam!'') == 'Dolci'>active</#if>">Dolci</a>
+            <a href="menu?categoria=Bevande&search=${searchParam!''}" class="pill <#if (categoriaParam!'') == 'Bevande'>active</#if>">Bevande</a>
         </div>
 
         <div class="menu-grid">
             <#if prodotti?has_content>
                 <#list prodotti as prodotto>
-                    <div class="menu-card" data-categoria="${prodotto.categoria!''}">
+                    <div class="menu-card">
                         
                         <div class="card-image-wrapper">
                             <#if prodotto.badge?has_content>
@@ -83,7 +84,7 @@
                 </#list>
             <#else>
                 <p style="font-size: 1.2rem; color: #666; grid-column: span 2;">
-                    Al momento non ci sono prodotti disponibili nel menù.
+                    Al momento non ci sono prodotti disponibili nel menù per questa ricerca.
                 </p>
             </#if>
         </div>
@@ -134,70 +135,15 @@
         </#list>
     </#if>
 
-<script>
-        let categoriaAttuale = 'Tutti';
-
-        function filtra(categoria, elementoBottone) {
-            let bottoni = document.querySelectorAll('.pill');
-            bottoni.forEach(b => b.classList.remove('active'));
-            if(elementoBottone) elementoBottone.classList.add('active');
-            
-            categoriaAttuale = categoria;
-            applicaFiltri();
-        }
-
-        function applicaFiltri() {
-            let inputElement = document.getElementById('searchInput');
-            if (!inputElement) return; // Se la barra non esiste, si ferma senza errori
-            
-            let searchTesto = inputElement.value.toLowerCase().trim();
-            let cards = document.querySelectorAll('.menu-card');
-
-            cards.forEach(card => {
-                let catProdotto = (card.getAttribute('data-categoria') || '').toLowerCase().trim();
-                
-                let tagH3 = card.querySelector('h3');
-                let tagDesc = card.querySelector('.description');
-                
-                let nomeProdotto = tagH3 ? tagH3.textContent.toLowerCase() : '';
-                let descProdotto = tagDesc ? tagDesc.textContent.toLowerCase() : '';
-
-                let catSelezionata = categoriaAttuale.toLowerCase();
-                let matchCategoria = false;
-                
-                if (catSelezionata === 'tutti') {
-                    matchCategoria = true;
-                } else {
- 
-                    let radice = catSelezionata.substring(0, 4);
-                    if (catProdotto.includes(radice) || catSelezionata === catProdotto) {
-                        matchCategoria = true;
-                    }
-                }
-
-                let matchTesto = false;
-                if (searchTesto === '') {
-                    matchTesto = true; // Se la barra è vuota, passa il controllo
-                } else if (nomeProdotto.includes(searchTesto) || descProdotto.includes(searchTesto)) {
-                    matchTesto = true; // Se il testo c'è nel titolo o nella descrizione, passa
-                }
-
-                if (matchCategoria && matchTesto) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
+    <script>
         function apriModal(index) {
-            let modal = document.getElementById('modal-menu-personalizza-' + index);
-            if(modal) modal.style.display = 'flex';
+            document.getElementById('modal-menu-personalizza-' + index).style.display = 'flex';
         }
 
         function chiudiModal(index) {
-            let modal = document.getElementById('modal-menu-personalizza-' + index);
-            if(modal) modal.style.display = 'none';
+            document.getElementById('modal-menu-personalizza-' + index).style.display = 'none';
         }
     </script>
+
 </body>
 </html>
