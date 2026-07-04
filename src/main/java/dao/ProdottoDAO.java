@@ -16,7 +16,29 @@ public class ProdottoDAO {
             em.close();
         }
     }
-
+public java.util.Map<String, java.util.Map<String, java.util.List<model.Caratteristica>>> getMappaCustomizzazioni() {
+        jakarta.persistence.EntityManager em = util.JpaUtil.getEntityManagerFactory().createEntityManager();
+        try {
+            java.util.Map<String, java.util.Map<String, java.util.List<model.Caratteristica>>> mappa = new java.util.HashMap<>();
+            java.util.List<model.Caratteristica> tutte = em.createQuery("SELECT c FROM Caratteristica c", model.Caratteristica.class).getResultList();
+            
+            for (model.Caratteristica c : tutte) {
+                String pId = String.valueOf(c.getProdotto().getId());
+                mappa.putIfAbsent(pId, new java.util.HashMap<>());
+                                String gruppoName = (c.getGruppo() != null && c.getGruppo().getNomeGruppo() != null) 
+                                    ? c.getGruppo().getNomeGruppo() 
+                                    : "Extra";
+                mappa.get(pId).putIfAbsent(gruppoName, new java.util.ArrayList<>());
+                mappa.get(pId).get(gruppoName).add(c);
+            }
+            return mappa;
+        } catch(Exception e) {
+            e.printStackTrace();
+            return new java.util.HashMap<>(); 
+        } finally {
+            em.close();
+        }
+    }
     public List<Prodotto> getBevande(int limit) {
         EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
         try {

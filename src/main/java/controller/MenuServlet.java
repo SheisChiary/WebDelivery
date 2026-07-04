@@ -43,11 +43,14 @@ public class MenuServlet extends HttpServlet {
         }
 
         try {
+            // 1. Prende i prodotti
             List<Prodotto> catalogo = prodottoDao.getProdottiFiltrati(searchParam, categoriaParam);
+            
+            // 2. Prende le customizzazioni raggruppate VERE dal DB
+            Map<String, Map<String, List<model.Caratteristica>>> customizzazioni = prodottoDao.getMappaCustomizzazioni();
 
             HttpSession session = request.getSession(false); 
             String nomeUtente = "";
-            
             if (session != null && session.getAttribute("utente") != null) {
                 model.Utente u = (model.Utente) session.getAttribute("utente");
                 nomeUtente = u.getNomeCompleto(); 
@@ -59,14 +62,14 @@ public class MenuServlet extends HttpServlet {
             templateData.put("searchParam", searchParam);
             templateData.put("categoriaParam", categoriaParam);
             
-            
-            templateData.put("customizzazioni", new HashMap<String, Object>());
+            // 3. Passa la mappa vera alla grafica!
+            templateData.put("customizzazioni", customizzazioni);
 
             Template template = cfg.getTemplate("menu.ftl");
             template.process(templateData, response.getWriter());
 
         } catch (Exception e) {
-            throw new ServletException(e);
+            throw new ServletException("Errore nel caricamento del menù", e);
         }
     }
 }

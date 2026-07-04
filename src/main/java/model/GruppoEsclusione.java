@@ -35,4 +35,6 @@ public class GruppoEsclusione {
 
     public String getNomeGruppo() { return nomeGruppo; }
     public void setNomeGruppo(String nomeGruppo) { this.nomeGruppo = nomeGruppo; }
+
+  
 }
